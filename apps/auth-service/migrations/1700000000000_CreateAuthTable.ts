@@ -4,10 +4,7 @@ export class CreateAuthTable1700000000000 implements MigrationInterface {
     name = 'CreateAuthTable1700000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // UUID helper
         await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);
-
-        // USERS
         await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS "auth" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -51,7 +48,6 @@ export class CreateAuthTable1700000000000 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop tables in reverse order of creation
         await queryRunner.query(`DROP TABLE IF EXISTS "refresh_tokens";`);
         await queryRunner.query(`DROP TRIGGER IF EXISTS trg_auth_updated_at ON "auth";`);
         await queryRunner.query(`DROP FUNCTION IF EXISTS set_updated_at;`);

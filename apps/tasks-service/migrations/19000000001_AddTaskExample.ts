@@ -17,28 +17,28 @@ export class AddTaskExample19000000001 implements MigrationInterface {
         const h2 = '88888888-8888-8888-8888-888888888888';
 
         await queryRunner.query(`
-      INSERT INTO "tasks"(id,title,description,priority,status,due_date,created_by)
+      INSERT INTO tasks."tasks"(id,title,description,priority,status,due_date,created_by)
       VALUES
         ('${t1}','Implement auth','Registrar e logar usuários','HIGH','IN_PROGRESS', now() + interval '3 days','${u1}'),
         ('${t2}','Lista de tarefas','Tela com filtros e busca','MEDIUM','TODO', NULL,'${u1}');
     `);
 
         await queryRunner.query(`
-      INSERT INTO "comments"(id,task_id,author_id,content)
+      INSERT INTO tasks."comments"(id,task_id,author_id,content)
       VALUES
         ('${c1}','${t1}','${u2}','Posso pegar essa tarefa para revisão?'),
         ('${c2}','${t2}','${u1}','Vou começar pelo layout da lista');
     `);
 
         await queryRunner.query(`
-      INSERT INTO "assignments"(id,task_id,user_id,role)
+      INSERT INTO tasks."assignments"(id,task_id,user_id,role)
       VALUES
         ('${a1}','${t1}','${u2}','reviewer'),
         ('${a2}','${t2}','${u1}','owner');
     `);
 
         await queryRunner.query(`
-      INSERT INTO "task_history"(id,task_id,actor_id,change_type,before,after)
+      INSERT INTO tasks."task_history"(id,task_id,actor_id,change_type,before,after)
       VALUES
         ('${h1}','${t1}','${u1}','CREATE', NULL, jsonb_build_object('status','IN_PROGRESS')),
         ('${h2}','${t2}','${u1}','CREATE', NULL, jsonb_build_object('status','TODO'));
@@ -46,13 +46,13 @@ export class AddTaskExample19000000001 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DELETE FROM "task_history" WHERE id IN 
+        await queryRunner.query(`DELETE FROM tasks."task_history" WHERE id IN 
       ('99999999-9999-9999-9999-999999999999','88888888-8888-8888-8888-888888888888');`);
-        await queryRunner.query(`DELETE FROM "assignments" WHERE id IN 
+        await queryRunner.query(`DELETE FROM tasks."assignments" WHERE id IN 
       ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee','ffffffff-ffff-ffff-ffff-ffffffffffff');`);
-        await queryRunner.query(`DELETE FROM "comments" WHERE id IN 
+        await queryRunner.query(`DELETE FROM tasks."comments" WHERE id IN 
       ('cccccccc-cccc-cccc-cccc-cccccccccccc','dddddddd-dddd-dddd-dddd-dddddddddddd');`);
-        await queryRunner.query(`DELETE FROM "tasks" WHERE id IN 
+        await queryRunner.query(`DELETE FROM tasks."tasks" WHERE id IN 
       ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');`);
     }
 }

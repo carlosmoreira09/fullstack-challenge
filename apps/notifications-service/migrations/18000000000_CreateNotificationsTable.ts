@@ -1,13 +1,12 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
-
 export class CreateNotificationsTable20000000000 implements MigrationInterface {
     name = 'CreateNotificationsTable20000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`SET search_path TO notifications`);
         await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);
 
         await queryRunner.query(`
-      CREATE TABLE IF NOT EXISTS "notifications" (
+      CREATE TABLE IF NOT EXISTS notifications."notifications" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "user_id" uuid NOT NULL,
         "type" varchar(30) NOT NULL,
@@ -17,11 +16,15 @@ export class CreateNotificationsTable20000000000 implements MigrationInterface {
       );
     `);
 
-        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_user" ON "notifications" ("user_id");`);
-        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_created" ON "notifications" ("created_at");`);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_user" ON notifications."notifications" ("user_id");`);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_created" ON notifications."notifications" ("created_at");`);
+
+        await queryRunner.query(`SET search_path TO public`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE IF EXISTS "notifications";`);
+        await queryRunner.query(`SET search_path TO notifications`);
+        await queryRunner.query(`DROP TABLE IF EXISTS notifications."notifications";`);
+        await queryRunner.query(`SET search_path TO public`);
     }
 }
