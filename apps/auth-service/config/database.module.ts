@@ -2,18 +2,43 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
+import { Client } from 'pg';
 import {AuthEntity} from "../src/app/entities/auth.entity";
 import {RefreshToken} from "../src/app/entities/refresh-token.entity";
+
+const parsePort = (value?: string) => parseInt(value || '5432', 10);
+
+async function createSchemas(config: ConfigService, schema: string) {
+    const sslOption = config.get('DB_SSL') === 'true' ? { rejectUnauthorized: false } : false;
+
+    const client = new Client({
+        host: config.get<string>('DB_HOST'),
+        port: parsePort(config.get<string>('DB_PORT')),
+        user: config.get<string>('DB_USERNAME'),
+        password: config.get<string>('DB_PASSWORD'),
+        database: config.get<string>('DB_DATABASE'),
+        ssl: sslOption,
+    });
+
+    try {
+        await client.connect();
+        await client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+    } finally {
+        await client.end();
+    }
+}
 
 @Module({
     imports: [
         TypeOrmModule.forRootAsync({
-            useFactory: (config: ConfigService) => {
+            useFactory: async (config: ConfigService) => {
                 const isDev = process.env.NODE_ENV === 'development';
+                const schema = 'auth';
+                await createSchemas(config, schema);
                 return {
                     type: 'postgres' as const,
                     host: config.get<string>('DB_HOST'),
-                    port: parseInt(config.get<string>('DB_PORT') || '5432', 10),
+                    port: parsePort(config.get<string>('DB_PORT')),
                     username: config.get<string>('DB_USERNAME'),
                     password: config.get<string>('DB_PASSWORD'),
                     database: config.get<string>('DB_DATABASE'),
@@ -21,6 +46,7 @@ import {RefreshToken} from "../src/app/entities/refresh-token.entity";
                         AuthEntity,
                         RefreshToken
                     ],
+                    schema,
                     migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
                     migrationsRun: true,
                     migrationsTableName: 'migrations',

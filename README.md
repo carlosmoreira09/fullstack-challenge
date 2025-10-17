@@ -1,14 +1,73 @@
 # Desafio Full-stack Júnior — Sistema de Gestão de Tarefas Colaborativo
 
-Bem‑vindo(a)! Este é um **teste prático** para a vaga de **Full‑stack Developer Júnior** na **Jungle Gaming**. O objetivo é avaliar sua capacidade de estruturar um monorepo, modelar um domínio simples, construir uma UI funcional e integrar serviços usando mensageria.
+> **Comentarios Diários** 
+> 
+> Dia 1.
+>> Encontrei um pouco de dificuldade na hora de realizar o setup do projeto, principalmente na parte de build do docker com docker-compose, 
+> mas consegui resolver pesquisando sobre no google e estou utilizando o chatGPT para tirar algumas duvidas teóricas de algumas stacks e configuração do composer.
+> Apesar de ter uma boa experiência com o NestJS tendo um projeto grande em produção(www.locmoto.com.br), nunca trabalhei
+> com a parte de Microserviços do NestJS, estou conseguindo desenvolver bem depois de assistir os dois videos recomendados. 
+> Apesar de nunca ter trabalhado com RabbitMQ e Docker não encontrei dificuldade para entender como funciona até aqui, até agora o maior desafio continua sendo a parte de configuração do projeto e integrações dos microserviços devido a falta de experiência previa com as ferramentas.
 
-> **Stack Obrigatória**
->
-> * **Front‑end:** React.js + **TanStack Router**, **shadcn/ui**, **Tailwind CSS**
-> * **Back‑end:** **Nest.js**, **TypeORM**, **RabbitMQ** (microservices Nest)
-> * **Infra/DevX:** **Docker & docker‑compose**, **Monorepo com Turborepo**
-
+Dia 2.
+> Finalizei a primeira parte das integrações do projeto entre a api-gateway e auth-service com autenticação JWT, 
+> Realizando login pela roda /api/auth/login, retornado JWT para api-gateway, em seguida gateway acessa os dados do usuário com o JWT retornando os dados
+> do mesmo como resposta do login inicialmente.
 ---
+
+Comentarios Gerais
+> Acredito que a parte de desenvolvimento agora seja mais fluida e rapido, os desafios iniciais encontrados foram mais devido a falta de experiência com 
+> microserviços e as ferramentas exigidas. Todo os dias vou descrever aqui como foi a experiência do desenvolvimento e do progresso de acordo com os requerimentos do projeto.
+
+> 
+> #### Initial Database Details
+>```
+>┌──────────┐          ┌────────────┐        ┌────────────┐
+>│  users   │1       * │ assignments│ *    1 │   tasks     │
+>├──────────┤          ├────────────┤        ├────────────┤
+>│id (pk)   │          │id (pk)     │        │id (pk)     │
+>│email*    │          │user_id (fk)│        │title*      │
+>│username* │          │task_id (fk)│        │description │
+>│password  │          │role        │        │priority*   │ {LOW,MEDIUM,HIGH,URGENT}
+>│created_at│          │created_at  │        │status*     │ {TODO,IN_PROGRESS,REVIEW,DONE}
+>└──────────┘          └────────────┘        │due_date    │
+>                                            │created_by  │ (fk users)
+>                                            │updated_at  │
+>                                            └────────────┘
+>             1     *
+>┌──────────┐  ──────>  ┌────────────┐
+>│  tasks   │           │  comments  │
+>├──────────┤           ├────────────┤
+>│id        │           │id (pk)     │
+>│...       │           │task_id (fk)│
+>│          │           │author_id   │ (fk users)
+>└──────────┘           │content*    │
+>                       │created_at  │
+>                       └────────────┘
+>>
+>┌──────────────────┐
+>│  task_history    │  (audit log simplificado)
+>├──────────────────┤
+>│id (pk)           │
+>│task_id (fk)      │
+>│actor_id (fk)     │
+>│change_type*      │ {CREATE, UPDATE, STATUS_CHANGE, ASSIGN, COMMENT}
+>│before (jsonb)    │
+>│after  (jsonb)    │
+>│created_at        │
+>└──────────────────┘
+>
+>┌──────────────────┐
+>│  notifications   │
+>├──────────────────┤
+>│id (pk)           │
+>│user_id (fk)      │ (quem deve ser notificado)
+>│type*             │ {TASK_ASSIGNED, TASK_STATUS, COMMENT_NEW}
+>│payload (jsonb)   │ (dados do evento)
+>│read_at (nullable)│
+>│created_at        │
+>└──────────────────┘
+>```
 
 ## 🎯 Contexto & Objetivo
 
@@ -58,72 +117,12 @@ Construir um **Sistema de Gestão de Tarefas Colaborativo** com autenticação s
 
 ### HTTP (Gateway)
 
-```
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/refresh
-
-GET    /api/tasks?page=&size=               # lista de tarefas com paginação
-POST   /api/tasks                           # cria e publica `task.created`
-GET    /api/tasks/:id
-PUT    /api/tasks/:id                       # atualiza e publica `task.updated`
-DELETE /api/tasks/:id
-
-POST   /api/tasks/:id/comments              # publica `task.comment.created`
-GET    /api/tasks/:id/comments?page=&size   # lista de comentários com paginação
-```
 
 ### WebSocket Events
-
-* `task:created` – tarefa foi criada
-* `task:updated` – tarefa foi atualizada
-* `comment:new` – novo comentário
 
 ---
 
 ## 🏗️ Estrutura do Monorepo (sugerida)
-
-```
-.
-├── apps/
-│   ├── web/                     
-│   │   ├── src/                  # React + TanStack Router + shadcn + Tailwind
-│   │   ├── Dockerfile   
-│   │   ├── .env.example          # variáveis de ambiente do frontend
-│   │   ├── package.json              
-│   ├── api-gateway/   
-│   │   ├── src/                  # HTTP + WebSocket + Swagger
-│   │   ├── Dockerfile
-│   │   ├── .env.example          # variáveis do API Gateway (Nest.js)
-│   │   ├── package.json
-│   ├── auth-service/            
-│   │   ├── src/                  # Nest.js (microserviço de autenticação)
-│   │   ├── migrations/
-│   │   ├── Dockerfile
-│   │   ├── .env.example          # variáveis do serviço de autenticação
-│   │   ├── package.json
-│   ├── tasks-service/   
-│   │   ├── src/                  # Nest.js (microserviço RabbitMQ)
-│   │   ├── migrations/
-│   │   ├── Dockerfile        
-│   │   ├── .env.example          # variáveis do serviço de tarefas
-│   │   ├── package.json
-│   └── notifications-service/   
-│       ├── src/                  # Nest.js (microserviço RabbitMQ + WebSocket)
-│       ├── migrations/
-│       ├── Dockerfile
-│       ├── .env.example          # variáveis do serviço de notificações
-│       ├── package.json                
-├── packages/
-│   ├── types/                   
-│   ├── utils/                   
-│   ├── eslint-config/           
-│   └── tsconfig/                
-├── docker-compose.yml
-├── turbo.json
-├── package.json
-└── README.md
-```
 
 ---
 
@@ -161,169 +160,6 @@ GET    /api/tasks/:id/comments?page=&size   # lista de comentários com paginaç
 
 ## 🐳 Docker & Compose (sugerido)
 
-```yaml
-version: '3.8'
-
-services:
-  # Frontend React Application
-  web:
-    container_name: web
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-      target: development
-    ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=development
-    networks:
-      - challenge-network
-    command: npm run dev -- --host 0.0.0.0
-
-  # API Gateway
-  api-gateway:
-    container_name: api-gateway
-    build:
-      context: .
-      dockerfile: ./apps/api-gateway/Dockerfile
-      target: development
-    ports:
-      - '3001:3001'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/api-gateway/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Auth Service
-  auth-service:
-    container_name: auth-service
-    build:
-      context: .
-      dockerfile: ./apps/auth-service/Dockerfile
-      target: development
-    ports:
-      - '3002:3002'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/auth-service/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3002
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Tasks Service
-  tasks-service:
-    container_name: tasks-service
-    build:
-      context: .
-      dockerfile: ./apps/tasks-service/Dockerfile
-      target: development
-    ports:
-      - '3003:3003'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/tasks-service/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3003
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Notifications Service
-  notifications-service:
-    container_name: notifications-service
-    build:
-      context: .
-      dockerfile: ./apps/notifications-service/Dockerfile
-      target: development
-    ports:
-      - '3004:3004'
-    volumes:
-      - .:/app
-      - ./packages:/app/packages
-      - /app/node_modules
-      - /app/apps/notifications-service/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=3004
-    depends_on:
-      db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
-    networks:
-      - challenge-network
-
-  # Postgres Database
-  db:
-    image: postgres:17.5-alpine3.21
-    container_name: db
-    attach: false
-    ports:
-      - '5432:5432'
-    networks:
-      - challenge-network
-    restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: postgres
-      POSTGRES_DB: challenge_db
-
-  # RabbitMQ
-  rabbitmq:
-    image: rabbitmq:3.13-management-alpine
-    container_name: rabbitmq
-    attach: false
-    restart: always
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    networks:
-      - challenge-network
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
-    volumes: ['rabbitmq_data:/var/lib/rabbitmq']
-
-volumes:
-  postgres_data:
-    driver: local
-  rabbitmq_data:
-    driver: local
-
-networks:
-  challenge-network:
-    driver: bridge
-```
-
 ---
 
 ## 📝 Documentação Esperada
@@ -344,14 +180,10 @@ Para auxiliar no desenvolvimento deste desafio, disponibilizamos alguns conteúd
 
 ### Vídeos Recomendados
 
-* **[Autenticação centralizada em microsserviços NestJS](https://www.youtube.com/watch?v=iiSTB0btEgA)** - Como implementar autenticação centralizada em uma arquitetura de microsserviços usando NestJS.
-* **[Tutorial de Microservices com Nest.js em 20 Minutos](https://www.youtube.com/watch?v=C250DCwS81Q)** - Passo a passo rápido para criar e conectar microsserviços no NestJS.
-
-Estes materiais são sugestões para apoiar seu desenvolvimento, mas sinta-se livre para buscar outras referências que julgar necessárias.
 
 ---
 
-## ❓ FAQ
+## ❓ Nice to Have
 
 **Posso usar NextJS ao invés de React puro?**
 Não. React com TanStack Router é obrigatório.
@@ -364,31 +196,10 @@ Sim, para notificações em tempo real.
 
 **Posso usar Prisma ou MikroORM ao invés de TypeORM?**
 Não. TypeORM é requisito obrigatório.
-
 ---
-
-## 📧 Suporte e Dúvidas
-
-Caso tenha alguma dúvida sobre o teste ou precise de esclarecimentos:
-
-* Entre em contato com o **recrutador que enviou este teste**
-* Ou envie um e-mail para: **recruitment@junglegaming.io**
-
-Responderemos o mais breve possível para garantir que você tenha todas as informações necessárias para realizar o desafio.
-
----
-
-## 🕒 Prazo
-
-* **Entrega:** 14 dias corridos a partir do recebimento
-
----
-
 ## 💡 Dicas Finais
-
 * **Comece pelo básico:** Auth → CRUD → RabbitMQ → WebSocket.
 * **Logs claros:** Facilita debug do fluxo assíncrono.
-
 ---
 
 **Boa sorte!** 🚀
