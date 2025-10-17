@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddNotificationsExample200001 implements MigrationInterface {
-    name = 'SeedNotificationsExamples1700030000001'
+export class AddNotificationsExample20000000001 implements MigrationInterface {
+    name = 'AddNotificationsExample20000000001'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         const u1 = '11111111-1111-1111-1111-111111111111';

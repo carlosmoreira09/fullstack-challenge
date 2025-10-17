@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddTaskExample190001 implements MigrationInterface {
-    name = 'SeedTasksExamples1700020000001'
+export class AddTaskExample19000000001 implements MigrationInterface {
+    name = 'AddTaskExample19000000001'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         const u1 = '11111111-1111-1111-1111-111111111111';

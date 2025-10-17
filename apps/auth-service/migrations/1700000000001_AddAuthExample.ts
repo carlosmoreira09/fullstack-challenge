@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddUsers1700000000001 implements MigrationInterface {
-    name = 'AddUsers1700000000001';
+export class AddAuthExample700000000001 implements MigrationInterface {
+    name = 'AddAuthExample700000000001';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Fixed IDs for test users
@@ -14,8 +14,8 @@ export class AddUsers1700000000001 implements MigrationInterface {
         await queryRunner.query(`
             INSERT INTO "auth"(id, email, username, password_hash)
             VALUES 
-                ('${u1}', 'alice@example.com', 'alice', '$argon2id$examplehash1'),
-                ('${u2}', 'bob@example.com', 'bob', '$argon2id$examplehash2');
+                ('${u1}', 'alice@example.com', 'alice', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q'),
+                ('${u2}', 'bob@example.com', 'bob', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q');
         `);
 
         await queryRunner.query(`

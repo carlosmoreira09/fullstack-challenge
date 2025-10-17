@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateNotificationsTable200000 implements MigrationInterface {
-    name = 'InitNotifications1700030000000'
+export class CreateNotificationsTable20000000000 implements MigrationInterface {
+    name = 'CreateNotificationsTable20000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);
@@ -10,7 +10,7 @@ export class CreateNotificationsTable200000 implements MigrationInterface {
       CREATE TABLE IF NOT EXISTS "notifications" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "user_id" uuid NOT NULL,
-        "type" varchar(30) NOT NULL, -- TASK_ASSIGNED | TASK_STATUS | COMMENT_NEW
+        "type" varchar(30) NOT NULL,
         "payload" jsonb NOT NULL,
         "read_at" timestamptz,
         "created_at" timestamptz NOT NULL DEFAULT now()
