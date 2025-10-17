@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+.pnpm-store
+.pnp.*
+npm-debug.log
+yarn.lock
+.DS_Store
+.git
+.gitignore
+dist
+build
+coverage
+.env*
