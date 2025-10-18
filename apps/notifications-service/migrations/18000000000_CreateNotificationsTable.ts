@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateNotificationsTable20000000000 implements MigrationInterface {
-    name = 'CreateNotificationsTable20000000000'
+export class CreateNotificationsTable1800000000000 implements MigrationInterface {
+    name = 'CreateNotificationsTable1800000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`SET search_path TO notifications`);
@@ -18,9 +18,8 @@ export class CreateNotificationsTable20000000000 implements MigrationInterface {
       );
     `);
 
-        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_user" ON notifications."notifications" ("user_id");`);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_user" ON notifications."notifications" ("userId");`);
         await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_created" ON notifications."notifications" ("created_at");`);
-
         await queryRunner.query(`SET search_path TO public`);
     }
 
