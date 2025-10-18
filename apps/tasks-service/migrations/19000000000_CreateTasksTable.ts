@@ -51,7 +51,7 @@ export class CreateTasksTable19000000000 implements MigrationInterface {
       CREATE TABLE IF NOT EXISTS tasks."assignments" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "task_id" uuid NOT NULL REFERENCES tasks."tasks"("id") ON DELETE CASCADE,
-        "user_id" uuid NOT NULL, -- user_id
+        "userId" uuid NOT NULL, -- user_id
         "role" varchar(30),
         "created_at" timestamptz NOT NULL DEFAULT now()
       );

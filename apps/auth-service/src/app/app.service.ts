@@ -16,8 +16,9 @@ const user = {
 @Injectable()
 export class AppService {
 
-    constructor(@InjectRepository(AuthEntity) private authRepository: Repository<AuthEntity>,
-
+    constructor(
+        @InjectRepository(AuthEntity)
+        private authRepository: Repository<AuthEntity>,
         private readonly jwtService: JwtService) {}
 
       async login(payload: LoginDTO) {

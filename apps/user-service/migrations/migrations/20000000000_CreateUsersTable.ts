@@ -12,7 +12,6 @@ export class CreateUsersTable20000000000 implements MigrationInterface {
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "name" varchar(160) NOT NULL,
         "email" varchar(160) NOT NULL,
-        "age" INT,
         "birthday" varchar(10) NOT NULL,
         "document" varchar(20),
         "created_by" uuid NOT NULL,

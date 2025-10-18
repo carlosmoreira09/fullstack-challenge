@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Index } from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Index, JoinColumn} from 'typeorm';
 import {AuthEntity} from "./auth.entity";
 
 @Entity('refresh_tokens')
@@ -8,7 +8,11 @@ export class RefreshToken {
     id: string;
 
     @ManyToOne(() => AuthEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'userId'})
     user: AuthEntity;
+
+    @Column()
+    userId: number;
 
     @Column({ name: 'token_hash', length: 255 })
     tokenHash: string;

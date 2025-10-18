@@ -6,7 +6,7 @@ export class CreateAuthTable1700000000000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);
         await queryRunner.query(`
-      CREATE TABLE IF NOT EXISTS "auth" (
+      CREATE TABLE IF NOT EXISTS auth."auth" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "email" varchar(255) NOT NULL,
         "username" varchar(50) NOT NULL,
@@ -26,16 +26,16 @@ export class CreateAuthTable1700000000000 implements MigrationInterface {
       END;
       $$ LANGUAGE plpgsql;
 
-      DROP TRIGGER IF EXISTS trg_auth_updated_at ON "auth";
+      DROP TRIGGER IF EXISTS trg_auth_updated_at ON auth."auth";
       CREATE TRIGGER trg_auth_updated_at
-      BEFORE UPDATE ON "auth"
+      BEFORE UPDATE ON auth."auth"
       FOR EACH ROW
       EXECUTE FUNCTION set_updated_at();
     `);
         await queryRunner.query(`
-      CREATE TABLE IF NOT EXISTS "refresh_tokens" (
+      CREATE TABLE IF NOT EXISTS auth."refresh_tokens" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        "user_id" uuid NOT NULL REFERENCES "auth"("id") ON DELETE CASCADE,
+        "userId" uuid NOT NULL REFERENCES auth."auth"("id") ON DELETE CASCADE,
         "token_hash" varchar(255) NOT NULL,
         "expires_at" timestamptz NOT NULL,
         "revoked_at" timestamptz,
@@ -43,14 +43,14 @@ export class CreateAuthTable1700000000000 implements MigrationInterface {
         "created_by_ip" inet
       );
     `);
-        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_refresh_user" ON "refresh_tokens" ("user_id");`);
-        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_refresh_expires" ON "refresh_tokens" ("expires_at");`);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_refresh_user" ON auth."refresh_tokens"("userId");`);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_refresh_expires" ON auth."refresh_tokens"("expires_at");`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE IF EXISTS "refresh_tokens";`);
-        await queryRunner.query(`DROP TRIGGER IF EXISTS trg_auth_updated_at ON "auth";`);
+        await queryRunner.query(`DROP TABLE IF EXISTS auth."refresh_tokens";`);
+        await queryRunner.query(`DROP TRIGGER IF EXISTS trg_auth_updated_at ON auth."auth";`);
         await queryRunner.query(`DROP FUNCTION IF EXISTS set_updated_at;`);
-        await queryRunner.query(`DROP TABLE IF EXISTS "auth";`);
+        await queryRunner.query(`DROP TABLE IF EXISTS auth."auth";`);
     }
 }

@@ -31,7 +31,7 @@ export class AddTaskExample19000000001 implements MigrationInterface {
     `);
 
         await queryRunner.query(`
-      INSERT INTO tasks."assignments"(id,task_id,user_id,role)
+      INSERT INTO tasks."assignments"(id,task_id,userId,role)
       VALUES
         ('${a1}','${t1}','${u2}','reviewer'),
         ('${a2}','${t2}','${u1}','owner');

@@ -13,7 +13,7 @@ export class AddNotificationsExample20000000001 implements MigrationInterface {
         const n2 = '34343434-3434-3434-3434-343434343434';
 
         await queryRunner.query(`
-      INSERT INTO "notifications"(id,user_id,type,payload)
+      INSERT INTO "notifications"(id,userId,type,payload)
       VALUES
         ('${n1}','${u2}','TASK_ASSIGNED', jsonb_build_object('taskId','${t1}','title','Implement auth')),
         ('${n2}','${u2}','COMMENT_NEW',  jsonb_build_object('taskId','${t2}','by','${u1}','content','Vou começar pelo layout da lista'));

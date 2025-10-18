@@ -3,8 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
 import { Client } from 'pg';
-import {AuthEntity} from "../src/app/entities/auth.entity";
-import {RefreshToken} from "../src/app/entities/refresh-token.entity";
 
 const parsePort = (value?: string) => parseInt(value || '5432', 10);
 
@@ -42,10 +40,7 @@ async function createSchemas(config: ConfigService, schema: string) {
                     username: config.get<string>('DB_USERNAME'),
                     password: config.get<string>('DB_PASSWORD'),
                     database: config.get<string>('DB_DATABASE'),
-                    entities: [
-                        AuthEntity,
-                        RefreshToken
-                    ],
+                    entities: [join(__dirname, '../src/app/entities/**/*{.ts,.js}')],
                     schema,
                     migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
                     migrationsRun: true,

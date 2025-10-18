@@ -1,3 +1,5 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
 export class CreateNotificationsTable20000000000 implements MigrationInterface {
     name = 'CreateNotificationsTable20000000000'
 
@@ -8,7 +10,7 @@ export class CreateNotificationsTable20000000000 implements MigrationInterface {
         await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS notifications."notifications" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        "user_id" uuid NOT NULL,
+        "userId" uuid NOT NULL,
         "type" varchar(30) NOT NULL,
         "payload" jsonb NOT NULL,
         "read_at" timestamptz,
