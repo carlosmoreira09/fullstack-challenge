@@ -37,6 +37,7 @@ services:
       - AUTH_SERVICE_URL=tcp://auth-service:3002
       - TASKS_SERVICE_URL=tcp://tasks-service:3003
       - NOTIFS_SERVICE_URL=tcp://notifications-service:3004
+      - USER_SERVICE_URL=tcp://notifications-service:3005
     depends_on:
       db:
         condition: service_started
@@ -62,7 +63,7 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3002
-      - DATABASE_URL=postgres://postgres:password@db:5432/challenge_db
+      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - JWT_SECRET=supersecret
       - JWT_REFRESH_SECRET=superrefresh
@@ -82,7 +83,7 @@ services:
       dockerfile: ./apps/tasks-service/Dockerfile
       target: development
     ports:
-      - '3003:3003'
+      - '3004:3004'
     volumes:
       - .:/app
       - ./packages:/app/packages
@@ -91,7 +92,7 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3003
-      - DATABASE_URL=postgres://postgres:password@db:5432/challenge_db
+      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
     depends_on:
       db:
@@ -109,7 +110,7 @@ services:
       dockerfile: ./apps/notifications-service/Dockerfile
       target: development
     ports:
-      - '3004:3004'
+      - '3003:3003'
     volumes:
       - .:/app
       - ./packages:/app/packages
@@ -118,9 +119,35 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3004
-      - DATABASE_URL=postgres://postgres:password@db:5432/challenge_db
+      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - WS_PORT=3004
+    depends_on:
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - challenge-network
+  # Notifications Service
+  user-service:
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: ./apps/user-service/Dockerfile
+      target: development
+    ports:
+      - '3005:3005'
+    volumes:
+      - .:/app
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/app/user-service/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
     depends_on:
       db:
         condition: service_started

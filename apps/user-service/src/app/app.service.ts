@@ -47,8 +47,8 @@ export class AppService {
         return await this.userRepository.update(userId, updateUser)
     }
 
-    async softDelete(userId: number) {
-        return await this.userRepository.softDelete(userId)
+    async delete(userId: number) {
+        return await this.userRepository.delete(userId)
     }
 
     async restore(userId: number) {

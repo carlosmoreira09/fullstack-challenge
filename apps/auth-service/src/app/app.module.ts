@@ -5,7 +5,8 @@ import { AppService } from './app.service';
 import { DatabaseModule } from '../../config/database.module';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthEntity} from "./entities/auth.entity";
-import {JwtModule, JwtService} from "@nestjs/jwt";
+import {JwtModule} from "@nestjs/jwt";
+import {RefreshToken} from "./entities/refresh-token.entity";
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import {JwtModule, JwtService} from "@nestjs/jwt";
       }),
     DatabaseModule,
       TypeOrmModule.forFeature([
-          AuthEntity
+          AuthEntity,
+          RefreshToken
       ])
   ],
   controllers: [AppController],

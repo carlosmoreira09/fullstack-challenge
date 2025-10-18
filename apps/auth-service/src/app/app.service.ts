@@ -6,13 +6,6 @@ import {AuthEntity} from "./entities/auth.entity";
 import {Repository} from "typeorm";
 import * as bcrypt from 'bcrypt';
 
-const user = {
-    id: 1,
-    password: '123456',
-    name: 'username',
-    role: 'admin',
-
-}
 @Injectable()
 export class AppService {
 

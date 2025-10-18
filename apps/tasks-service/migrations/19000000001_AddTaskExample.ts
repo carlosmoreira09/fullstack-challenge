@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddTaskExample19000000001 implements MigrationInterface {
-    name = 'AddTaskExample19000000001'
+    name = 'AddTaskExample1900000000001'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         const u1 = '11111111-1111-1111-1111-111111111111';
@@ -31,14 +31,14 @@ export class AddTaskExample19000000001 implements MigrationInterface {
     `);
 
         await queryRunner.query(`
-      INSERT INTO tasks."assignments"(id,task_id,userId,role)
+      INSERT INTO tasks."assignments"("id","task_id","userId","role")
       VALUES
         ('${a1}','${t1}','${u2}','reviewer'),
         ('${a2}','${t2}','${u1}','owner');
     `);
 
         await queryRunner.query(`
-      INSERT INTO tasks."task_history"(id,task_id,actor_id,change_type,before,after)
+      INSERT INTO tasks."task_history"("id","task_id","actor_id","change_type","before","after")
       VALUES
         ('${h1}','${t1}','${u1}','CREATE', NULL, jsonb_build_object('status','IN_PROGRESS')),
         ('${h2}','${t2}','${u1}','CREATE', NULL, jsonb_build_object('status','TODO'));
