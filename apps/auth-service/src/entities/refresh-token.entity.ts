@@ -11,8 +11,8 @@ export class RefreshToken {
     @JoinColumn({ name: 'userId'})
     user: AuthEntity;
 
-    @Column()
-    userId: number;
+    @Column({ name: 'userId', type: 'uuid' })
+    userId: string;
 
     @Column({ name: 'token_hash', length: 255 })
     tokenHash: string;

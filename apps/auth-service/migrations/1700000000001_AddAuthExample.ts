@@ -12,8 +12,8 @@ export class AddAuthExample1700000000001 implements MigrationInterface {
         await queryRunner.query(`
             INSERT INTO auth."auth"("id","email", "username", "password_hash")
             VALUES 
-                ('${u1}', 'alice@example.com', 'alice', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q'),
-                ('${u2}', 'bob@example.com', 'bob', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q');
+                ('${u1}', 'alice@example.com', 'alice@example.com', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q'),
+                ('${u2}', 'bob@example.com', 'bob@example.com', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q');
         `);
 
         await queryRunner.query(`

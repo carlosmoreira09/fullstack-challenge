@@ -38,3 +38,5 @@ tsconfig.node.tsbuildinfo
 *.sw?
 .env
 .env.deploy
+.turbo
+.dockerignore
