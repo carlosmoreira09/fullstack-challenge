@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import {MessagePattern, Payload} from "@nestjs/microservices";
-import {LoginDTO} from "./dto/login.dto";
+import {LoginDTO} from "../dto/login.dto";
 
 @Controller()
 export class AppController {

@@ -12,7 +12,6 @@ export class AppService {
         private readonly userRepository: Repository<UsersEntity>) {}
 
     async findOne(userId: number) {
-        console.log('teste')
         return await this.userRepository.findOne({
             where: {
                 id: userId

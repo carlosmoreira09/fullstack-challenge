@@ -4,9 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from '../../config/database.module';
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {AuthEntity} from "./entities/auth.entity";
+import {AuthEntity} from "../entities/auth.entity";
 import {JwtModule} from "@nestjs/jwt";
-import {RefreshToken} from "./entities/refresh-token.entity";
+import {RefreshToken} from "../entities/refresh-token.entity";
 
 @Module({
   imports: [
