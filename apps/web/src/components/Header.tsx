@@ -1,30 +1,52 @@
-import { Link } from '@tanstack/react-router'
-
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Home, Menu, X } from 'lucide-react'
+import { Home, Menu, X, LogOut } from 'lucide-react'
+import { useAuth } from '@/hooks/auth'
+import { Button } from '@/components/ui/button'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const { logout, decoded } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate({ to: '/login' })
+  }
 
   return (
     <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className="ml-4 text-xl font-semibold">
-          <Link to="/">
-            <img
-              src="/tanstack-word-logo-white.svg"
-              alt="TanStack Logo"
-              className="h-10"
-            />
-          </Link>
-        </h1>
+      <header className="p-4 flex items-center justify-between bg-gray-800 text-white shadow-lg">
+        <div className="flex items-center">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu size={24} />
+          </button>
+          <h1 className="ml-4 text-xl font-semibold">
+            <Link to="/" className="hover:text-gray-300 transition-colors">
+              TaskManagerJungle
+            </Link>
+          </h1>
+        </div>
+        <div className="flex items-center gap-4">
+          {decoded && (
+            <span className="text-sm text-gray-300">
+              {decoded.email}
+            </span>
+          )}
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-gray-700"
+          >
+            <LogOut size={18} className="mr-2" />
+            Sair
+          </Button>
+        </div>
       </header>
 
       <aside
@@ -56,10 +78,18 @@ export default function Header() {
             <Home size={20} />
             <span className="font-medium">Home</span>
           </Link>
-
-          {/* Demo Links Start */}
-
-          {/* Demo Links End */}
+            <Link
+                to="/system"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+                activeProps={{
+                    className:
+                        'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+                }}
+            >
+                <Home size={20} />
+                <span className="font-medium">System Status</span>
+            </Link>
         </nav>
       </aside>
     </>

@@ -10,11 +10,11 @@ export type Props = {
 };
 
 const AuthProvider = ({ children }: Props) => {
-    const loginService = authService();
     const [decoded, setDecoded] = useState<DecodedToken | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const loginService = useMemo(() => authService(), []);
 
     const handleAuthSuccess = useCallback((response: AuthResponse) => {
         const decodedToken = jwtDecode<DecodedToken>(response.token);
@@ -59,7 +59,7 @@ const AuthProvider = ({ children }: Props) => {
         restoreSessionFromCookies();
     }, [restoreSessionFromCookies]);
 
-    const login = async (logindData: LoginData) => {
+    const login = useCallback(async (logindData: LoginData) => {
         const response = await loginService.login(logindData);
         if(response?.token && response?.refreshToken) {
             handleAuthSuccess(response);
@@ -67,7 +67,7 @@ const AuthProvider = ({ children }: Props) => {
         }
         clearAuthState();
         return null;
-    };
+    }, [loginService, handleAuthSuccess, clearAuthState]);
 
     const refreshAccessToken = useCallback(async () => {
         if(isRefreshing) {
@@ -88,9 +88,9 @@ const AuthProvider = ({ children }: Props) => {
         }
     }, [clearAuthState, handleAuthSuccess, isRefreshing, loginService]);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         clearAuthState();
-    };
+    }, [clearAuthState]);
 
     const value = useMemo(() => ({
         userId,

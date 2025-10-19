@@ -1,12 +1,8 @@
 import { Navigate, useRouter } from '@tanstack/react-router'
 import { useAuth } from '@/hooks/auth'
-import React from "react";
+import AppLayout from '@/pages/AppLayout'
 
-interface ProtectedRouteProps {
-  children?: React.ReactNode
-}
-
-export function ProtectedRoute({ children = null }: ProtectedRouteProps = {}) {
+export function ProtectedRoute() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
 
@@ -15,5 +11,5 @@ export function ProtectedRoute({ children = null }: ProtectedRouteProps = {}) {
     return <Navigate to="/login" search={{ redirect: router.state.location.href }} replace />
   }
 
-  return <>{children}</>
+  return <AppLayout />
 }

@@ -1,10 +1,10 @@
-import { Outlet, createRootRoute, createRouter, createRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import {Outlet, createRootRoute, createRouter, createRoute} from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { Toaster } from "@/components/ui/sonner"
 import { Login } from "@/pages/login/Login"
 import { Home } from "@/pages/Home"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
+import {MicroservicesDashboard} from "@/pages/system/SystemInfo.tsx";
 
 // Rota raiz
 const rootRoute = createRootRoute({
@@ -12,17 +12,8 @@ const rootRoute = createRootRoute({
     <>
       <Outlet />
       <Toaster />
-      <TanStackDevtools
-          config={{
-              position: 'bottom-right',
-          }}
-          plugins={[
-              {
-                  name: 'Tanstack Router',
-                  render: <TanStackRouterDevtools />,
-              },
-          ]}
-           />
+        <TanStackRouterDevtools position="bottom-left" />
+
     </>
   ),
 })
@@ -34,35 +25,36 @@ const loginRoute = createRoute({
   component: Login,
 })
 
-// Rota protegida (wrapper para rotas que precisam de autenticação)
 const authenticatedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'authenticated',
   component: ProtectedRoute,
 })
 
-// Rota da home (protegida)
 const homeRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: '/',
   component: Home,
 })
+const systemStatusRoute = createRoute({
+    getParentRoute: () => authenticatedRoute,
+    path: '/system',
+    component: MicroservicesDashboard,
+})
 
-// Configuração das rotas
 const routeTree = rootRoute.addChildren([
   loginRoute,
   authenticatedRoute.addChildren([
     homeRoute,
-    // Adicione mais rotas protegidas aqui
+      systemStatusRoute
   ]),
 ])
 
-// Criação do roteador
 export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   context: {
-    auth: undefined!, // Isso será preenchido no AuthProvider
+    auth: undefined!,
   },
 })
 

@@ -20,6 +20,6 @@ export interface AuthResponse {
 export interface DecodedToken {
     userId: string;
     email: string;
-    role?: string;
+    role: string;
     exp: number;
 }

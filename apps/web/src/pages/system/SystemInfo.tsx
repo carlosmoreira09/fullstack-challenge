@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
@@ -60,21 +59,21 @@ const microservices: Microservice[] = [
     id: 'tasks-service',
     name: 'Tasks Service',
     description: 'Processes task domain logic and persistence.',
-    port: '3003',
+    port: '3004',
     container: 'tasks-service',
     protocol: 'tcp',
     icon: Activity,
-    healthUrl: 'http://localhost:3003',
+    healthUrl: 'http://localhost:3004',
   },
   {
     id: 'notifications-service',
     name: 'Notifications Service',
     description: 'Publishes real-time notifications and WebSocket events.',
-    port: '3004',
+    port: '3003',
     container: 'notifications-service',
     protocol: 'tcp/ws',
     icon: BellRing,
-    healthUrl: 'http://localhost:3004',
+    healthUrl: 'http://localhost:3003',
   },
   {
     id: 'postgres',
@@ -97,10 +96,6 @@ const microservices: Microservice[] = [
   },
 ]
 
-export const Route = createFileRoute('/')({
-  component: MicroservicesDashboard,
-})
-
 type ServiceState = 'loading' | 'online' | 'degraded' | 'offline' | 'not-monitored'
 
 type ServiceStatus = {
@@ -109,7 +104,7 @@ type ServiceStatus = {
   message?: string
 }
 
-function MicroservicesDashboard() {
+export function MicroservicesDashboard() {
   const services = useMemo(() => {
     const origin =
       typeof window !== 'undefined' && window.location.origin
