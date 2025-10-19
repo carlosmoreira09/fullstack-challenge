@@ -7,13 +7,15 @@ import {firstValueFrom} from "rxjs";
 @Controller('user')
 export class UserController {
 
-    constructor(@Inject("AUTH_SERVICE") private readonly authClient: ClientProxy){}
+    constructor(
+    @Inject("USERS_SERVICE")
+    private readonly userClinet: ClientProxy
+    ){}
 
     @UseGuards(AuthGuard)
     @Get()
     async getUserProfile(@Req() req: any) {
         const userId = req.user?.userId;
-        console.log(req.user)
-        return await firstValueFrom(this.authClient.send("user-profile", userId));
+        return await firstValueFrom(this.userClinet.send("user-profile", userId));
     }
 }

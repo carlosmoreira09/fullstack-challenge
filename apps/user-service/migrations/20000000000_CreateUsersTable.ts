@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateUsersTable20000000000 implements MigrationInterface {
-    name = 'CreateUsersTable20000000000'
+export class CreateUsersTable2000000000000 implements MigrationInterface {
+    name = 'CreateUsersTable2000000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`SET search_path TO users`);
@@ -12,9 +12,10 @@ export class CreateUsersTable20000000000 implements MigrationInterface {
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "name" varchar(160) NOT NULL,
         "email" varchar(160) NOT NULL,
-        "birthday" varchar(10) NOT NULL,
+        "role" varchar(160) NOT NULL,
+        "birthday" timestamptz NULL,
         "document" varchar(20),
-        "created_by" uuid NOT NULL,
+        "createdById" uuid NOT NULL,
         "created_at" timestamptz NOT NULL DEFAULT now(),
         "updated_at" timestamptz NOT NULL DEFAULT now()
       );
@@ -23,6 +24,7 @@ export class CreateUsersTable20000000000 implements MigrationInterface {
         await queryRunner.query(`
       CREATE OR REPLACE FUNCTION set_updated_at_users()
       RETURNS TRIGGER AS $$
+      BEGIN
         NEW.updated_at = now();
         RETURN NEW;
       END;
@@ -32,7 +34,7 @@ export class CreateUsersTable20000000000 implements MigrationInterface {
       CREATE TRIGGER trg_users_updated_at
       BEFORE UPDATE ON users."users"
       FOR EACH ROW
-      EXECUTE FUNCTION set_updated_at_tasks();
+      EXECUTE FUNCTION set_updated_at_users();
     `);
         await queryRunner.query(`SET search_path TO public`);
     }

@@ -14,7 +14,7 @@ export class CreateNotificationsTable1800000000000 implements MigrationInterface
         "type" varchar(30) NOT NULL,
         "payload" jsonb NOT NULL,
         "read_at" timestamptz,
-        "created_at" timestamptz NOT NULL DEFAULT now()
+        created_at timestamptz NOT NULL DEFAULT now()
       );
     `);
 

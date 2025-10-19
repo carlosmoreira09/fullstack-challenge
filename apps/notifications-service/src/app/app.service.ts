@@ -25,12 +25,9 @@ export class AppService {
     }
 
     async create(notificationData: CreateNotificationsDto) {
-        const newNotification = this.notifcationsRepository.create(notificationData)
-        return await this.notifcationsRepository.save(newNotification)
     }
 
     async update(notificationId: number, notificationData: UpdateNotificationsDto) {
-        return await this.notifcationsRepository.update(notificationId, notificationData)
     }
 
     async delete(notificationId: number) {

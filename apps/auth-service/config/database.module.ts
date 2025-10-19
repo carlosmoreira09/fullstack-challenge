@@ -7,6 +7,9 @@ import { Client } from 'pg';
 const parsePort = (value?: string) => parseInt(value || '5432', 10);
 
 async function createSchemas(config: ConfigService, schema: string) {
+    const schemas = [
+        'auth', 'users', 'notifications', 'tasks',
+    ]
     const sslOption = config.get('DB_SSL') === 'true' ? { rejectUnauthorized: false } : false;
 
     const client = new Client({
@@ -20,7 +23,9 @@ async function createSchemas(config: ConfigService, schema: string) {
 
     try {
         await client.connect();
-        await client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+        await Promise.all(schemas.map(schema => 
+            client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`)
+        ));
     } finally {
         await client.end();
     }
@@ -40,7 +45,7 @@ async function createSchemas(config: ConfigService, schema: string) {
                     username: config.get<string>('DB_USERNAME'),
                     password: config.get<string>('DB_PASSWORD'),
                     database: config.get<string>('DB_DATABASE'),
-                    entities: [join(__dirname, '../src/app/entities/**/*{.ts,.js}')],
+                    entities: [join(__dirname, '../src/entities/*{.ts,.js}')],
                     schema,
                     migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
                     migrationsRun: true,

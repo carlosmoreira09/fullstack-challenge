@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
-import {TaskEntity} from "../entities/task.entity";
 import {Repository} from "typeorm";
+import { TaskEntity } from '../entities/task.entity';
 import {CreateTaskDto} from "../dto/create-task.dto";
 import {TaskPriority, TaskStatus} from "../enum/tasks.enum";
 
@@ -17,11 +17,11 @@ export class AppService {
         return await this.taskRepository.find();
     }
 
-    async findOne(id: number) {
+    async findOne(id: string) {
         return await this.taskRepository.findOne({ where: { id: id } });
     }
 
-    async findByCreator(userId: number) {
+    async findByCreator(userId: string) {
         return await this.taskRepository.find({ where: { createdById: userId } });
     }
 
@@ -51,13 +51,9 @@ export class AppService {
 
     async create(task: CreateTaskDto) {
 
-        const newTask = this.taskRepository.create(task);
-
-        return await this.taskRepository.save(newTask);
     }
 
     async update(id: string, task: TaskEntity) {
-        return await this.taskRepository.update(id, task);
     }
 
     async delete(id: string) {

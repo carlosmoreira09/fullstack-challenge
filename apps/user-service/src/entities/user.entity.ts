@@ -1,36 +1,40 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {AuthEntity} from "auth-service/dist/src/app/entities/auth.entity";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from "typeorm";
 
-@Entity('users')
+@Entity('users', { schema: 'users' })
 export class UsersEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: number;
 
-    @Column()
+    @Column({ type: 'varchar', length: 160 })
     name: string;
 
-    @Column()
+    @Column({ type: 'timestamp with time zone' })
     birthday: Date;
 
-    @Column()
+    @Column({ type: 'varchar', length: 20 })
     document: string;
 
-    @Column()
+    @Column({ type: 'varchar', length: 160 })
     email: string;
 
-    @Column()
+    @Column({ type: 'varchar', length: 160 })
     role: string;
 
-    @ManyToOne(() => UsersEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'createdById' })
-    created_by: UsersEntity;
+    @Column({ type: 'uuid'})
+    createdById: string;
 
-    @Column()
-    createdById: number;
-
-    @Column()
+    @CreateDateColumn()
     created_at: Date;
 
-    @Column()
+    @UpdateDateColumn()
     updated_at: Date;
+
 }

@@ -1,12 +1,14 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity('notifications')
 export class NotificationsEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: number;
 
-    @Column()
-    userId: number;
+    @Column({
+        type: 'uuid'
+    })
+    userId: string;
 
     @Column({ length: 30 })
     type: string;
@@ -16,10 +18,10 @@ export class NotificationsEntity {
     })
     payload: string;
 
-    @Column()
+    @Column({ nullable: true })
     readAt: Date;
 
-    @Column()
+    @CreateDateColumn()
     createdAt: Date;
 
 }

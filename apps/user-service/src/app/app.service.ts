@@ -12,6 +12,7 @@ export class AppService {
         private readonly userRepository: Repository<UsersEntity>) {}
 
     async findOne(userId: number) {
+        console.log('teste')
         return await this.userRepository.findOne({
             where: {
                 id: userId
@@ -26,9 +27,8 @@ export class AppService {
     async create(createUserData: CreateUserDto) {
         const newUser = this.userRepository.create({
             ...createUserData,
-            created_by: {
-                id: createUserData.createdById
-            }
+            createdById: createUserData.createdById
+
         })
         return await this.userRepository.save(newUser)
     }
@@ -40,9 +40,7 @@ export class AppService {
         }
         const updateUser = this.userRepository.create({
             ...updateUserData,
-            created_by: {
-                id: user.createdById
-            }
+            createdById: user.createdById
         })
         return await this.userRepository.update(userId, updateUser)
     }
@@ -51,16 +49,11 @@ export class AppService {
         return await this.userRepository.delete(userId)
     }
 
-    async restore(userId: number) {
-        return await this.userRepository.restore(userId)
-    }
 
-    async findByCreator(userId: number) {
+    async findByCreator(userId: string) {
         return await this.userRepository.find({
             where: {
-                created_by: {
-                    id: userId
-                }
+                createdById: userId
             }
         })
     }

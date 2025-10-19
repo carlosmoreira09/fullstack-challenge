@@ -1,54 +1,54 @@
 import {
     Column,
-    CreateDateColumn, DeleteDateColumn,
+    CreateDateColumn,
     Entity,
+    OneToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {TaskPriority, TaskStatus} from "../enum/tasks.enum";
+    UpdateDateColumn,
+} from 'typeorm';
+import { TaskPriority, TaskStatus } from '../enum/tasks.enum';
+import { CommentEntity } from './comment.entity';
+import { TaskAssignmentEntity } from './task-assignment.entity';
+import { TaskHistoryEntity } from './task-history.entity';
 
-@Entity('tasks')
+@Entity({ name: 'tasks', schema: 'tasks' })
 export class TaskEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-    @Column()
+    @Column({ type: 'varchar', length: 160 })
     title: string;
 
-    @Column({ nullable: true })
-    description: string;
+    @Column({ type: 'text', nullable: true })
+    description?: string | null;
 
-    @Column( {
-        type: 'enum',
-        enum: TaskPriority,
-        default: TaskPriority.LOW,
-    })
+    @Column({ type: 'varchar', length: 10, default: TaskPriority.LOW })
     priority: TaskPriority;
 
-    @Column( {
-        type: 'enum',
-        enum: TaskStatus,
-        default: TaskStatus.TODO,
-    })
+    @Column({ type: 'varchar', length: 15, default: TaskStatus.TODO })
     status: TaskStatus;
 
-
-    @Column({ type: 'timestamptz', nullable: true })
+    @Column({ name: 'due_date', type: 'timestamptz', nullable: true })
     dueDate?: Date | null;
 
-    @Column()
-    createdById: number;
+    @Column({ name: 'created_by_id', type: 'uuid' })
+    createdById: string;
 
-    @Column()
-    assignees: number[];
+    @Column({ type: 'uuid', array: true, default: () => "ARRAY[]::uuid[]" })
+    assignees: string[];
 
-    @CreateDateColumn()
-    created_at: Date;
+    @CreateDateColumn({ name: 'created_at', type: 'timestamptz', default: () => 'now()' })
+    createdAt: Date;
 
-    @UpdateDateColumn()
-    updated_at: Date;
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: () => 'now()' })
+    updatedAt: Date;
 
-    @DeleteDateColumn()
-    delete_at: Date;
+    @OneToMany(() => CommentEntity, (comment) => comment.task)
+    comments: CommentEntity[];
 
+    @OneToMany(() => TaskAssignmentEntity, (assignment) => assignment.task)
+    assignments: TaskAssignmentEntity[];
+
+    @OneToMany(() => TaskHistoryEntity, (history) => history.task)
+    history: TaskHistoryEntity[];
 }

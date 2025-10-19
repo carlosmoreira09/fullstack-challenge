@@ -16,8 +16,5 @@ export class AppController {
     async validateToken(@Payload() payload: string) {
       return this.appService.validateToken(payload);
   }
-  @MessagePattern("user-profile")
-  async getUserProfile(userId: string) {
-      return this.appService.getUserProfile(userId);
-  }
+
 }

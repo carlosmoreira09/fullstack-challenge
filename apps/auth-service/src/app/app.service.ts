@@ -53,8 +53,4 @@ export class AppService {
             }
 
       }
-
-      async getUserProfile(userId: string) {
-            return await this.authRepository.findOne({ where: { id: userId } });
-      }
 }
