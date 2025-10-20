@@ -6,6 +6,16 @@ import {MessagePattern, Payload} from "@nestjs/microservices";
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+    @MessagePattern({ cmd: 'health' })
+    async health() {
+        return {
+            status: 'ok',
+            service: 'users-service',
+            message: 'Service is healthy',
+            timestamp: new Date().toISOString(),
+        };
+    }
+
     @MessagePattern("user-profile")
     async getUserProfile(@Payload() userId: number) {
       return await this.appService.findOne(userId);

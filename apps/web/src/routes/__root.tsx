@@ -1,24 +1,24 @@
 import {Outlet, createRootRoute, createRouter, createRoute} from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { Toaster } from "@/components/ui/sonner"
-import { Login } from "@/pages/login/Login"
+import  Login  from "@/pages/login/Login"
 import { Home } from "@/pages/Home"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import {MicroservicesDashboard} from "@/pages/system/SystemInfo.tsx";
+import CreateUserPage from "@/pages/users/CreateUserPage.tsx";
+import UsersPage from "@/pages/users/UsersPage.tsx";
+import ListTasks from "@/pages/tasks/ListTasks.tsx";
 
-// Rota raiz
 const rootRoute = createRootRoute({
   component: () => (
     <>
       <Outlet />
       <Toaster />
         <TanStackRouterDevtools position="bottom-left" />
-
     </>
   ),
 })
 
-// Rota de login
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
@@ -41,12 +41,33 @@ const systemStatusRoute = createRoute({
     path: '/system',
     component: MicroservicesDashboard,
 })
+const usersRoute = createRoute({
+    getParentRoute: () => authenticatedRoute,
+    path: '/usuarios',
+    component: UsersPage,
+})
+
+const tasksRoute = createRoute({
+    getParentRoute: () => authenticatedRoute,
+    path: '/tarefas',
+    component: ListTasks,
+})
+const addUserRoute = createRoute({
+    getParentRoute: () => authenticatedRoute,
+    path: '/adicionar-usuario',
+    component: CreateUserPage,
+})
+
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
   authenticatedRoute.addChildren([
-    homeRoute,
-      systemStatusRoute
+      homeRoute,
+      systemStatusRoute,
+      usersRoute.addChildren(
+          [addUserRoute]
+      ),
+      tasksRoute,
   ]),
 ])
 

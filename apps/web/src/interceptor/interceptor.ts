@@ -107,8 +107,8 @@ const applyCoreInterceptors = (client: AxiosInstance): AxiosInstance => {
 export const createApiClient = (options: AxiosRequestConfig = {}): AxiosInstance => {
     const instance = axios.create({
         baseURL: appConfig.apiUrl,
-        maxBodyLength: 5 * 1024 * 1024, // 5MB
-        maxContentLength: 5 * 1024 * 1024, // 5MB
+        maxBodyLength: 5 * 1024 * 1024,
+        maxContentLength: 5 * 1024 * 1024,
         ...options,
     });
 

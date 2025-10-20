@@ -131,37 +131,96 @@ export function MicroservicesDashboard() {
     let cancelled = false
 
     const checkHealth = async () => {
-      await Promise.all(
-        services
-          .filter((service) => service.healthUrl)
-          .map(async (service) => {
+      try {
+        // Check web (self)
+        if (!cancelled) {
+          setStatuses((prev) => ({
+            ...prev,
+            web: {
+              state: 'online',
+              httpStatus: 200,
+              message: 'Web client is running',
+            },
+          }))
+        }
+
+        // Check API Gateway
+        try {
+          const apiGatewayResponse = await fetch('http://localhost:3001', {
+            method: 'GET',
+            cache: 'no-store',
+            mode: 'cors',
+          })
+
+          if (!cancelled) {
+            setStatuses((prev) => ({
+              ...prev,
+              'api-gateway': {
+                state: apiGatewayResponse.ok ? 'online' : 'degraded',
+                httpStatus: apiGatewayResponse.status,
+              },
+            }))
+          }
+        } catch (error) {
+          if (!cancelled) {
+            setStatuses((prev) => ({
+              ...prev,
+              'api-gateway': {
+                state: 'offline',
+                message: 'API Gateway unavailable',
+              },
+            }))
+          }
+        }
+
+        // Check all microservices through API Gateway health endpoints
+        const serviceChecks = [
+          { id: 'auth-service', endpoint: 'http://localhost:3001/health/auth' },
+          { id: 'tasks-service', endpoint: 'http://localhost:3001/health/tasks' },
+          { id: 'notifications-service', endpoint: 'http://localhost:3001/health/notifications' },
+          { id: 'postgres', endpoint: 'http://localhost:3001/health/postgres' },
+          { id: 'rabbitmq', endpoint: 'http://localhost:3001/health/rabbitmq' },
+        ]
+
+        await Promise.all(
+          serviceChecks.map(async ({ id, endpoint }) => {
             try {
-              const response = await fetch(service.healthUrl!, {
+              const response = await fetch(endpoint, {
                 method: 'GET',
                 headers: {
-                  Accept: 'application/json, text/plain, */*',
+                  Accept: 'application/json',
                 },
                 cache: 'no-store',
                 mode: 'cors',
               })
-                console.log(response)
 
               if (cancelled) return
 
-              setStatuses((prev) => ({
-                ...prev,
-                [service.id]: {
-                  state: response.ok ? 'online' : 'degraded',
-                  httpStatus: response.status,
-                  message: response.statusText || undefined,
-                },
-              }))
+              if (response.ok) {
+                const data = await response.json()
+                setStatuses((prev) => ({
+                  ...prev,
+                  [id]: {
+                    state: data.status ? 'online' : 'offline',
+                    httpStatus: response.status,
+                    message: data.message,
+                  },
+                }))
+              } else {
+                setStatuses((prev) => ({
+                  ...prev,
+                  [id]: {
+                    state: 'degraded',
+                    httpStatus: response.status,
+                  },
+                }))
+              }
             } catch (error) {
               if (cancelled) return
 
               setStatuses((prev) => ({
                 ...prev,
-                [service.id]: {
+                [id]: {
                   state: 'offline',
                   message:
                     error instanceof Error
@@ -171,11 +230,14 @@ export function MicroservicesDashboard() {
               }))
             }
           }),
-      )
+        )
+      } catch (error) {
+        console.error('Health check error:', error)
+      }
     }
 
     checkHealth()
-    const interval = window.setInterval(checkHealth, 15000)
+    const interval = window.setInterval(checkHealth, 1500000)
 
     return () => {
       cancelled = true

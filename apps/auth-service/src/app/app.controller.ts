@@ -8,6 +8,16 @@ import {RefreshTokenDTO} from "../dto/refresh-token.dto";
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+    @MessagePattern({ cmd: 'health' })
+    async health() {
+        return {
+            status: 'ok',
+            service: 'auth-service',
+            message: 'Service is healthy',
+            timestamp: new Date().toISOString(),
+        };
+    }
+
     @MessagePattern("auth-login")
     async login(@Payload() payload: LoginDTO) {
       return this.appService.login(payload);

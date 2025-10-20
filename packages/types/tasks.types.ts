@@ -15,13 +15,13 @@ export interface TaskCreatedEvent extends TaskEventBase {
     priority: TaskPriority;
     status: TaskStatus;
     dueDate?: string | null;
-    assignees: string[]; // user ids
+    assignees: string[];
 }
 
 
 export interface TaskUpdatedEvent extends TaskEventBase {
     type: 'task.updated';
-    changes: Record<string, { before:any; after:any }>; // diff simplificado
+    changes: Record<string, { before:any; after:any }>
 }
 
 

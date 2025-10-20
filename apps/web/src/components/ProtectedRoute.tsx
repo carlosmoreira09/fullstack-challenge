@@ -7,7 +7,6 @@ export function ProtectedRoute() {
   const router = useRouter()
 
   if (!isAuthenticated) {
-    // Redireciona para a página de login, salvando a rota atual
     return <Navigate to="/login" search={{ redirect: router.state.location.href }} replace />
   }
 

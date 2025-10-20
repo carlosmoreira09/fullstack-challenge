@@ -1,11 +1,16 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Home, Menu, X, LogOut } from 'lucide-react'
+import { LogOut, Users, ListTodo } from 'lucide-react'
 import { useAuth } from '@/hooks/auth'
 import { Button } from '@/components/ui/button'
+import {
+    NavigationMenu, NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList, NavigationMenuTrigger,
+    navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu'
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false)
   const { logout, decoded } = useAuth()
   const navigate = useNavigate()
 
@@ -15,83 +20,70 @@ export default function Header() {
   }
 
   return (
-    <>
-      <header className="p-4 flex items-center justify-between bg-gray-800 text-white shadow-lg">
-        <div className="flex items-center">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-            aria-label="Open menu"
-          >
-            <Menu size={24} />
-          </button>
-          <h1 className="ml-4 text-xl font-semibold">
-            <Link to="/" className="hover:text-gray-300 transition-colors">
-              TaskManagerJungle
-            </Link>
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          {decoded && (
-            <span className="text-sm text-gray-300">
-              {decoded.email}
-            </span>
-          )}
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-gray-700"
-          >
-            <LogOut size={18} className="mr-2" />
-            Sair
-          </Button>
-        </div>
-      </header>
-
-      <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Navigation</h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-            aria-label="Close menu"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <Link
-            to="/"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Home size={20} />
-            <span className="font-medium">Home</span>
+    <header className="p-4 flex items-center justify-between bg-gray-800 text-white shadow-lg">
+      <div className="flex items-center gap-8">
+        <h1 className="text-xl font-semibold">
+          <Link to="/" className="hover:text-gray-300 transition-colors">
+            TaskManagerJungle
           </Link>
-            <Link
-                to="/system"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-                activeProps={{
-                    className:
-                        'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-                }}
-            >
-                <Home size={20} />
-                <span className="font-medium">System Status</span>
-            </Link>
-        </nav>
-      </aside>
-    </>
+        </h1>
+        
+        <NavigationMenu>
+          <NavigationMenuList className="flex-wrap">
+            <NavigationMenuItem>
+                 <NavigationMenuTrigger className={navigationMenuTriggerStyle() + " bg-transparent text-white hover:bg-gray-800 hover:text-black"}>
+                     <Users size={18} className="mr-2" />
+                     Usuários
+                 </NavigationMenuTrigger>
+                    <NavigationMenuContent className="grid gap-4 p-2 pb-5 bg-gray-700 text-white space-y-2">
+                        <NavigationMenuLink asChild>
+                            <Link to="/adicionar-usuario" className="w-[200px] hover:bg-gray-800 hover:text-white p-2 rounded-2xl block">
+                                Adicionar Usuário
+                            </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                            <Link to="/usuarios" className="hover:bg-gray-800 hover:text-white p-2 rounded-2xl block">
+                                Lista de Usuários
+                            </Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + " bg-transparent text-white hover:bg-gray-700 hover:text-white"}>
+                <Link to="/tarefas">
+                  <ListTodo size={18} className="mr-2" />
+                  Tarefas
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + " bg-transparent text-white hover:bg-gray-700 hover:text-white"}>
+                <Link to="/system">
+                  <ListTodo size={18} className="mr-2" />
+                  Status do Sistema
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+      
+      <div className="flex items-center gap-4">
+        {decoded && (
+          <span className="text-sm text-gray-300">
+            {decoded.email}
+          </span>
+        )}
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          size="sm"
+          className="text-white hover:bg-gray-700"
+        >
+          <LogOut size={18} className="mr-2" />
+          Sair
+        </Button>
+      </div>
+    </header>
   )
 }

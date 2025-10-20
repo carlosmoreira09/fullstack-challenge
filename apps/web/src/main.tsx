@@ -7,7 +7,6 @@ import reportWebVitals from './reportWebVitals.ts'
 import  AuthProvider  from './context/AuthContext'
 import { router } from './routes/__root'
 
-// Render the app
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)

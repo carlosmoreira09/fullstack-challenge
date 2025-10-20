@@ -10,7 +10,7 @@ import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
 
-export const Login: React.FC = () => {
+export default function Login() {
     const navigate = useNavigate();
     const auth = useAuth();
     const [formData, setFormData] = useState({
