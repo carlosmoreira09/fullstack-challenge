@@ -1,9 +1,9 @@
 export interface User {
-    id?: number;
+    id?: string;
     name: string;
     email: string;
     document: string;
     role: string;
-    birthday: Date;
-    createdById: number
+    birthday: string;
+    createdById?: number
 }

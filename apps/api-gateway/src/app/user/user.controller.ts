@@ -1,4 +1,16 @@
-import {Body, Controller, Get, HttpException, HttpStatus, Inject, Post, Req, UseGuards} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpException,
+    HttpStatus,
+    Inject,
+    Param,
+    Patch,
+    Post, Put,
+    Req,
+    UseGuards
+} from '@nestjs/common';
 import { AuthGuard } from "../../guards/auth/auth.guard";
 import {ClientProxy} from "@nestjs/microservices";
 import {firstValueFrom} from "rxjs";
@@ -36,5 +48,20 @@ export class UserController {
         } else {
             throw new HttpException("Bad Request", HttpStatus.BAD_REQUEST);
         }
+    }
+    @UseGuards(AuthGuard)
+    @Patch(':id/password')
+    async updatePassword(
+        @Param('id') id: string,
+        @Body() userData: { password: string }) {
+        return await firstValueFrom(this.authClient.send('update-password',{...userData, id: id}))
+    }
+
+    @UseGuards(AuthGuard)
+    @Put(':id')
+    async updateUser(
+        @Param('id') id: string,
+        @Body() userData: any) {
+        return await firstValueFrom(this.userClinet.send('update-user',{...userData, id: id}))
     }
 }

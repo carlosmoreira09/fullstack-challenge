@@ -28,20 +28,15 @@ export class AppController {
         return this.appService.createAuth(payload);
     }
 
-    @MessagePattern("update-auth")
-    async updateAuth(@Payload() id: string, payload: any) {
-        return this.appService.updateAuth(id, payload);
-    }
-
     @MessagePattern("update-password")
-    async updatePassword(@Payload() id: string, password: string) {
-        return this.appService.updatePassword(id, password);
+    async updatePassword(@Payload() data: {id: string, password: string}) {
+        return this.appService.updatePassword(data.id, data.password);
     }
 
-  @MessagePattern("validate-token")
-    async validateToken(@Payload() payload: string) {
-      return this.appService.validateToken(payload);
-  }
+      @MessagePattern("validate-token")
+        async validateToken(@Payload() payload: string) {
+          return this.appService.validateToken(payload);
+      }
 
     @MessagePattern("auth-refresh")
     async refresh(@Payload() payload: RefreshTokenDTO) {

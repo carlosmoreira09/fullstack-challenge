@@ -11,7 +11,7 @@ import {
 @Entity('users', { schema: 'users' })
 export class UsersEntity {
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
     @Column({ type: 'varchar', length: 160 })
     name: string;

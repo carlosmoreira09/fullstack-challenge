@@ -6,6 +6,7 @@ import { apiClient } from '@/lib/interceptor.ts';
 import { Button } from '@/components/ui/button';
 import { UserFormDialog } from '@/components/users/UserFormDialog';
 import { UsersList } from '@/components/users/UsersList';
+import { ChangePasswordDialog } from '@/components/users/ChangePasswordDialog';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 interface User {
@@ -21,8 +22,10 @@ interface User {
 export default function UsersPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToChangePassword, setUserToChangePassword] = useState<User | null>(null);
   const queryClient = useQueryClient();
 
   const { data: users = [], isLoading } = useQuery<User[]>({
@@ -61,6 +64,11 @@ export default function UsersPage() {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleChangePassword = (user: User) => {
+    setUserToChangePassword(user);
+    setIsPasswordDialogOpen(true);
+  };
+
   const confirmDelete = () => {
     if (userToDelete) {
       deleteUserMutation.mutate(userToDelete.id);
@@ -83,12 +91,19 @@ export default function UsersPage() {
         isLoading={isLoading}
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
+        onChangePassword={handleChangePassword}
       />
 
       <UserFormDialog
         open={isFormDialogOpen}
         onOpenChange={setIsFormDialogOpen}
         user={selectedUser}
+      />
+
+      <ChangePasswordDialog
+        open={isPasswordDialogOpen}
+        onOpenChange={setIsPasswordDialogOpen}
+        user={userToChangePassword}
       />
 
       <ConfirmDialog

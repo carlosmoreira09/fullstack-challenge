@@ -11,7 +11,7 @@ export class AppService {
         @InjectRepository(UsersEntity)
         private readonly userRepository: Repository<UsersEntity>) {}
 
-    async findOne(userId: number) {
+    async findOne(userId: string) {
         return await this.userRepository.findOne({
             where: {
                 id: userId
@@ -32,7 +32,7 @@ export class AppService {
         return await this.userRepository.save(newUser)
     }
 
-    async update(userId: number, updateUserData: UpdateUserDto ) {
+    async update(userId: string, updateUserData: UpdateUserDto ) {
         const user = await this.findOne(userId)
         if (!user) {
             throw new Error('User not found')
@@ -44,8 +44,8 @@ export class AppService {
         return await this.userRepository.update(userId, updateUser)
     }
 
-    async delete(userId: number) {
-        return await this.userRepository.delete(userId)
+    async delete(id: string) {
+        return await this.userRepository.delete(id)
     }
 
 

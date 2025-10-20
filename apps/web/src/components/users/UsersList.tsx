@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -24,9 +24,10 @@ interface UsersListProps {
   isLoading: boolean;
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
+  onChangePassword: (user: User) => void;
 }
 
-export function UsersList({ users, isLoading, onEdit, onDelete }: UsersListProps) {
+export function UsersList({ users, isLoading, onEdit, onDelete, onChangePassword }: UsersListProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
@@ -74,6 +75,14 @@ export function UsersList({ users, isLoading, onEdit, onDelete }: UsersListProps
                       title="Editar usuário"
                     >
                       <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onChangePassword(user)}
+                      title="Alterar senha"
+                    >
+                      <Key className="h-4 w-4 text-blue-500" />
                     </Button>
                     <Button
                       variant="ghost"

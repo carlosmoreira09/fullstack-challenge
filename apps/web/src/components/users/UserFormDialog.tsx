@@ -15,15 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  document: string;
-  role: string;
-  birthday: string;
-}
+import type {User} from "@/dto/users/users.dto.ts";
 
 interface UserFormDialogProps {
   open: boolean;
@@ -45,7 +37,7 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
         email: user.email,
         document: user.document,
         role: user.role,
-        birthday: new Date(user.birthday),
+        birthday: user.birthday, // Convert to YYYY-MM-DD format
       });
     } else {
       setFormData({});
@@ -71,7 +63,7 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: async (data: Partial<CreateUserFormData>) => {
+    mutationFn: async (data: Omit<Partial<CreateUserFormData>, 'password'>) => {
       const response = await apiClient.put(`/users/${user?.id}`, data);
       return response.data;
     },
@@ -91,11 +83,8 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
     e.preventDefault();
 
     if (isEditing) {
-      // Para edição, não validamos a senha se não foi fornecida
-      const dataToUpdate = { ...formData };
-      if (!dataToUpdate.password) {
-        delete dataToUpdate.password;
-      }
+      // Para edição, removemos o campo de senha
+      const { password, ...dataToUpdate } = formData;
       updateUserMutation.mutate(dataToUpdate);
     } else {
       // Para criação, validamos todos os campos
@@ -166,21 +155,20 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
               )}
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="password">
-                Senha {isEditing && '(deixe em branco para manter a atual)'}
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password || ''}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                placeholder={isEditing ? 'Nova senha (opcional)' : ''}
-              />
-              {formErrors.password && (
-                <span className="text-sm text-red-500">{formErrors.password}</span>
-              )}
-            </div>
+            {!isEditing && (
+              <div className="grid gap-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password || ''}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                />
+                {formErrors.password && (
+                  <span className="text-sm text-red-500">{formErrors.password}</span>
+                )}
+              </div>
+            )}
 
             <div className="grid gap-2">
               <Label htmlFor="document">Documento</Label>
