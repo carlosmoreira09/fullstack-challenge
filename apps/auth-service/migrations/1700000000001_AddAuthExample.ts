@@ -10,14 +10,14 @@ export class AddAuthExample1700000000001 implements MigrationInterface {
         const rt2 = '44444444-4444-4444-4444-444444444444';
 
         await queryRunner.query(`
-            INSERT INTO auth."auth"("id","email", "username", "password_hash")
+            INSERT INTO auth."auth"("id","email", "role","username", "password_hash")
             VALUES 
-                ('${u1}', 'alice@example.com', 'alice@example.com', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q'),
-                ('${u2}', 'bob@example.com', 'bob@example.com', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q');
+                ('${u1}', 'alice@example.com', 'admin','alice@example.com', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q'),
+                ('${u2}', 'bob@example.com','user','bob@example.com', '$2b$12$54ToKdDgZlfg3C9dL3a3fOylBrmNLOebwjUMKnLKmdcjRomh0Dp1q');
         `);
 
         await queryRunner.query(`
-            INSERT INTO auth."refresh_tokens"("id", "userId", "token_hash", "expires_at", "created_by_ip")
+            INSERT INTO auth."refresh_tokens"("id", "userId","token_hash", "expires_at", "created_by_ip")
             VALUES
                 ('${rt1}', '${u1}', 'hash_refresh_1', now() + interval '7 days', '127.0.0.1'),
                 ('${rt2}', '${u2}', 'hash_refresh_2', now() + interval '7 days', '127.0.0.1');

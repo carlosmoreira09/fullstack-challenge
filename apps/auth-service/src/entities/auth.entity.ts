@@ -16,6 +16,9 @@ export class AuthEntity {
     @Column({ name: 'password_hash', length: 255 })
     passwordHash: string;
 
+    @Column({ default: 'user'})
+    role: string;
+
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
     createdAt: Date;
 

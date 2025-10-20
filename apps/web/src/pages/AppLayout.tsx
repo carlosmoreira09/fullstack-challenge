@@ -6,7 +6,7 @@ const AppLayout: React.FC = () => {
     return (
         <div className="min-h-screen bg-background flex flex-col">
             <Header />
-            <main className="flex-1">
+            <main className="flex-1 p-10">
                 <Outlet />
             </main>
             <footer className="border-t py-4 px-6 bg-background">

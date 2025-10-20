@@ -10,6 +10,7 @@ export class CreateAuthTable1700000000000 implements MigrationInterface {
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "email" varchar(255) NOT NULL,
         "username" varchar(50) NOT NULL,
+        "role" varchar(50) NOT NULL DEFAULT 'user',
         "password_hash" varchar(255) NOT NULL,
         "created_at" timestamptz NOT NULL DEFAULT now(),
         "updated_at" timestamptz NOT NULL DEFAULT now(),

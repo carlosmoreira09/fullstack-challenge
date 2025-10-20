@@ -32,6 +32,7 @@ export class AuthController {
         return await firstValueFrom(this.authClient.send('auth-refresh', refreshPayload));
     }
 
+
     private extractIp(req: Request): string | undefined {
         const forwarded = req.headers['x-forwarded-for'];
         if(typeof forwarded === 'string') {

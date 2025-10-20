@@ -52,14 +52,39 @@ export class AppService {
         })
       }
 
+      async createAuth(userData: any) {
+        const hashPassword = await bcrypt.hash(userData.password, 12);
+        const newAuth = this.authRepository.create({
+            username: userData.email,
+            passwordHash: hashPassword,
+            email: userData.email,
+            role: userData.role,
+        })
+          return await this.authRepository.save(newAuth)
+      }
+    async updateAuth(id: string, userData: any) {
+        const newAuth = this.authRepository.create({
+            username: userData.username,
+            email: userData.email,
+            role: userData.role,
+        })
+        return await this.authRepository.update(id, newAuth)
+    }
+    async updatePassword(id: string, newPassword: string) {
+        const hashPassword = await bcrypt.hash(newPassword, 12);
+        return await this.authRepository.update(id, {
+            passwordHash: hashPassword,
+        })
+    }
+
       async validateToken(token: string) {
             try{
                 const decoded = this.jwtService.verify(token, {
                     secret: process.env.JWT_SECRET,
                 });
-                return { valid: true, userId: decoded.userId, email: decoded.email }
+                return { valid: true, userId: decoded.userId, email: decoded.email, role: decoded.role }
             } catch (error) {
-                return { valid: false, userId: null, role: null }
+                return { valid: false, userId: null, role: null, email: null }
             }
 
       }
@@ -98,6 +123,7 @@ export class AppService {
           const payload = {
               userId: user.id,
               email: user.email,
+              role: user.role
           }
 
           return this.jwtService.sign(payload, {

@@ -8,6 +8,7 @@ import {MicroservicesDashboard} from "@/pages/system/SystemInfo.tsx";
 import CreateUserPage from "@/pages/users/CreateUserPage.tsx";
 import UsersPage from "@/pages/users/UsersPage.tsx";
 import ListTasks from "@/pages/tasks/ListTasks.tsx";
+import * as TanStackQueryProvider from '../tanstack-query/queryclient.tsx'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -18,6 +19,9 @@ const rootRoute = createRootRoute({
     </>
   ),
 })
+
+const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
+
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -73,8 +77,12 @@ const routeTree = rootRoute.addChildren([
 
 export const router = createRouter({
   routeTree,
-  defaultPreload: 'intent',
+    defaultPreload: 'intent',
+    scrollRestoration: true,
+    defaultStructuralSharing: true,
+    defaultPreloadStaleTime: 0,
   context: {
+    ...TanStackQueryProviderContext,
     auth: undefined!,
   },
 })

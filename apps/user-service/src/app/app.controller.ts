@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import {MessagePattern, Payload} from "@nestjs/microservices";
+import {CreateUserDto} from "../dto/create-user.dto";
 
 @Controller()
 export class AppController {
@@ -19,5 +20,15 @@ export class AppController {
     @MessagePattern("user-profile")
     async getUserProfile(@Payload() userId: number) {
       return await this.appService.findOne(userId);
+    }
+
+    @MessagePattern("get-all-users")
+    async getAllUsers() {
+      return await this.appService.findAll();
+    }
+
+    @MessagePattern("create-user")
+    async createUser(@Payload() userData: CreateUserDto) {
+        return await this.appService.create(userData);
     }
 }

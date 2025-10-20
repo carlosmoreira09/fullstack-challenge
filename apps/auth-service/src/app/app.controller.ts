@@ -23,6 +23,21 @@ export class AppController {
       return this.appService.login(payload);
   }
 
+    @MessagePattern("create-auth")
+    async createAuth(@Payload() payload: any) {
+        return this.appService.createAuth(payload);
+    }
+
+    @MessagePattern("update-auth")
+    async updateAuth(@Payload() id: string, payload: any) {
+        return this.appService.updateAuth(id, payload);
+    }
+
+    @MessagePattern("update-password")
+    async updatePassword(@Payload() id: string, password: string) {
+        return this.appService.updatePassword(id, password);
+    }
+
   @MessagePattern("validate-token")
     async validateToken(@Payload() payload: string) {
       return this.appService.validateToken(payload);

@@ -1,4 +1,4 @@
-import apiClient from "@/interceptor/interceptor.ts";
+import apiClient from "@/lib/interceptor.ts";
 import Cookies from "js-cookie";
 import type {AuthResponse, LoginData} from "@/dto/auth/auth.dto.ts";
 

@@ -3,10 +3,10 @@ import { LogOut, Users, ListTodo } from 'lucide-react'
 import { useAuth } from '@/hooks/auth'
 import { Button } from '@/components/ui/button'
 import {
-    NavigationMenu, NavigationMenuContent,
+    NavigationMenu,
     NavigationMenuItem,
     NavigationMenuLink,
-    NavigationMenuList, NavigationMenuTrigger,
+    NavigationMenuList,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 
@@ -31,22 +31,12 @@ export default function Header() {
         <NavigationMenu>
           <NavigationMenuList className="flex-wrap">
             <NavigationMenuItem>
-                 <NavigationMenuTrigger className={navigationMenuTriggerStyle() + " bg-transparent text-white hover:bg-gray-800 hover:text-black"}>
-                     <Users size={18} className="mr-2" />
-                     Usuários
-                 </NavigationMenuTrigger>
-                    <NavigationMenuContent className="grid gap-4 p-2 pb-5 bg-gray-700 text-white space-y-2">
-                        <NavigationMenuLink asChild>
-                            <Link to="/adicionar-usuario" className="w-[200px] hover:bg-gray-800 hover:text-white p-2 rounded-2xl block">
-                                Adicionar Usuário
-                            </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                            <Link to="/usuarios" className="hover:bg-gray-800 hover:text-white p-2 rounded-2xl block">
-                                Lista de Usuários
-                            </Link>
-                        </NavigationMenuLink>
-                    </NavigationMenuContent>
+                <NavigationMenuLink asChild>
+                    <Link to="/usuarios" className="flex hover:bg-gray-800 hover:text-white p-2 rounded-2xl block">
+
+                        <Users size={18} className="mr-2" /> Usuários
+                    </Link>
+                </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + " bg-transparent text-white hover:bg-gray-700 hover:text-white"}>

@@ -6,6 +6,9 @@ import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 import  AuthProvider  from './context/AuthContext'
 import { router } from './routes/__root'
+import * as TanStackQueryProvider from './tanstack-query/queryclient.tsx'
+
+const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
 
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
@@ -13,7 +16,9 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <AuthProvider>
-        <RouterProvider router={router} />
+          <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+          <RouterProvider router={router} />
+          </TanStackQueryProvider.Provider>
       </AuthProvider>
     </StrictMode>,
   )
