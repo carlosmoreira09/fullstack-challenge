@@ -22,3 +22,24 @@ export interface ListTasksParams {
     assigneeId?: string;
     createdById?: string;
 }
+export interface TaskComment {
+    id: string
+    taskId?: string
+    authorId: string
+    authorName: string
+    content: string
+    createdAt: string
+}
+
+export type ChangeType = "CREATE" | "UPDATE" | "STATUS_CHANGE" | "ASSIGN" | "COMMENT"
+
+export interface TaskHistoryEntry {
+    id: string
+    taskId: string
+    actorId: string
+    actorName: string
+    changeType: ChangeType
+    before: any
+    after: any
+    createdAt: string
+}

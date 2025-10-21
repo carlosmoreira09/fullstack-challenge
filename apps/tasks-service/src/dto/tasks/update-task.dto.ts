@@ -1,7 +1,7 @@
 import {CreateTaskDto} from "./create-task.dto";
-import {IsNumber} from "class-validator";
+import {IsString} from "class-validator";
 
 export class UpdateTaskDto extends CreateTaskDto {
-    @IsNumber()
-    id: number
+    @IsString()
+    id: string
 }

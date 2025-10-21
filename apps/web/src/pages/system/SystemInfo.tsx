@@ -9,6 +9,8 @@ import {
   Lock,
   Server,
 } from 'lucide-react'
+import {createRoute} from "@tanstack/react-router";
+import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
 
 type Microservice = {
   id: string
@@ -103,6 +105,12 @@ type ServiceStatus = {
   httpStatus?: number
   message?: string
 }
+
+export const systemStatusRoute = createRoute({
+    getParentRoute: () => authenticatedRoute,
+    path: '/system',
+    component: MicroservicesDashboard,
+})
 
 export function MicroservicesDashboard() {
   const services = useMemo(() => {

@@ -1,4 +1,12 @@
 import { useAuth } from '@/hooks/auth'
+import {createRoute} from "@tanstack/react-router";
+import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
+
+export const homeRoute = createRoute({
+    getParentRoute: () => authenticatedRoute,
+    path: '/',
+    component: Home,
+})
 
 export function Home() {
   const { decoded } = useAuth()

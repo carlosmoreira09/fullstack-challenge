@@ -36,7 +36,7 @@ export class UserController {
     @UseGuards(AuthGuard)
     @Get('all')
     async getAllUsers() {
-        return await firstValueFrom(this.userClinet.send("get-all-users", {}));
+        return await firstValueFrom(this.userClinet.send("list-users", {}));
     }
 
     @UseGuards(AuthGuard)

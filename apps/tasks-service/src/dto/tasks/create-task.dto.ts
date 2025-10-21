@@ -18,8 +18,8 @@ export class CreateTaskDto {
     dueDate?: string;
 
     @IsArray()
-    assignees: number[];
+    assignees: string[];
 
-    @IsNumber()
-    createdById: number;
+    @IsString()
+    createdById: string;
 }

@@ -1,10 +1,12 @@
-import {useState} from "react"
+import {useCallback, useEffect, useMemo, useState} from "react"
 import {Plus} from "lucide-react"
 import {Button} from "@/components/ui/button"
 import {useNavigate} from "@tanstack/react-router";
 import {KanbanColumn} from "@/components/tasks/kanban.tsx";
 import {CreateTaskDialog} from "@/components/tasks/create-task-dialog.tsx";
 import type {Task, TaskStatus} from "@/dto/tasks/task.dto.ts";
+import {taskService} from "@/service/task.service.ts";
+import {useAuth} from "@/hooks/auth.tsx";
 
 const COLUMNS: { id: TaskStatus; title: string }[] = [
     { id: "TODO", title: "To Do" },
@@ -13,51 +15,33 @@ const COLUMNS: { id: TaskStatus; title: string }[] = [
     { id: "DONE", title: "Done" },
 ]
 
-// Mock initial data
-const INITIAL_TASKS: Task[] = [
-    {
-        id: "1",
-        title: "Implementar autenticação JWT",
-        description: "Criar sistema de login com tokens de acesso e refresh",
-        status: "TODO",
-        priority: "HIGH",
-        dueDate: "2025-10-25",
-        assignees: ["João Silva"],
-    },
-    {
-        id: "2",
-        title: "Configurar RabbitMQ",
-        description: "Setup do broker de mensagens para comunicação entre microserviços",
-        status: "IN_PROGRESS",
-        priority: "URGENT",
-        dueDate: "2025-10-22",
-        assignees: ["Maria Santos", "Pedro Costa"],
-    },
-    {
-        id: "3",
-        title: "Criar componentes shadcn/ui",
-        description: "Implementar componentes de UI reutilizáveis",
-        status: "REVIEW",
-        priority: "MEDIUM",
-        dueDate: "2025-10-28",
-        assignees: ["Ana Lima"],
-    },
-    {
-        id: "4",
-        title: "Setup Docker Compose",
-        description: "Configurar containers para todos os serviços",
-        status: "DONE",
-        priority: "HIGH",
-        dueDate: "2025-10-20",
-        assignees: ["João Silva"],
-    },
-]
-
 export function KanbanBoard() {
     const router = useNavigate()
-    const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+    const [tasks, setTasks] = useState<Task[]>([])
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
     const [draggedTask, setDraggedTask] = useState<Task | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    const { userId } = useAuth()
+    const taskApi = useMemo(() => taskService(), [])
+
+    const fetchTasks = useCallback(async () => {
+        try {
+            setIsLoading(true)
+            setError(null)
+            const data = await taskApi.listTasks()
+            setTasks(data)
+        } catch (err) {
+            setError("Não foi possível carregar as tarefas.")
+        } finally {
+            setIsLoading(false)
+        }
+    }, [taskApi])
+
+    useEffect(() => {
+        void fetchTasks()
+    }, [fetchTasks])
 
     const handleDragStart = (task: Task) => {
         setDraggedTask(task)
@@ -67,20 +51,48 @@ export function KanbanBoard() {
         setDraggedTask(null)
     }
 
-    const handleDrop = (status: TaskStatus) => {
+    const handleDrop = async (status: TaskStatus) => {
         if (!draggedTask) return
 
-        setTasks((prevTasks) => prevTasks.map((task) => (task.id === draggedTask.id ? { ...task, status } : task)))
+        const optimisticTask = { ...draggedTask, status }
+        setTasks((prevTasks) => prevTasks.map((task) => (task.id === draggedTask.id ? optimisticTask : task)))
         setDraggedTask(null)
+
+        if (!draggedTask.id) {
+            return
+        }
+
+        try {
+            await taskApi.updateTask({
+                ...optimisticTask,
+                id: draggedTask.id,
+                createdById: optimisticTask.createdById ?? userId ?? "",
+            })
+        } catch (err) {
+            setError("Não foi possível atualizar a tarefa.")
+            // revert state in case of error
+            setTasks((prevTasks) =>
+                prevTasks.map((task) => (task.id === draggedTask.id ? { ...draggedTask, status: draggedTask.status } : task)),
+            )
+        }
     }
 
-    const handleCreateTask = (newTask: Omit<Task, "id">) => {
-        const task: Task = {
-            ...newTask,
-            id: Date.now().toString(),
+    const handleCreateTask = async (newTask: Omit<Task, "id">) => {
+        if (!userId) {
+            setError("Usuário não autenticado.")
+            return
         }
-        setTasks((prevTasks) => [...prevTasks, task])
-        setIsCreateDialogOpen(false)
+
+        try {
+            const createdTask = await taskApi.createTask({
+                ...newTask,
+                createdById: userId,
+            })
+            setTasks((prevTasks) => [...prevTasks, createdTask])
+            setIsCreateDialogOpen(false)
+        } catch (err) {
+            setError("Não foi possível criar a tarefa.")
+        }
     }
 
     const getTasksByStatus = (status: TaskStatus) => {
@@ -88,7 +100,28 @@ export function KanbanBoard() {
     }
 
     const handleTaskClick = (task: Task) => {
-        router({ to: `/tasks/${task.id}`})
+        router({ to: `/tarefas/${task.id}`})
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <p className="text-muted-foreground">Carregando tarefas...</p>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <div className="space-y-4 text-center">
+                    <p className="text-muted-foreground">{error}</p>
+                    <Button onClick={() => void fetchTasks()} size="sm">
+                        Tentar novamente
+                    </Button>
+                </div>
+            </div>
+        )
     }
 
     return (

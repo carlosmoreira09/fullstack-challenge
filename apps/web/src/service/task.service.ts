@@ -1,13 +1,17 @@
 import apiClient from "@/lib/interceptor.ts";
 import type { CreateTaskDto } from "@/dto/tasks/create-task.dto.ts";
+import type { UpdateTaskDto } from "@/dto/tasks/update-task.dto.ts";
 import type { ListTasksParams, Task } from "@/dto/tasks/task.dto.ts";
 
-const serializeCreateTaskPayload = (data: CreateTaskDto) => {
+type TaskPayload = CreateTaskDto & { id?: string };
+
+const normalizeTaskPayload = (data: TaskPayload) => {
     const payload: Record<string, unknown> = {
+        id: data.id,
         title: data.title.trim(),
         description: data.description?.trim(),
-        priority: data.priority ?? 'LOW',
-        status: data.status ?? 'TODO',
+        priority: data.priority ?? "LOW",
+        status: data.status ?? "TODO",
         dueDate: data.dueDate ?? null,
         assignees: data.assignees ?? [],
         createdById: data.createdById,
@@ -21,22 +25,42 @@ const serializeCreateTaskPayload = (data: CreateTaskDto) => {
         payload.dueDate = null;
     }
 
+    if (!payload.id) {
+        delete payload.id;
+    }
+
+    if (!payload.createdById) {
+        delete payload.createdById;
+    }
+
     return payload;
 };
 
 export const taskService = () => {
     const listTasks = async (params: ListTasksParams = {}) => {
-        const response = await apiClient.get<Task[]>("/api/tasks", { params });
+        const response = await apiClient.get<Task[]>("/tasks", { params });
         return response.data;
     };
 
     const createTask = async (data: CreateTaskDto) => {
-        const response = await apiClient.post<Task>("/api/tasks", serializeCreateTaskPayload(data));
+        const response = await apiClient.post<Task>("/tasks", normalizeTaskPayload(data));
         return response.data;
+    };
+
+    const updateTask = async (data: UpdateTaskDto) => {
+        const response = await apiClient.put("/tasks", normalizeTaskPayload(data));
+        return response.data;
+    };
+
+    const getTaskById = async (id: string) => {
+        const tasks = await listTasks();
+        return tasks.find((task) => task.id === id) ?? null;
     };
 
     return {
         listTasks,
         createTask,
+        updateTask,
+        getTaskById,
     };
 };

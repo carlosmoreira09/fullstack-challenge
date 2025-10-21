@@ -23,7 +23,7 @@ export class AppController {
       return await this.appService.findOne(userId);
     }
 
-    @MessagePattern("get-all-users")
+    @MessagePattern("list-users")
     async getAllUsers() {
       return await this.appService.findAll();
     }

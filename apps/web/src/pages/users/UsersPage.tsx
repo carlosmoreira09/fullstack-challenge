@@ -8,6 +8,8 @@ import { UserFormDialog } from '@/components/users/UserFormDialog';
 import { UsersList } from '@/components/users/UsersList';
 import { ChangePasswordDialog } from '@/components/users/ChangePasswordDialog';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import {createRoute} from "@tanstack/react-router";
+import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
 
 interface User {
   id: string;
@@ -18,6 +20,11 @@ interface User {
   birthday: string;
   created_at: string;
 }
+export const usersRoute = createRoute({
+    getParentRoute: () => authenticatedRoute,
+    path: '/usuarios',
+    component: UsersPage,
+})
 
 export default function UsersPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);

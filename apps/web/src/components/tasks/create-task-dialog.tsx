@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import {useState} from "react"
+import {useCallback, useEffect, useMemo, useState} from "react"
 import {Button} from "@/components/ui/button"
 import {
     Dialog,
@@ -16,6 +16,9 @@ import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import type {Task, TaskPriority, TaskStatus} from "@/dto/tasks/task.dto.ts";
+import type {User} from "@/dto/users/users.dto.ts";
+import {ScrollArea} from "@/components/ui/scroll-area"
+import {userService} from "@/service/user.service.ts";
 
 interface CreateTaskDialogProps {
     open: boolean
@@ -34,6 +37,44 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask }: CreateTas
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
+    const [users, setUsers] = useState<User[]>([])
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false)
+    const [usersError, setUsersError] = useState<string | null>(null)
+
+    const usersApi = useMemo(() => userService(), [])
+
+    const fetchUsers = useCallback(async () => {
+        try {
+            setIsLoadingUsers(true)
+            setUsersError(null)
+            const response = await usersApi.listUsers()
+            setUsers(response)
+        } catch (error) {
+            setUsersError("Não foi possível carregar os usuários.")
+        } finally {
+            setIsLoadingUsers(false)
+        }
+    }, [usersApi])
+
+    useEffect(() => {
+        if (!open) {
+            return
+        }
+
+        void fetchUsers()
+    }, [open, fetchUsers])
+
+    const handleToggleAssignee = (userId: string) => {
+        setFormData((prev) => {
+            const alreadySelected = prev.assignees.includes(userId)
+            return {
+                ...prev,
+                assignees: alreadySelected
+                    ? prev.assignees.filter((id) => id !== userId)
+                    : [...prev.assignees, userId],
+            }
+        })
+    }
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
@@ -187,6 +228,54 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask }: CreateTas
                                 className={errors.deadline ? "border-red-500" : ""}
                             />
                             {errors.deadline && <p className="text-sm text-red-500">{errors.deadline}</p>}
+                        </div>
+
+                        {/* Assignees */}
+                        <div className="grid gap-2">
+                            <Label>Responsáveis</Label>
+                            <div className="rounded-md border">
+                                <ScrollArea className="h-40">
+                                    <div className="flex flex-col">
+                                        {isLoadingUsers && (
+                                            <p className="px-4 py-3 text-sm text-muted-foreground">Carregando usuários...</p>
+                                        )}
+                                        {usersError && (
+                                            <div className="space-y-3 px-4 py-3 text-sm text-muted-foreground">
+                                                <p>{usersError}</p>
+                                                <Button type="button" size="sm" variant="outline" onClick={() => void fetchUsers()}>
+                                                    Tentar novamente
+                                                </Button>
+                                            </div>
+                                        )}
+                                        {!isLoadingUsers && !usersError && users.filter((user): user is User & { id: string } => Boolean(user.id)).length === 0 && (
+                                            <p className="px-4 py-3 text-sm text-muted-foreground">Nenhum usuário disponível.</p>
+                                        )}
+                                        {!isLoadingUsers && !usersError &&
+                                            users
+                                                .filter((user): user is User & { id: string } => typeof user.id === "string" && user.id.length > 0)
+                                                .map((user) => {
+                                                    const checked = formData.assignees.includes(user.id)
+                                                    return (
+                                                        <label
+                                                            key={user.id}
+                                                            className="flex items-center justify-between gap-3 border-b px-4 py-2 last:border-b-0"
+                                                        >
+                                                            <div className="flex flex-col">
+                                                                <span className="text-sm font-medium text-foreground">{user.name}</span>
+                                                                <span className="text-xs text-muted-foreground">{user.email}</span>
+                                                            </div>
+                                                            <input
+                                                                type="checkbox"
+                                                                className="h-4 w-4"
+                                                                checked={checked}
+                                                                onChange={() => handleToggleAssignee(user.id)}
+                                                            />
+                                                        </label>
+                                                    )
+                                                })}
+                                    </div>
+                                </ScrollArea>
+                            </div>
                         </div>
                     </div>
 
