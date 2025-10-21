@@ -1,5 +1,5 @@
 import {IsArray, IsNumber, IsString} from "class-validator";
-import {TaskPriority, TaskStatus} from "../enum/tasks.enum";
+import {TaskPriority, TaskStatus} from "../../enum/tasks.enum";
 
 export class CreateTaskDto {
     @IsString()
