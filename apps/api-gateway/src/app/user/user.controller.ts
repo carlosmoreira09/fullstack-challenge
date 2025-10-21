@@ -21,7 +21,7 @@ export class UserController {
 
     constructor(
     @Inject("USERS_SERVICE")
-    private readonly userClinet: ClientProxy,
+    private readonly userClient: ClientProxy,
     @Inject("AUTH_SERVICE")
     private readonly authClient: ClientProxy
     ){}
@@ -30,13 +30,13 @@ export class UserController {
     @Get()
     async getUserProfile(@Req() req: any) {
         const userId = req.user?.userId;
-        return await firstValueFrom(this.userClinet.send("user-profile", userId));
+        return await firstValueFrom(this.userClient.send("user-profile", userId));
     }
 
     @UseGuards(AuthGuard)
     @Get('all')
     async getAllUsers() {
-        return await firstValueFrom(this.userClinet.send("list-users", {}));
+        return await firstValueFrom(this.userClient.send("list-users", {}));
     }
 
     @UseGuards(AuthGuard)
@@ -44,7 +44,7 @@ export class UserController {
     async createUser(@Body() userData: any) {
        const createAuth = await firstValueFrom(this.authClient.send('create-auth', userData))
         if(createAuth) {
-            return await firstValueFrom(this.userClinet.send("create-user", userData));
+            return await firstValueFrom(this.userClient.send("create-user", userData));
         } else {
             throw new HttpException("Bad Request", HttpStatus.BAD_REQUEST);
         }
@@ -62,6 +62,6 @@ export class UserController {
     async updateUser(
         @Param('id') id: string,
         @Body() userData: any) {
-        return await firstValueFrom(this.userClinet.send('update-user',{...userData, id: id}))
+        return await firstValueFrom(this.userClient.send('update-user',{...userData, id: id}))
     }
 }

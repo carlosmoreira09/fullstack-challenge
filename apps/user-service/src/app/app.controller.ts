@@ -1,8 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import {MessagePattern, Payload} from "@nestjs/microservices";
-import {CreateUserDto} from "../dto/create-user.dto";
-import {UpdateUserDto} from "../dto/update-user.dto";
+import {CreateUserDto, UpdateUserDto} from "@taskmanagerjungle/types";
 
 @Controller()
 export class AppController {

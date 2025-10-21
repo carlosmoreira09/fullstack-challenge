@@ -1,0 +1,6 @@
+export * from './task.enums';
+export * from './dto/create-task.dto';
+export * from './dto/update-task.dto';
+export * from './dto/create-comment.dto';
+export * from './dto/update-comment.dto';
+export * from './dto/task.dto';

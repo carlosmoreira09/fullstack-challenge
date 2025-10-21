@@ -6,10 +6,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { TaskPriority, TaskStatus } from '../enum/tasks.enum';
 import { CommentEntity } from './comment.entity';
 import { TaskAssignmentEntity } from './task-assignment.entity';
 import { TaskHistoryEntity } from './task-history.entity';
+import {TaskPriority, TaskStatus} from "@taskmanagerjungle/types";
 
 @Entity({ name: 'tasks', schema: 'tasks' })
 export class TaskEntity {

@@ -176,7 +176,7 @@ function TaskDetails() {
                         <div className="flex-1">
                             <h1 className="text-2xl font-semibold text-foreground">{task.title}</h1>
                             <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
-                                <span>Criado por {task.createdById ?? "-"}</span>
+                                <span>Criado por {task.createdByData?.name ?? task.createdById ?? "-"}</span>
                                 <span>•</span>
                                 <span>{formatDate(task.createdAt)}</span>
                             </div>
@@ -297,16 +297,23 @@ function TaskDetails() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-3">
-                                    {task.assignees.map((user, index) => (
-                                        <div key={index} className="flex items-center gap-3">
-                                            <Avatar className="h-9 w-9">
-                                                <AvatarFallback className="bg-primary text-sm text-primary-foreground">
-                                                    {getInitials(user)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <span className="text-sm font-medium">{user}</span>
-                                        </div>
-                                    ))}
+                                    {task.assigneesData && task.assigneesData.length > 0 ? (
+                                        task.assigneesData.map((user) => (
+                                            <div key={user.id} className="flex items-center gap-3">
+                                                <Avatar className="h-9 w-9">
+                                                    <AvatarFallback className="bg-primary text-sm text-primary-foreground">
+                                                        {getInitials(user.name)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-medium">{user.name}</span>
+                                                    <span className="text-xs text-muted-foreground">{user.email}</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-muted-foreground">Nenhum responsável atribuído</p>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>

@@ -2,8 +2,7 @@ import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern } from '@nestjs/microservices';
 import {Payload} from "@nestjs/microservices/decorators/payload.decorator";
-import {CreateTaskDto} from "../dto/tasks/create-task.dto";
-import {UpdateTaskDto} from "../dto/tasks/update-task.dto";
+import {CreateTaskDto, UpdateTaskDto} from "@taskmanagerjungle/types";
 
 @Controller()
 export class AppController {

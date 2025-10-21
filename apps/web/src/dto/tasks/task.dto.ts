@@ -1,6 +1,13 @@
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
 
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    role?: string;
+}
+
 export interface Task {
     id?: string;
     title: string;
@@ -9,7 +16,9 @@ export interface Task {
     status: TaskStatus;
     dueDate?: string | null;
     assignees: string[];
+    assigneesData?: User[];
     createdById?: string;
+    createdByData?: User;
     createdAt?: string;
     updatedAt?: string;
 }

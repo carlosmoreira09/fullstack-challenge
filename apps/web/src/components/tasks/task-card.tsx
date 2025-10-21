@@ -81,13 +81,32 @@ export function TaskCard({ task, onDragStart, onDragEnd, onClick }: TaskCardProp
 
                 {/* Assigned Users */}
                 <div className="flex items-center gap-1">
-                    {task.assignees.slice(0, 3).map((user, index) => (
-                        <Avatar key={index} className="h-6 w-6 border border-border">
-                            <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{getInitials(user)}</AvatarFallback>
-                        </Avatar>
-                    ))}
-                    {task.assignees.length > 3 && (
-                        <span className="ml-1 text-xs text-muted-foreground">+{task.assignees.length - 3}</span>
+                    {task.assigneesData && task.assigneesData.length > 0 ? (
+                        <>
+                            {task.assigneesData.slice(0, 3).map((user) => (
+                                <Avatar key={user.id} className="h-6 w-6 border border-border" title={user.name}>
+                                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{getInitials(user.name)}</AvatarFallback>
+                                </Avatar>
+                            ))}
+                            {task.assigneesData.length > 3 && (
+                                <span className="ml-1 text-xs text-muted-foreground">+{task.assigneesData.length - 3}</span>
+                            )}
+                        </>
+                    ) : task.assignees.length > 0 ? (
+                        <>
+                            {task.assignees.slice(0, 3).map((userId, index) => (
+                                <Avatar key={index} className="h-6 w-6 border border-border">
+                                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{getInitials(userId)}</AvatarFallback>
+                                </Avatar>
+                            ))}
+                            {task.assignees.length > 3 && (
+                                <span className="ml-1 text-xs text-muted-foreground">+{task.assignees.length - 3}</span>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                                <Badge className="text-[10px] bg-primary/10 text-primary">Ninguém assignado</Badge>
+                        </>
                     )}
                 </div>
             </div>
