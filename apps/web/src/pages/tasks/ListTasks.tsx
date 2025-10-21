@@ -1,7 +1,9 @@
+import {KanbanBoard} from "@/components/tasks/kanbon-board.tsx";
+
 export default function ListTasks() {
     return (
         <div>
-            <h1>Users</h1>
+            <KanbanBoard />
         </div>
     )
 }

@@ -1,0 +1,203 @@
+"use client"
+
+import type React from "react"
+import {useState} from "react"
+import {Button} from "@/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Textarea} from "@/components/ui/textarea"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import type {Task, TaskPriority, TaskStatus} from "@/dto/tasks/task.dto.ts";
+
+interface CreateTaskDialogProps {
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    onCreateTask: (task: Omit<Task, "id">) => void
+}
+
+export function CreateTaskDialog({ open, onOpenChange, onCreateTask }: CreateTaskDialogProps) {
+    const [formData, setFormData] = useState({
+        title: "",
+        description: "",
+        status: "TODO" as TaskStatus,
+        priority: "MEDIUM" as TaskPriority,
+        dueDate: "",
+        assignees: [] as string[],
+    })
+
+    const [errors, setErrors] = useState<Record<string, string>>({})
+
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {}
+
+        // Title validation
+        if (!formData.title.trim()) {
+            newErrors.title = "O título é obrigatório"
+        } else if (formData.title.length < 3) {
+            newErrors.title = "O título deve ter pelo menos 3 caracteres"
+        } else if (formData.title.length > 100) {
+            newErrors.title = "O título deve ter no máximo 100 caracteres"
+        }
+
+        // Description validation
+        if (formData.description && formData.description.length > 500) {
+            newErrors.description = "A descrição deve ter no máximo 500 caracteres"
+        }
+
+        // Deadline validation
+        if (formData.dueDate) {
+            const selectedDate = new Date(formData.dueDate)
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+            if (selectedDate < today) {
+                newErrors.dueDate = "O prazo não pode ser no passado"
+            }
+        }
+
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+
+        if (validateForm()) {
+            onCreateTask(formData)
+
+            // Reset form and errors
+            setFormData({
+                title: "",
+                description: "",
+                status: "TODO",
+                priority: "MEDIUM",
+                dueDate: "",
+                assignees: [],
+            })
+            setErrors({})
+            onOpenChange(false)
+        }
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>Criar Nova Tarefa</DialogTitle>
+                    <DialogDescription>Preencha os detalhes da tarefa. Clique em criar quando terminar.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit}>
+                    <div className="grid gap-4 py-4">
+                        {/* Title */}
+                        <div className="grid gap-2">
+                            <Label htmlFor="title">Título *</Label>
+                            <Input
+                                id="title"
+                                placeholder="Ex: Implementar autenticação JWT"
+                                value={formData.title}
+                                onChange={(e) => {
+                                    setFormData({ ...formData, title: e.target.value })
+                                    if (errors.title) {
+                                        setErrors({ ...errors, title: "" })
+                                    }
+                                }}
+                                className={errors.title ? "border-red-500" : ""}
+                            />
+                            {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                        </div>
+
+                        {/* Description */}
+                        <div className="grid gap-2">
+                            <Label htmlFor="description">Descrição</Label>
+                            <Textarea
+                                id="description"
+                                placeholder="Descreva os detalhes da tarefa..."
+                                value={formData.description}
+                                onChange={(e) => {
+                                    setFormData({ ...formData, description: e.target.value })
+                                    if (errors.description) {
+                                        setErrors({ ...errors, description: "" })
+                                    }
+                                }}
+                                rows={3}
+                                className={errors.description ? "border-red-500" : ""}
+                            />
+                            {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+                        </div>
+
+                        {/* Priority and Status */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="priority">Prioridade</Label>
+                                <Select
+                                    value={formData.priority}
+                                    onValueChange={(value: TaskPriority) => setFormData({ ...formData, priority: value })}
+                                >
+                                    <SelectTrigger id="priority">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="LOW">Baixa</SelectItem>
+                                        <SelectItem value="MEDIUM">Média</SelectItem>
+                                        <SelectItem value="HIGH">Alta</SelectItem>
+                                        <SelectItem value="URGENT">Urgente</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="status">Status</Label>
+                                <Select
+                                    value={formData.status}
+                                    onValueChange={(value: TaskStatus) => setFormData({ ...formData, status: value })}
+                                >
+                                    <SelectTrigger id="status">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="TODO">To Do</SelectItem>
+                                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                                        <SelectItem value="REVIEW">Review</SelectItem>
+                                        <SelectItem value="DONE">Done</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        {/* Deadline */}
+                        <div className="grid gap-2">
+                            <Label htmlFor="deadline">Prazo</Label>
+                            <Input
+                                id="deadline"
+                                type="date"
+                                value={formData.dueDate}
+                                onChange={(e) => {
+                                    setFormData({ ...formData, dueDate: e.target.value })
+                                    if (errors.deadline) {
+                                        setErrors({ ...errors, deadline: "" })
+                                    }
+                                }}
+                                className={errors.deadline ? "border-red-500" : ""}
+                            />
+                            {errors.deadline && <p className="text-sm text-red-500">{errors.deadline}</p>}
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            Cancelar
+                        </Button>
+                        <Button type="submit">Criar Tarefa</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    )
+}

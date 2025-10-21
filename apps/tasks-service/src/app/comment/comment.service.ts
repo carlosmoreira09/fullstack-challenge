@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import {Repository} from "typeorm";
-import { TaskEntity } from '../entities/task.entity';
-import {CreateTaskDto} from "../dto/tasks/create-task.dto";
-import {TaskPriority, TaskStatus} from "../enum/tasks.enum";
-import {CommentEntity} from "../entities/comment.entity";
-import {CreateCommentDto} from "../dto/comment/create-comment.dto";
-import {UpdateCommentDto} from "../dto/comment/update-comment.dto";
+import { TaskEntity } from '../../entities/task.entity';
+import {CreateTaskDto} from "../../dto/tasks/create-task.dto";
+import {TaskPriority, TaskStatus} from "../../enum/tasks.enum";
+import {CommentEntity} from "../../entities/comment.entity";
+import {CreateCommentDto} from "../../dto/comment/create-comment.dto";
+import {UpdateCommentDto} from "../../dto/comment/update-comment.dto";
 
 @Injectable()
 export class CommentService {
