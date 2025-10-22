@@ -87,16 +87,16 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center light:bg-gray-100">
-            <div className="flex flex-row absolute top-5 left-10 text-2xl cursor-pointer">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+            <div className="flex flex-row absolute top-5 left-10 text-2xl cursor-pointer text-foreground">
                 <div className="mt-2">
-                    <ArrowLeft onClick={() => navigate({to: '/'})}/>
+                    <ArrowLeft onClick={() => navigate({to: '/'})} className="hover:text-primary transition"/>
                 </div>
             </div>
             <div
-                className="w-full rounded-xl max-w-md p-8 space-y-8 bg-background dark:bg-white shadow-md dark:shadow-white">
+                className="w-full rounded-xl max-w-md p-8 space-y-8 bg-card shadow-lg border border-border">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-primary dark:text-black">Área Admin</h2>
+                    <h2 className="text-2xl font-bold text-foreground">Área Admin</h2>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -107,7 +107,7 @@ export default function Login() {
                             placeholder="E-mail"
                             value={formData.email}
                             onChange={handleChange}
-                            className={`w-full dark:placeholder:text-black text-black ${errors.email ? 'border-red-500' : ''}`}
+                            className={`w-full ${errors.email ? 'border-red-500' : ''}`}
                             required
                         />
                         {errors.email && (
@@ -122,7 +122,7 @@ export default function Login() {
                             placeholder="Senha"
                             value={formData.password}
                             onChange={handleChange}
-                            className={`w-full dark:placeholder:text-black text-black ${errors.password ? 'border-red-500' : ''}`}
+                            className={`w-full ${errors.password ? 'border-red-500' : ''}`}
                             required
                         />
                         {errors.password && (
@@ -132,7 +132,7 @@ export default function Login() {
 
                     <Button
                         type="submit"
-                        className="w-full px-4 py-2 text-lg bg-orange-500 hover:bg-orange-600 text-gray-50 dark:text-gray-50"
+                        className="w-full px-4 py-2 text-lg"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Entrando...' : 'Entrar'}

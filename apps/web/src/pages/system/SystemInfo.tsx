@@ -45,7 +45,7 @@ const microservices: Microservice[] = [
     protocol: 'http',
     icon: Server,
     url: 'http://localhost:3001',
-    healthUrl: 'http://localhost:3001',
+    healthUrl: 'http://localhost:3001/api/health',
   },
   {
     id: 'auth-service',
@@ -55,7 +55,7 @@ const microservices: Microservice[] = [
     container: 'auth-service',
     protocol: 'tcp',
     icon: Lock,
-    healthUrl: 'http://localhost:3002',
+    healthUrl: 'http://localhost:3001/api/health/auth',
   },
   {
     id: 'tasks-service',
@@ -65,7 +65,7 @@ const microservices: Microservice[] = [
     container: 'tasks-service',
     protocol: 'tcp',
     icon: Activity,
-    healthUrl: 'http://localhost:3004',
+    healthUrl: 'http://localhost:3001/api/health/tasks',
   },
   {
     id: 'notifications-service',
@@ -75,7 +75,7 @@ const microservices: Microservice[] = [
     container: 'notifications-service',
     protocol: 'tcp/ws',
     icon: BellRing,
-    healthUrl: 'http://localhost:3003',
+    healthUrl: 'http://localhost:3001/api/health/notifications',
   },
   {
     id: 'postgres',
@@ -85,6 +85,7 @@ const microservices: Microservice[] = [
     container: 'db',
     protocol: 'postgres',
     icon: Database,
+    healthUrl: 'http://localhost:3001/api/health/postgres',
   },
   {
     id: 'rabbitmq',
@@ -95,6 +96,7 @@ const microservices: Microservice[] = [
     protocol: 'amqp',
     icon: Cable,
     url: 'http://localhost:15672',
+    healthUrl: 'http://localhost:3001/api/health/rabbitmq',
   },
 ]
 
@@ -152,11 +154,12 @@ export function MicroservicesDashboard() {
         }
 
         try {
-          const apiGatewayResponse = await fetch('http://localhost:3001', {
+          const apiGatewayResponse = await fetch('http://localhost:3001/api/health', {
             method: 'GET',
             cache: 'no-store',
             mode: 'cors',
           })
+            console.log(apiGatewayResponse)
 
           if (!cancelled) {
             setStatuses((prev) => ({
@@ -180,11 +183,12 @@ export function MicroservicesDashboard() {
         }
 
         const serviceChecks = [
-          { id: 'auth-service', endpoint: 'http://localhost:3001/health/auth' },
-          { id: 'tasks-service', endpoint: 'http://localhost:3001/health/tasks' },
-          { id: 'notifications-service', endpoint: 'http://localhost:3001/health/notifications' },
-          { id: 'postgres', endpoint: 'http://localhost:3001/health/postgres' },
-          { id: 'rabbitmq', endpoint: 'http://localhost:3001/health/rabbitmq' },
+            { id: 'api-gateway', endpoint: 'http://localhost:3001/api/health' },
+            { id: 'auth-service', endpoint: 'http://localhost:3001/api/health/auth' },
+          { id: 'tasks-service', endpoint: 'http://localhost:3001/api/health/tasks' },
+          { id: 'notifications-service', endpoint: 'http://localhost:3001/api/health/notifications' },
+          { id: 'postgres', endpoint: 'http://localhost:3001/api/health/postgres' },
+          { id: 'rabbitmq', endpoint: 'http://localhost:3001/api/health/rabbitmq' },
         ]
 
         await Promise.all(
@@ -206,7 +210,7 @@ export function MicroservicesDashboard() {
                 setStatuses((prev) => ({
                   ...prev,
                   [id]: {
-                    state: data.status ? 'online' : 'offline',
+                    state: response.ok ? 'online' : 'offline',
                     httpStatus: response.status,
                     message: data.message,
                   },
@@ -254,39 +258,39 @@ export function MicroservicesDashboard() {
     switch (status.state) {
       case 'online':
         return (
-          <span className="flex items-center gap-2 text-sm font-medium text-emerald-400">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.7)]" />
+          <span className="flex items-center gap-2 text-sm font-medium text-emerald-600">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
             Online
             {status.httpStatus ? ` · ${status.httpStatus}` : null}
           </span>
         )
       case 'degraded':
         return (
-          <span className="flex items-center gap-2 text-sm font-medium text-amber-300">
-            <span className="h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(252,211,77,0.7)]" />
-            Degraded
+          <span className="flex items-center gap-2 text-sm font-medium text-amber-600">
+            <span className="h-2 w-2 rounded-full bg-amber-500" />
+            404
             {status.httpStatus ? ` · ${status.httpStatus}` : null}
           </span>
         )
       case 'offline':
         return (
-          <span className="flex items-center gap-2 text-sm font-medium text-rose-400">
-            <span className="h-2 w-2 rounded-full bg-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.7)]" />
+          <span className="flex items-center gap-2 text-sm font-medium text-rose-600">
+            <span className="h-2 w-2 rounded-full bg-rose-500" />
             Offline
           </span>
         )
       case 'loading':
         return (
-          <span className="flex items-center gap-2 text-sm font-medium text-slate-300">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-slate-300" />
+          <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-muted-foreground" />
             Checking...
           </span>
         )
       case 'not-monitored':
       default:
         return (
-          <span className="flex items-center gap-2 text-sm font-medium text-slate-400">
-            <span className="h-2 w-2 rounded-full bg-slate-500/60" />
+          <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <span className="h-2 w-2 rounded-full bg-muted" />
             Not monitored
           </span>
         )
@@ -294,39 +298,39 @@ export function MicroservicesDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
-      <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-16 text-slate-100">
-        <header className="flex flex-col items-start gap-4">
-          <span className="rounded-full bg-slate-900/80 px-4 py-1 text-sm font-medium text-slate-300 ring-1 ring-slate-800">
-            TaskManager Jungle • Microservices
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-6 py-8">
+        <header className="mb-8 flex flex-col items-start gap-4">
+          <span className="rounded-full bg-muted px-4 py-1 text-sm font-medium text-muted-foreground ring-1 ring-border">
+            TaskManager Jungle • Microservices Running
           </span>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Runtime overview
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            Visão geral
           </h1>
-          <p className="max-w-3xl text-base text-slate-300">
-            A quick snapshot of every service that powers the TaskManager Jungle
-            platform. Use these details to verify that each container is up and
-            listening on the expected port while you develop locally.
+          <p className="text-base text-muted-foreground">
+              Um rápido resumo de todos os serviços que alimentam a plataforma TaskManager Jungle.
+              Use esses detalhes para verificar se cada contêiner está ativo e
+              escutando na porta esperada enquanto você desenvolve localmente.
           </p>
         </header>
 
-        <section className="grid gap-6 sm:grid-cols-2">
+        <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {services.map((service) => {
             const Icon = service.icon
             const status = statuses[service.id]
             return (
               <article
                 key={service.name}
-                className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-xl shadow-slate-950/40 transition hover:border-cyan-500/60 hover:shadow-cyan-500/10"
+                className="rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:border-primary/50 hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="rounded-xl bg-slate-900 p-3">
-                      <Icon className="h-5 w-5 text-cyan-400" />
+                    <span className="rounded-xl bg-muted p-3">
+                      <Icon className="h-5 w-5 text-primary" />
                     </span>
                     <div>
-                      <h2 className="text-lg font-semibold">{service.name}</h2>
-                      <p className="text-sm text-slate-400">
+                      <h2 className="text-lg font-semibold text-foreground">{service.name}</h2>
+                      <p className="text-sm text-muted-foreground">
                         {service.description}
                       </p>
                     </div>
@@ -334,18 +338,18 @@ export function MicroservicesDashboard() {
                   {renderStatusBadge(status)}
                 </div>
 
-                <dl className="mt-6 grid gap-2 text-sm text-slate-300">
+                <dl className="mt-6 grid gap-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <dt className="text-slate-400">Container</dt>
-                    <dd className="font-mono text-slate-200">{service.container}</dd>
+                    <dt className="text-muted-foreground">Container</dt>
+                    <dd className="font-mono text-foreground">{service.container}</dd>
                   </div>
                   <div className="flex items-center justify-between">
-                    <dt className="text-slate-400">Protocol</dt>
-                    <dd className="font-mono text-slate-200">{service.protocol}</dd>
+                    <dt className="text-muted-foreground">Protocol</dt>
+                    <dd className="font-mono text-foreground">{service.protocol}</dd>
                   </div>
                   <div className="flex items-center justify-between">
-                    <dt className="text-slate-400">Port</dt>
-                    <dd className="font-mono text-slate-200">{service.port}</dd>
+                    <dt className="text-muted-foreground">Port</dt>
+                    <dd className="font-mono text-foreground">{service.port}</dd>
                   </div>
                 </dl>
 
@@ -354,20 +358,20 @@ export function MicroservicesDashboard() {
                     href={service.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-6 inline-flex items-center justify-center rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+                    className="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
                   >
                     Open interface
                   </a>
                 ) : status.state === 'not-monitored' ? (
-                  <p className="mt-6 text-sm text-slate-500">
+                  <p className="mt-6 text-sm text-muted-foreground">
                     Monitoring not available for this protocol.
                   </p>
                 ) : status.message ? (
-                  <p className="mt-6 text-sm text-slate-500">
+                  <p className="mt-6 text-sm text-muted-foreground">
                     {status.message}
                   </p>
                 ) : (
-                  <p className="mt-6 text-sm text-slate-500">
+                  <p className="mt-6 text-sm text-muted-foreground">
                     No additional details.
                   </p>
                 )}
@@ -376,7 +380,7 @@ export function MicroservicesDashboard() {
           })}
         </section>
 
-        <footer className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 text-sm text-slate-400">
+        <footer className="mt-8 rounded-2xl border border-border bg-muted/50 p-6 text-sm text-muted-foreground">
           Update these details if you change container names, ports, or expose
           new services in `docker-compose.yaml`.
         </footer>

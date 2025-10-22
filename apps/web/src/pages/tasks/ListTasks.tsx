@@ -10,7 +10,7 @@ export const tasksRoute = createRoute({
 
 function ListTasks() {
     return (
-        <div>
+        <div className="container mx-auto py-8">
             <KanbanBoard />
         </div>
     )
