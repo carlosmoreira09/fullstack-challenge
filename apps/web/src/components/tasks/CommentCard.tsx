@@ -3,7 +3,7 @@ import { Edit2, Trash2, Check, X } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type { TaskComment } from "@/dto/tasks/task.dto.ts";
+import type { TaskComment } from "@taskmanagerjungle/types";
 
 interface CommentCardProps {
     comment: TaskComment;

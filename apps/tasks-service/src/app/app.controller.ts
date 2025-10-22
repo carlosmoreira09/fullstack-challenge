@@ -4,12 +4,14 @@ import { MessagePattern } from '@nestjs/microservices';
 import {Payload} from "@nestjs/microservices/decorators/payload.decorator";
 import {CreateTaskDto, UpdateTaskDto, CreateCommentDto, UpdateCommentDto} from "@taskmanagerjungle/types";
 import { CommentService } from './comment/comment.service';
+import { TasksHistoryService } from './tasks-history/tasks-history.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly commentService: CommentService
+    private readonly commentService: CommentService,
+    private readonly tasksHistoryService: TasksHistoryService
   ) {}
 
   @MessagePattern({ cmd: 'health' })
@@ -59,5 +61,10 @@ export class AppController {
     @MessagePattern('delete-comment')
     async deleteComment(@Payload() id: string) {
         return await this.commentService.delete(id);
+    }
+
+    @MessagePattern('list-history-by-task')
+    async findHistoryByTask(@Payload() taskId: string) {
+        return await this.tasksHistoryService.findByTask(taskId);
     }
 }

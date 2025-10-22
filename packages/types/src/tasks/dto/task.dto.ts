@@ -1,5 +1,6 @@
-import { TaskPriority, TaskStatus } from '../task.enums';
+import { TaskPriority, TaskStatus } from '../task.enums.js';
 import {IsArray, IsDate, IsString} from "class-validator";
+import {User} from "../../users";
 
 export class TaskDto {
     @IsString()
@@ -22,4 +23,28 @@ export class TaskDto {
     createdAt!: Date;
     @IsDate()
     updatedAt!: Date;
+}
+
+export interface Task {
+    id?: string;
+    title: string;
+    description?: string | null;
+    priority: TaskPriority;
+    status: TaskStatus;
+    dueDate?: string | null;
+    assignees: string[];
+    assigneesData?: User[];
+    createdById?: string;
+    createdByData?: User;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface ListTasksParams {
+    page?: number;
+    size?: number;
+    status?: TaskStatus;
+    priority?: TaskPriority;
+    assigneeId?: string;
+    createdById?: string;
 }

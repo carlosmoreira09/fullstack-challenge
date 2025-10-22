@@ -9,6 +9,7 @@ import { HealthController } from './health/health.controller';
 import { HealthService } from './health/health.service';
 import {TaskController} from "./tasks/task.controller";
 import {CommentController} from "./comments/comment.controller";
+import {TasksHistoryController} from "./tasks/tasks-history.controller";
 
 @Module({
   imports: [
@@ -47,7 +48,7 @@ import {CommentController} from "./comments/comment.controller";
           }
       ])
   ],
-  controllers: [AppController, AuthController, UserController, HealthController, TaskController, CommentController],
+  controllers: [AppController, AuthController, UserController, HealthController, TaskController, CommentController, TasksHistoryController],
   providers: [AppService, HealthService],
 })
 export class AppModule {}

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm';
-import { CreateCommentDto, UpdateCommentDto } from '@taskmanagerjungle/types';
+import { CreateCommentDto, TaskHistoryAction, UpdateCommentDto } from '@taskmanagerjungle/types';
 import { CommentEntity } from '../../entities/comment.entity';
+import { TasksHistoryService } from '../tasks-history/tasks-history.service';
 
 @Injectable()
 export class CommentService {
@@ -10,6 +11,7 @@ export class CommentService {
     constructor(
         @InjectRepository(CommentEntity)
         private readonly commentRepository: Repository<CommentEntity>,
+        private readonly tasksHistoryService: TasksHistoryService,
     ) {}
 
     async findAll() {
@@ -40,19 +42,76 @@ export class CommentService {
             ...createTask,
             task: { id: createTask.taskId }
         })
-        return await this.commentRepository.save(addTask)
+        const newComment = await this.commentRepository.save(addTask)
+
+        try {
+            await this.tasksHistoryService.create({
+                taskId: createTask.taskId,
+                userId: createTask.authorId,
+                action: TaskHistoryAction.COMMENT_ADDED,
+                oldValue: null,
+                newValue: {
+                    commentId: newComment.id,
+                    content: newComment.content
+                }
+            });
+        } catch (error) {
+            Logger.error('Failed to create comment history:', error);
+        }
+
+        return newComment;
     }
 
     async update(id: string, updateTask: UpdateCommentDto) {
-        const task = await this.findOne(id)
-        if(!task) {
-            throw new Error("Task not found.");
+        const comment = await this.findOne(id)
+        if(!comment) {
+            throw new Error("Comment not found.");
         }
 
-        return await this.commentRepository.update(id, updateTask)
-     }
+        const result = await this.commentRepository.update(id, updateTask)
+
+        try {
+            await this.tasksHistoryService.create({
+                taskId: comment.taskId,
+                userId: comment.authorId,
+                action: TaskHistoryAction.COMMENT_UPDATED,
+                oldValue: {
+                    commentId: comment.id,
+                    content: comment.content
+                },
+                newValue: {
+                    commentId: comment.id,
+                    content: updateTask.content
+                }
+            });
+        } catch (error) {
+            Logger.error('Failed to create comment update history:', error);
+        }
+
+        return result;
+    }
 
     async delete(id: string) {
+        const comment = await this.findOne(id);
+        if (!comment) {
+            throw new Error("Comment not found.");
+        }
+
+        try {
+            await this.tasksHistoryService.create({
+                taskId: comment.taskId,
+                userId: comment.authorId,
+                action: TaskHistoryAction.COMMENT_DELETED,
+                oldValue: {
+                    commentId: comment.id,
+                    content: comment.content
+                },
+                newValue: null
+            });
+        } catch (error) {
+            Logger.error('Failed to create comment deletion history:', error);
+        }
+
         return await this.commentRepository.delete(id);
     }
 

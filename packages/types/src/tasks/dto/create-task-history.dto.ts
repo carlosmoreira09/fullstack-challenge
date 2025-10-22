@@ -1,5 +1,5 @@
-import { IsDate, IsObject, IsString} from "class-validator";
-import {TaskHistoryAction} from "../task.enums";
+import { IsDate, IsObject, IsOptional, IsString} from "class-validator";
+import {TaskHistoryAction} from "../task.enums.js";
 
 export class CreateTaskHistoryDto {
     @IsString()
@@ -8,15 +8,18 @@ export class CreateTaskHistoryDto {
     @IsString()
     userId!: string;
 
-    @IsObject()
+    @IsString()
     action!: TaskHistoryAction;
 
+    @IsOptional()
     @IsObject()
     oldValue?: Record<string, unknown> | null;
 
-    @IsDate()
+    @IsOptional()
+    @IsObject()
     newValue?: Record<string, unknown> | null;
 
+    @IsOptional()
     @IsDate()
     createdAt?: Date
 }

@@ -102,7 +102,7 @@ export class AppService {
 
         const changes: Record<string, unknown> = {};
         const oldValues: Record<string, unknown> = {};
-        
+
         if (updateTask.title !== undefined && updateTask.title !== task.title) {
             changes.title = updateTask.title;
             oldValues.title = task.title;
@@ -123,13 +123,13 @@ export class AppService {
             changes.dueDate = updateTask.dueDate;
             oldValues.dueDate = task.dueDate;
         }
+
         if (updateTask.assignees && JSON.stringify(updateTask.assignees) !== JSON.stringify(task.assignees)) {
             const oldAssignees = task.assignees || [];
             const newAssignees = updateTask.assignees || [];
-            
+
             const addedAssignees = newAssignees.filter(a => !oldAssignees.includes(a));
             const removedAssignees = oldAssignees.filter(a => !newAssignees.includes(a));
-
             for (const assignee of addedAssignees) {
                 try {
                     await this.taskAssignmentService.create({
@@ -155,7 +155,7 @@ export class AppService {
                 try {
                     const assignments = await this.taskAssignmentService.findByTask(task.id);
                     const assignment = assignments.find(a => a.userId === assignee && a.isActive);
-                    
+
                     if (assignment) {
                         await this.taskAssignmentService.update({
                             id: assignment.id,
@@ -182,6 +182,7 @@ export class AppService {
             changes.assignees = newAssignees;
             oldValues.assignees = oldAssignees;
         }
+
         const updatedTask = await this.taskRepository.save({ ...task, ...updateTask });
 
         if (Object.keys(changes).length > 0) {
@@ -202,7 +203,6 @@ export class AppService {
         if (!task) {
             throw new Error("Task not found.");
         }
-
         await this.taskHistoryService.create({
             taskId: task.id,
             userId: task.createdById,

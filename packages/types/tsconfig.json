@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "resolvePackageJsonExports": true,
     "esModuleInterop": true,
     "declaration": true,
@@ -13,7 +13,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false
   },
   "include": ["src/**/*"],
   "exclude": ["dist", "node_modules"]

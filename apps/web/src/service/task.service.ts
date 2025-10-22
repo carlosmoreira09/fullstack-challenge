@@ -1,7 +1,5 @@
 import apiClient from "@/lib/interceptor.ts";
-import type { CreateTaskDto } from "@/dto/tasks/create-task.dto.ts";
-import type { UpdateTaskDto } from "@/dto/tasks/update-task.dto.ts";
-import type { ListTasksParams, Task } from "@/dto/tasks/task.dto.ts";
+import type { CreateTaskDto, UpdateTaskDto, ListTasksParams, Task } from "@taskmanagerjungle/types";
 
 type TaskPayload = CreateTaskDto & { id?: string };
 

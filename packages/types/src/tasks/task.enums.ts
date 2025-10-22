@@ -11,7 +11,6 @@ export enum TaskStatus {
   REVIEW = 'REVIEW',
   DONE = 'DONE',
 }
-
 export enum TaskHistoryAction {
     CREATED = 'CREATED',
     UPDATED = 'UPDATED',
@@ -21,4 +20,7 @@ export enum TaskHistoryAction {
     ASSIGNEE_ADDED = 'ASSIGNEE_ADDED',
     ASSIGNEE_REMOVED = 'ASSIGNEE_REMOVED',
     DUE_DATE_CHANGED = 'DUE_DATE_CHANGED',
+    COMMENT_ADDED = 'COMMENT_ADDED',
+    COMMENT_UPDATED = 'COMMENT_UPDATED',
+    COMMENT_DELETED = 'COMMENT_DELETED',
 }

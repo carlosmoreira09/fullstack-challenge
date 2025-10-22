@@ -8,14 +8,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import type {Task, TaskComment, TaskHistoryEntry, TaskPriority} from "@/dto/tasks/task.dto.ts";
+import {type Task, type TaskComment, type TaskHistoryEntry, TaskPriority} from "@taskmanagerjungle/types";
 import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
 import {taskService} from "@/service/task.service.ts";
 import {commentService} from "@/service/comment.service.ts";
 import {CommentCard} from "@/components/tasks/CommentCard.tsx";
 import {useAuth} from "@/hooks/auth.tsx";
 import {AddAssigneesDialog} from "@/components/tasks/AddAssigneesDialog.tsx";
-import type {UpdateTaskDto} from "@/dto/tasks/update-task.dto.ts";
+import {UpdateTaskDto} from "@taskmanagerjungle/types";
+import {taskHistoryService} from "@/service/taskHistory.service.ts";
 
 const PRIORITY_CONFIG: Record<
     TaskPriority,
@@ -45,15 +46,17 @@ function TaskDetails() {
     const { userId, decoded } = useAuth()
     const [task, setTask] = useState<Task | null>(null)
     const [comments, setComments] = useState<TaskComment[]>([])
-    const [history] = useState<TaskHistoryEntry[]>([])
+    const [history, setHistory] = useState<TaskHistoryEntry[]>([])
     const [newComment, setNewComment] = useState("")
     const [isLoading, setIsLoading] = useState(true)
     const [isLoadingComments, setIsLoadingComments] = useState(false)
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [isAssigneesDialogOpen, setIsAssigneesDialogOpen] = useState(false)
 
     const taskApi = useMemo(() => taskService(), [])
     const commentApi = useMemo(() => commentService(), [])
+    const historyApi = useMemo(() => taskHistoryService(), [])
     const isAdmin = decoded?.role === 'ADMIN'
 
     useEffect(() => {
@@ -94,6 +97,22 @@ function TaskDetails() {
         void fetchComments()
     }, [commentApi, taskId])
 
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                setIsLoadingHistory(true)
+                const data = await historyApi.getHistoryByTask(taskId)
+                setHistory(data)
+            } catch (err) {
+                console.error("Erro ao carregar histórico:", err)
+            } finally {
+                setIsLoadingHistory(false)
+            }
+        }
+
+        void fetchHistory()
+    }, [historyApi, taskId])
+
     const handleAddComment = async () => {
         if (!newComment.trim() || !task) return
 
@@ -104,6 +123,9 @@ function TaskDetails() {
             })
             setComments([...comments, comment])
             setNewComment("")
+
+            const updatedHistory = await historyApi.getHistoryByTask(taskId)
+            setHistory(updatedHistory)
         } catch (err) {
             console.error("Erro ao adicionar comentário:", err)
         }
@@ -113,6 +135,9 @@ function TaskDetails() {
         try {
             const updatedComment = await commentApi.updateComment(commentId, { content })
             setComments(comments.map(c => c.id === commentId ? updatedComment : c))
+
+            const updatedHistory = await historyApi.getHistoryByTask(taskId)
+            setHistory(updatedHistory)
         } catch (err) {
             console.error("Erro ao editar comentário:", err)
             throw err
@@ -123,6 +148,9 @@ function TaskDetails() {
         try {
             await commentApi.deleteComment(commentId)
             setComments(comments.filter(c => c.id !== commentId))
+
+            const updatedHistory = await historyApi.getHistoryByTask(taskId)
+            setHistory(updatedHistory)
         } catch (err) {
             console.error("Erro ao deletar comentário:", err)
             throw err
@@ -157,7 +185,7 @@ function TaskDetails() {
     }
 
     const formatDate = (dateString?: string) => {
-       if(!dateString)  return 'Sem data'
+        if(!dateString)  return 'Sem data'
         return new Date(dateString).toLocaleDateString("pt-BR", {
             day: "2-digit",
             month: "short",
@@ -185,33 +213,71 @@ function TaskDetails() {
     }
 
     const renderHistoryChange = (entry: TaskHistoryEntry) => {
-        switch (entry.changeType) {
-            case "CREATE":
+        switch (entry.action) {
+            case "CREATED":
                 return <span className="text-muted-foreground">criou a tarefa</span>
-            case "ASSIGN":
+            case "ASSIGNEE_ADDED":
                 return (
                     <span className="text-muted-foreground">
-            atribuiu a tarefa para{" "}
-                        <span className="font-medium text-foreground">{entry.after.assignees.join(", ")}</span>
-          </span>
+                        adicionou um responsável
+                    </span>
                 )
-            case "STATUS_CHANGE":
+            case "ASSIGNEE_REMOVED":
                 return (
                     <span className="text-muted-foreground">
-            alterou o status de{" "}
+                        removeu um responsável
+                    </span>
+                )
+            case "STATUS_CHANGED":
+                return (
+                    <span className="text-muted-foreground">
+                        alterou o status de{" "}
                         <span className="font-medium text-foreground">
-              {STATUS_LABELS[entry.before.status as keyof typeof STATUS_LABELS]}
-            </span>{" "}
+                            {entry.oldValue?.status ? STATUS_LABELS[entry.oldValue.status as keyof typeof STATUS_LABELS] : "N/A"}
+                        </span>{" "}
                         para{" "}
                         <span className="font-medium text-foreground">
-              {STATUS_LABELS[entry.after.status as keyof typeof STATUS_LABELS]}
-            </span>
-          </span>
+                            {entry.newValue?.status ? STATUS_LABELS[entry.newValue.status as keyof typeof STATUS_LABELS] : "N/A"}
+                        </span>
+                    </span>
                 )
-            case "COMMENT":
-                return <span className="text-muted-foreground">adicionou um comentário</span>
-            case "UPDATE":
+            case "PRIORITY_CHANGED":
+                return (
+                    <span className="text-muted-foreground">
+                        alterou a prioridade
+                    </span>
+                )
+            case "DUE_DATE_CHANGED":
+                return (
+                    <span className="text-muted-foreground">
+                        alterou a data de vencimento
+                    </span>
+                )
+            case "COMMENT_ADDED":
+                return (
+                    <span className="text-muted-foreground">
+                        adicionou um comentário:{" "}
+                        <span className="italic text-foreground">
+                            "{entry.newValue?.content ? String(entry.newValue.content).substring(0, 50) : ""}..."
+                        </span>
+                    </span>
+                )
+            case "COMMENT_UPDATED":
+                return (
+                    <span className="text-muted-foreground">
+                        editou um comentário
+                    </span>
+                )
+            case "COMMENT_DELETED":
+                return (
+                    <span className="text-muted-foreground">
+                        deletou um comentário
+                    </span>
+                )
+            case "UPDATED":
                 return <span className="text-muted-foreground">atualizou a tarefa</span>
+            case "DELETED":
+                return <span className="text-muted-foreground text-red-500">deletou a tarefa</span>
             default:
                 return <span className="text-muted-foreground">realizou uma alteração</span>
         }
@@ -414,24 +480,34 @@ function TaskDetails() {
                             </CardHeader>
                             <CardContent>
                                 <ScrollArea className="h-[500px] pr-4">
-                                    <div className="space-y-4">
-                                        {history.map((entry, index) => (
-                                            <div key={entry.id} className="relative flex gap-3 pb-4">
-                                                {index !== history.length - 1 && (
-                                                    <div className="absolute left-4 top-10 h-full w-px bg-border" />
-                                                )}
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarFallback className="bg-muted text-xs">{getInitials(entry.actorName)}</AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex-1 space-y-1">
-                                                    <div className="text-sm">
-                                                        <span className="font-medium">{entry.actorName}</span> {renderHistoryChange(entry)}
+                                    {isLoadingHistory ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <p className="text-sm text-muted-foreground">Carregando histórico...</p>
+                                        </div>
+                                    ) : history.length === 0 ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <p className="text-sm text-muted-foreground">Nenhum histórico disponível</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {history.map((entry, index) => (
+                                                <div key={entry.id} className="relative flex gap-3 pb-4">
+                                                    {index !== history.length - 1 && (
+                                                        <div className="absolute left-4 top-10 h-full w-px bg-border" />
+                                                    )}
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarFallback className="bg-muted text-xs">{getInitials(entry.userName)}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="flex-1 space-y-1">
+                                                        <div className="text-sm">
+                                                            <span className="font-medium">{entry.userName}</span> {renderHistoryChange(entry)}
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground">{formatDateTime(entry.createdAt)}</p>
                                                     </div>
-                                                    <p className="text-xs text-muted-foreground">{formatDateTime(entry.createdAt)}</p>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </ScrollArea>
                             </CardContent>
                         </Card>

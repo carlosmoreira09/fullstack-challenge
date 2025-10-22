@@ -5,7 +5,6 @@ export class CreateUserDto {
   @IsString()
   name!: string;
 
-  @Type(() => Date)
   @IsDate()
   birthday!: Date;
 

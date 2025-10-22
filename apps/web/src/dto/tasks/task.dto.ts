@@ -39,16 +39,3 @@ export interface TaskComment {
     content: string
     createdAt: string
 }
-
-export type ChangeType = "CREATE" | "UPDATE" | "STATUS_CHANGE" | "ASSIGN" | "COMMENT"
-
-export interface TaskHistoryEntry {
-    id: string
-    taskId: string
-    actorId: string
-    actorName: string
-    changeType: ChangeType
-    before: any
-    after: any
-    createdAt: string
-}

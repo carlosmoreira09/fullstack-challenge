@@ -46,4 +46,25 @@ export class TasksAssignmentService {
 
         return await this.taskAssignmentRepository.save(updateObject)
     }
+
+    async unassignUser(taskId: string, userId: string) {
+        const assignments = await this.taskAssignmentRepository.find({
+            where: { taskId, userId, isActive: true }
+        });
+
+        if (assignments.length > 0) {
+            for (const assignment of assignments) {
+                assignment.isActive = false;
+                assignment.unassignedAt = new Date();
+                await this.taskAssignmentRepository.save(assignment);
+            }
+        }
+    }
+
+    async getActiveAssignees(taskId: string): Promise<string[]> {
+        const assignments = await this.taskAssignmentRepository.find({
+            where: { taskId, isActive: true }
+        });
+        return assignments.map(a => a.userId);
+    }
 }

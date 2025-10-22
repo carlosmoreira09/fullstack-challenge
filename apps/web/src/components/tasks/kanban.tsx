@@ -2,7 +2,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import type {Task, TaskStatus} from "@/dto/tasks/task.dto.ts";
+import type {Task, TaskStatus} from "@taskmanagerjungle/types";
 import {TaskCard} from "@/components/tasks/task-card.tsx";
 
 interface KanbanColumnProps {

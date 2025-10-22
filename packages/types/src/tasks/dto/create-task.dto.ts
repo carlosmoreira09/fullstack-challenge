@@ -1,5 +1,5 @@
 import { IsArray, IsOptional, IsString } from 'class-validator';
-import { TaskPriority, TaskStatus } from '../task.enums';
+import { TaskPriority, TaskStatus } from '../task.enums.js';
 
 export class CreateTaskDto {
   @IsString()
@@ -7,7 +7,7 @@ export class CreateTaskDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  description?: string | null;
 
   @IsString()
   priority!: TaskPriority;

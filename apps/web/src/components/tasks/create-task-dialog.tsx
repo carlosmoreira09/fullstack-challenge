@@ -15,10 +15,10 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import type {Task, TaskPriority, TaskStatus} from "@/dto/tasks/task.dto.ts";
 import type {User} from "@/dto/users/users.dto.ts";
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {userService} from "@/service/user.service.ts";
+import {type Task, TaskPriority, TaskStatus} from "@taskmanagerjungle/types";
 
 interface CreateTaskDialogProps {
     open: boolean
@@ -30,8 +30,8 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask }: CreateTas
     const [formData, setFormData] = useState({
         title: "",
         description: "",
-        status: "TODO" as TaskStatus,
-        priority: "MEDIUM" as TaskPriority,
+        status: TaskStatus.TODO,
+        priority: TaskPriority.MEDIUM,
         dueDate: "",
         assignees: [] as string[],
     })
@@ -117,8 +117,8 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask }: CreateTas
             setFormData({
                 title: "",
                 description: "",
-                status: "TODO",
-                priority: "MEDIUM",
+                status: TaskStatus.TODO,
+                priority: TaskPriority.MEDIUM,
                 dueDate: "",
                 assignees: [],
             })

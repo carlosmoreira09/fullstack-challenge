@@ -4,15 +4,15 @@ import {Button} from "@/components/ui/button"
 import {useNavigate} from "@tanstack/react-router";
 import {KanbanColumn} from "@/components/tasks/kanban.tsx";
 import {CreateTaskDialog} from "@/components/tasks/create-task-dialog.tsx";
-import type {Task, TaskStatus} from "@/dto/tasks/task.dto.ts";
+import {type Task, TaskStatus} from "@taskmanagerjungle/types";
 import {taskService} from "@/service/task.service.ts";
 import {useAuth} from "@/hooks/auth.tsx";
 
 const COLUMNS: { id: TaskStatus; title: string }[] = [
-    { id: "TODO", title: "To Do" },
-    { id: "IN_PROGRESS", title: "In Progress" },
-    { id: "REVIEW", title: "Review" },
-    { id: "DONE", title: "Done" },
+    { id: TaskStatus.TODO, title: "To Do" },
+    { id: TaskStatus.IN_PROGRESS, title: "In Progress" },
+    { id: TaskStatus.REVIEW, title: "Review" },
+    { id: TaskStatus.DONE, title: "Done" },
 ]
 
 export function KanbanBoard() {

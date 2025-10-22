@@ -1,5 +1,5 @@
 import apiClient from "@/lib/interceptor.ts";
-import type { TaskComment } from "@/dto/tasks/task.dto.ts";
+import type { TaskComment } from "@taskmanagerjungle/types";
 
 export interface CreateCommentDto {
     taskId: string;
