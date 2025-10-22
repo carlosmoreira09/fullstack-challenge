@@ -55,10 +55,18 @@ export const taskService = () => {
         return tasks.find((task) => task.id === id) ?? null;
     };
 
+    const listTasksByUser = async (userId: string, includeAssigned: boolean = false) => {
+        const response = await apiClient.get<Task[]>(`/tasks/user/${userId}`, {
+            params: { includeAssigned: includeAssigned.toString() }
+        });
+        return response.data;
+    };
+
     return {
         listTasks,
         createTask,
         updateTask,
         getTaskById,
+        listTasksByUser,
     };
 };

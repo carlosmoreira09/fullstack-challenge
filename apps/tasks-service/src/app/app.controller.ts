@@ -28,6 +28,30 @@ export class AppController {
     async findAll() {
       return await this.appService.findAll()
   }
+    @MessagePattern('list-tasks-by-user')
+    async findTasksByUser(@Payload() userId: string) {
+        return await this.appService.findByUser(userId);
+    }
+
+    @MessagePattern('list-tasks-created-by-user')
+    async findTasksCreatedByUser(@Payload() userId: string) {
+        return await this.appService.findCreatedByUser(userId);
+    }
+
+    @MessagePattern('list-tasks-assigned-to-user')
+    async findTasksAssignedToUser(@Payload() userId: string) {
+        return await this.appService.findAssignedToUser(userId);
+    }
+
+    @MessagePattern('list-tasks-created-and-assigned')
+    async findTasksCreatedAndAssigned(@Payload() userId: string) {
+        return await this.appService.findCreatedAndAssignedToUser(userId);
+    }
+    
+    @MessagePattern('get-task')
+    async getTask(@Payload() taskId: string) {
+        return await this.appService.findOne(taskId);
+    }
     @MessagePattern('create-task')
     async createTask(@Payload() createTask: CreateTaskDto) {
         return await this.appService.create(createTask);
@@ -39,8 +63,8 @@ export class AppController {
     }
 
     @MessagePattern('list-comments-by-task')
-    async findCommentsByTask(@Payload() taskId: string) {
-        return await this.commentService.findByTask(taskId);
+    async findCommentsByTask(@Payload() userId: string) {
+        return await this.commentService.findByCreated(userId);
     }
 
     @MessagePattern('get-comment')

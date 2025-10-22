@@ -1,7 +1,9 @@
 import type React from "react"
 
 import { useState } from "react"
+import { Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import type {Task, TaskStatus} from "@taskmanagerjungle/types";
 import {TaskCard} from "@/components/tasks/task-card.tsx";
 
@@ -14,6 +16,7 @@ interface KanbanColumnProps {
     onDrop: (status: TaskStatus) => void
     isDraggingOver: boolean
     onTaskClick?: (task: Task) => void
+    onAddTask?: (status: TaskStatus) => void
 }
 
 export function KanbanColumn({
@@ -25,6 +28,7 @@ export function KanbanColumn({
                                  onDrop,
                                  isDraggingOver,
                                  onTaskClick,
+                                 onAddTask,
                              }: KanbanColumnProps) {
     const [isDragOver, setIsDragOver] = useState(false)
 
@@ -53,6 +57,15 @@ export function KanbanColumn({
             {tasks.length}
           </span>
                 </div>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => onAddTask?.(status)}
+                    title={`Adicionar tarefa em ${title}`}
+                >
+                    <Plus className="h-4 w-4" />
+                </Button>
             </div>
 
             {/* Tasks Container */}

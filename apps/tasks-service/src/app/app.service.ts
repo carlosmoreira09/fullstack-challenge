@@ -28,6 +28,42 @@ export class AppService {
         return await this.taskRepository.find({ where: { createdById: userId } });
     }
 
+    async findByUser(userId: string) {
+        // Find tasks where user is creator OR assignee
+        return await this.taskRepository
+            .createQueryBuilder('task')
+            .where('task.createdById = :userId', { userId })
+            .orWhere(':userId = ANY(task.assignees)', { userId })
+            .getMany();
+    }
+
+    async findCreatedByUser(userId: string) {
+        // Find tasks created by user
+        return await this.taskRepository.find({ where: { createdById: userId } });
+    }
+
+    async findAssignedToUser(userId: string) {
+        // Find tasks assigned to user
+        return await this.taskRepository
+            .createQueryBuilder('task')
+            .where(':userId = ANY(task.assignees)', { userId })
+            .getMany();
+    }
+
+    async findCreatedAndAssignedToUser(userId: string) {
+        // Find tasks created by user AND assigned to user
+        const createdTasks = await this.findCreatedByUser(userId);
+        const assignedTasks = await this.findAssignedToUser(userId);
+        
+        // Combine and remove duplicates
+        const taskMap = new Map();
+        [...createdTasks, ...assignedTasks].forEach(task => {
+            taskMap.set(task.id, task);
+        });
+        
+        return Array.from(taskMap.values());
+    }
+
     async findByAssignee(assigneeId: number) {
         return await this.taskRepository
             .createQueryBuilder('task')

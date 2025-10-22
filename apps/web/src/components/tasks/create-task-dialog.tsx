@@ -24,9 +24,10 @@ interface CreateTaskDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onCreateTask: (task: Omit<Task, "id">) => void
+    initialStatus?: TaskStatus
 }
 
-export function CreateTaskDialog({ open, onOpenChange, onCreateTask }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStatus }: CreateTaskDialogProps) {
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -62,7 +63,12 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask }: CreateTas
         }
 
         void fetchUsers()
-    }, [open, fetchUsers])
+        
+        // Set initial status if provided
+        if (initialStatus) {
+            setFormData(prev => ({ ...prev, status: initialStatus }))
+        }
+    }, [open, fetchUsers, initialStatus])
 
     const handleToggleAssignee = (userId: string) => {
         setFormData((prev) => {
