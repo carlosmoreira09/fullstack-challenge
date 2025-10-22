@@ -2,11 +2,15 @@ import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern } from '@nestjs/microservices';
 import {Payload} from "@nestjs/microservices/decorators/payload.decorator";
-import {CreateTaskDto, UpdateTaskDto} from "@taskmanagerjungle/types";
+import {CreateTaskDto, UpdateTaskDto, CreateCommentDto, UpdateCommentDto} from "@taskmanagerjungle/types";
+import { CommentService } from './comment/comment.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly commentService: CommentService
+  ) {}
 
   @MessagePattern({ cmd: 'health' })
   async health() {
@@ -30,5 +34,30 @@ export class AppController {
     @MessagePattern('update-task')
     async updateTask(@Payload() updateTask: UpdateTaskDto) {
         return await this.appService.update(updateTask.id, updateTask)
+    }
+
+    @MessagePattern('list-comments-by-task')
+    async findCommentsByTask(@Payload() taskId: string) {
+        return await this.commentService.findByTask(taskId);
+    }
+
+    @MessagePattern('get-comment')
+    async getComment(@Payload() id: string) {
+        return await this.commentService.findOne(id);
+    }
+
+    @MessagePattern('create-comment')
+    async createComment(@Payload() createComment: CreateCommentDto) {
+        return await this.commentService.create(createComment);
+    }
+
+    @MessagePattern('update-comment')
+    async updateComment(@Payload() data: { id: string } & UpdateCommentDto) {
+        return await this.commentService.update(data.id, data);
+    }
+
+    @MessagePattern('delete-comment')
+    async deleteComment(@Payload() id: string) {
+        return await this.commentService.delete(id);
     }
 }

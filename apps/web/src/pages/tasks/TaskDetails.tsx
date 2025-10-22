@@ -1,6 +1,6 @@
 import {createRoute, useNavigate} from "@tanstack/react-router"
 import {useEffect, useMemo, useState} from "react"
-import { ArrowLeft, Calendar, Clock, Flag, MessageSquare, History, User, Send } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Flag, MessageSquare, History, User, Send, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +11,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import type {Task, TaskComment, TaskHistoryEntry, TaskPriority} from "@/dto/tasks/task.dto.ts";
 import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
 import {taskService} from "@/service/task.service.ts";
+import {commentService} from "@/service/comment.service.ts";
+import {CommentCard} from "@/components/tasks/CommentCard.tsx";
+import {useAuth} from "@/hooks/auth.tsx";
+import {AddAssigneesDialog} from "@/components/tasks/AddAssigneesDialog.tsx";
+import type {UpdateTaskDto} from "@/dto/tasks/update-task.dto.ts";
 
 const PRIORITY_CONFIG: Record<
     TaskPriority,
@@ -37,14 +42,19 @@ export const taskDetailsRoute = createRoute({
 function TaskDetails() {
     const navigate = useNavigate()
     const { taskId } = taskDetailsRoute.useParams()
+    const { userId, decoded } = useAuth()
     const [task, setTask] = useState<Task | null>(null)
     const [comments, setComments] = useState<TaskComment[]>([])
     const [history] = useState<TaskHistoryEntry[]>([])
     const [newComment, setNewComment] = useState("")
     const [isLoading, setIsLoading] = useState(true)
+    const [isLoadingComments, setIsLoadingComments] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [isAssigneesDialogOpen, setIsAssigneesDialogOpen] = useState(false)
 
     const taskApi = useMemo(() => taskService(), [])
+    const commentApi = useMemo(() => commentService(), [])
+    const isAdmin = decoded?.role === 'ADMIN'
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -68,20 +78,82 @@ function TaskDetails() {
         void fetchTask()
     }, [taskApi, taskId])
 
-    const handleAddComment = () => {
-        if (!newComment.trim() || !task) return
-
-        const comment: TaskComment = {
-            id: `c${Date.now()}`,
-            taskId: task.id,
-            authorId: "current-user",
-            authorName: "Você",
-            content: newComment,
-            createdAt: new Date().toISOString(),
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                setIsLoadingComments(true)
+                const data = await commentApi.getCommentsByTask(taskId)
+                setComments(data)
+            } catch (err) {
+                console.error("Erro ao carregar comentários:", err)
+            } finally {
+                setIsLoadingComments(false)
+            }
         }
 
-        setComments([...comments, comment])
-        setNewComment("")
+        void fetchComments()
+    }, [commentApi, taskId])
+
+    const handleAddComment = async () => {
+        if (!newComment.trim() || !task) return
+
+        try {
+            const comment = await commentApi.createComment({
+                taskId: task.id!,
+                content: newComment,
+            })
+            setComments([...comments, comment])
+            setNewComment("")
+        } catch (err) {
+            console.error("Erro ao adicionar comentário:", err)
+        }
+    }
+
+    const handleEditComment = async (commentId: string, content: string) => {
+        try {
+            const updatedComment = await commentApi.updateComment(commentId, { content })
+            setComments(comments.map(c => c.id === commentId ? updatedComment : c))
+        } catch (err) {
+            console.error("Erro ao editar comentário:", err)
+            throw err
+        }
+    }
+
+    const handleDeleteComment = async (commentId: string) => {
+        try {
+            await commentApi.deleteComment(commentId)
+            setComments(comments.filter(c => c.id !== commentId))
+        } catch (err) {
+            console.error("Erro ao deletar comentário:", err)
+            throw err
+        }
+    }
+
+    const handleUpdateAssignees = async (assigneeIds: string[]) => {
+        if (!task) return
+
+        const updateTask: UpdateTaskDto = {
+            id: task.id!,
+            title: task.title,
+            description: task.description,
+            priority: task.priority,
+            status: task.status,
+            dueDate: task.dueDate,
+            assignees: assigneeIds,
+            createdById: userId
+        }
+        try {
+            await taskApi.updateTask(updateTask)
+
+            // Refresh task data
+            const updatedTask = await taskApi.getTaskById(task.id!)
+            if (updatedTask) {
+                setTask(updatedTask)
+            }
+        } catch (err) {
+            console.error("Erro ao atualizar responsáveis:", err)
+            throw err
+        }
     }
 
     const formatDate = (dateString?: string) => {
@@ -246,25 +318,29 @@ function TaskDetails() {
                                 <CardDescription>Discussão e atualizações sobre a tarefa</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <ScrollArea className="h-[400px] pr-4">
-                                    <div className="space-y-4">
-                                        {comments.map((comment) => (
-                                            <div key={comment.id} className="flex gap-3">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-                                                        {getInitials(comment.authorName)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex-1 space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm font-medium">{comment.authorName}</span>
-                                                        <span className="text-xs text-muted-foreground">{formatDateTime(comment.createdAt)}</span>
-                                                    </div>
-                                                    <p className="text-sm leading-relaxed text-foreground">{comment.content}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <ScrollArea className="h-[120px] pr-4">
+                                    {isLoadingComments ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <p className="text-sm text-muted-foreground">Carregando comentários...</p>
+                                        </div>
+                                    ) : comments.length === 0 ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <p className="text-sm text-muted-foreground">Nenhum comentário ainda. Seja o primeiro!</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {comments.map((comment) => (
+                                                <CommentCard
+                                                    key={comment.id}
+                                                    comment={comment}
+                                                    currentUserId={userId || ""}
+                                                    isAdmin={isAdmin}
+                                                    onEdit={handleEditComment}
+                                                    onDelete={handleDeleteComment}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
                                 </ScrollArea>
 
                                 <Separator className="my-4" />
@@ -274,7 +350,7 @@ function TaskDetails() {
                                         placeholder="Adicione um comentário..."
                                         value={newComment}
                                         onChange={(e) => setNewComment(e.target.value)}
-                                        className="min-h-[100px] resize-none"
+                                        className="min-h-[50px] resize-none"
                                     />
                                     <div className="flex justify-end">
                                         <Button onClick={handleAddComment} disabled={!newComment.trim()} size="sm">
@@ -290,10 +366,20 @@ function TaskDetails() {
                     <div className="space-y-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-base">
-                                    <User className="h-4 w-4" />
-                                    Responsáveis
-                                </CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="flex items-center gap-2 text-base">
+                                        <User className="h-4 w-4" />
+                                        Responsáveis
+                                    </CardTitle>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0"
+                                        onClick={() => setIsAssigneesDialogOpen(true)}
+                                    >
+                                        <UserPlus className="h-4 w-4" />
+                                    </Button>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-3">
@@ -352,6 +438,13 @@ function TaskDetails() {
                     </div>
                 </div>
             </div>
+
+            <AddAssigneesDialog
+                open={isAssigneesDialogOpen}
+                onOpenChange={setIsAssigneesDialogOpen}
+                currentAssignees={task.assignees}
+                onSave={handleUpdateAssignees}
+            />
         </div>
     )
 }

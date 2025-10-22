@@ -1,5 +1,5 @@
 export interface IAuthContext {
-    userId: string | null;
+    userId: string;
     decoded: DecodedToken | null
     login: (user: LoginData) => Promise<AuthResponse | null>;
     logout: () => void;

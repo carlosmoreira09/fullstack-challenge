@@ -11,7 +11,7 @@ export type Props = {
 
 const AuthProvider = ({ children }: Props) => {
     const [decoded, setDecoded] = useState<DecodedToken | null>(null);
-    const [userId, setUserId] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string>('');
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const loginService = useMemo(() => authService(), []);
@@ -30,7 +30,7 @@ const AuthProvider = ({ children }: Props) => {
         Cookies.remove('token');
         Cookies.remove('refreshToken');
         setDecoded(null);
-        setUserId(null);
+        setUserId('');
         setIsAuthenticated(false);
     }, []);
 
