@@ -1,7 +1,8 @@
-import {Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Post, Put, Query} from "@nestjs/common";
+import {Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Post, Put, Query, UseGuards} from "@nestjs/common";
 import {ClientProxy} from "@nestjs/microservices";
 import {firstValueFrom} from "rxjs";
 import {TaskDto, UserDto} from "@taskmanagerjungle/types";
+import {AuthGuard} from "../../guards/auth/auth.guard";
 
 @Controller('tasks')
 export class TaskController {
@@ -124,5 +125,73 @@ export class TaskController {
     @Put()
     async updateTask(@Body() task: any) {
         return await firstValueFrom(this.taskClient.send('update-task', task));
+    }
+
+    @Get(':id/comments')
+    @UseGuards(AuthGuard)
+    async getTaskComments(
+        @Param('id') taskId: string,
+        @Query('page') page?: string,
+        @Query('size') size?: string
+    ) {
+        try {
+            const pageNum = page ? parseInt(page, 10) : 1;
+            const limitNum = size ? parseInt(size, 10) : 10;
+
+            const response = await firstValueFrom(
+                this.taskClient.send('list-comments-by-task', {
+                    taskId,
+                    page: pageNum,
+                    limit: limitNum
+                })
+            );
+
+            if (!response || !response.data || response.data.length === 0) {
+                return {
+                    data: [],
+                    meta: {
+                        total: 0,
+                        page: pageNum,
+                        limit: limitNum,
+                        totalPages: 0
+                    }
+                };
+            }
+
+            const uniqueAuthorIds: string[] = [...new Set(response.data.map((c: any) => c.authorId))] as string[];
+            const usersMap = new Map<string, UserDto>();
+
+            await Promise.all(
+                uniqueAuthorIds.map(async (authorId) => {
+                    try {
+                        const user: UserDto = await firstValueFrom(
+                            this.userClient.send('user-profile', authorId)
+                        );
+                        usersMap.set(authorId, user);
+                    } catch (error) {
+                        Logger.error(`Failed to fetch user ${authorId}:`, error);
+                    }
+                })
+            );
+
+            return {
+                data: response.data.map((comment: any) => ({
+                    ...comment,
+                    authorName: usersMap.get(comment.authorId)?.name || 'Unknown',
+                })),
+                meta: response.meta
+            };
+        } catch (error) {
+            Logger.error('Error fetching comments:', error);
+            return {
+                data: [],
+                meta: {
+                    total: 0,
+                    page: 1,
+                    limit: 10,
+                    totalPages: 0
+                }
+            };
+        }
     }
 }

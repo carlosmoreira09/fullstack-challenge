@@ -140,7 +140,6 @@ export function MicroservicesDashboard() {
 
     const checkHealth = async () => {
       try {
-        // Check web (self)
         if (!cancelled) {
           setStatuses((prev) => ({
             ...prev,
@@ -152,7 +151,6 @@ export function MicroservicesDashboard() {
           }))
         }
 
-        // Check API Gateway
         try {
           const apiGatewayResponse = await fetch('http://localhost:3001', {
             method: 'GET',
@@ -181,7 +179,6 @@ export function MicroservicesDashboard() {
           }
         }
 
-        // Check all microservices through API Gateway health endpoints
         const serviceChecks = [
           { id: 'auth-service', endpoint: 'http://localhost:3001/health/auth' },
           { id: 'tasks-service', endpoint: 'http://localhost:3001/health/tasks' },

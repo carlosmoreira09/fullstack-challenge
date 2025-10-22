@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -26,43 +27,6 @@ export class CommentController {
     @Inject('USERS_SERVICE')
     private readonly userClient: ClientProxy,
   ) {}
-
-  @Get('task/:taskId')
-  async findByTask(@Param('taskId') taskId: string) {
-    try {
-      const comments = await firstValueFrom(
-        this.taskClient.send('list-comments-by-task', taskId)
-      );
-
-      if (!comments || comments.length === 0) {
-        return [];
-      }
-
-      const uniqueAuthorIds: string[] = [...new Set(comments.map((c: any) => c.authorId))] as string[];
-      const usersMap = new Map<string, UserDto>();
-
-      await Promise.all(
-        uniqueAuthorIds.map(async (authorId) => {
-          try {
-            const user: UserDto = await firstValueFrom(
-              this.userClient.send('user-profile', authorId)
-            );
-            usersMap.set(authorId, user);
-          } catch (error) {
-            console.error(`Failed to fetch user ${authorId}:`, error);
-          }
-        })
-      );
-
-      return comments.map((comment: any) => ({
-        ...comment,
-        authorName: usersMap.get(comment.authorId)?.name || 'Unknown',
-      }));
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      return [];
-    }
-  }
 
   @Post()
   async createComment(@Body() createCommentDto: CreateCommentDto, @Request() req: any) {

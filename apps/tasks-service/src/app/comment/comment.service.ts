@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateCommentDto, TaskHistoryAction, UpdateCommentDto } from '@taskmanagerjungle/types';
 import { CommentEntity } from '../../entities/comment.entity';
 import { TasksHistoryService } from '../tasks-history/tasks-history.service';
+import { RabbitMQService } from '../../rabbitmq/rabbitmq.service';
 
 @Injectable()
 export class CommentService {
@@ -12,6 +13,7 @@ export class CommentService {
         @InjectRepository(CommentEntity)
         private readonly commentRepository: Repository<CommentEntity>,
         private readonly tasksHistoryService: TasksHistoryService,
+        private readonly rabbitMQService: RabbitMQService,
     ) {}
 
     async findAll() {
@@ -24,8 +26,25 @@ export class CommentService {
     async findOneByTask(taskId: string) {
         return await this.commentRepository.findOne({ where: { taskId: taskId } });
     }
-    async findByTask(taskId: string) {
-        return await this.commentRepository.find({ where: { taskId: taskId } });
+    async findByTask(taskId: string, page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        
+        const [comments, total] = await this.commentRepository.findAndCount({
+            where: { taskId: taskId },
+            order: { createdAt: 'DESC' },
+            skip,
+            take: limit
+        });
+
+        return {
+            data: comments,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
     }
 
     async findByCreated(authorId: string) {
@@ -57,6 +76,13 @@ export class CommentService {
             });
         } catch (error) {
             Logger.error('Failed to create comment history:', error);
+        }
+
+        try {
+            await this.rabbitMQService.publishCommentCreated(newComment);
+            Logger.log(`Published task.comment.created event for comment ${newComment.id}`);
+        } catch (error) {
+            Logger.error(`Failed to publish task.comment.created event for comment ${newComment.id}:`, error);
         }
 
         return newComment;

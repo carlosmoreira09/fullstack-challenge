@@ -5,6 +5,7 @@ import {TaskEntity} from '../entities/task.entity';
 import {CreateTaskDto, TaskHistoryAction, TaskPriority, TaskStatus, UpdateTaskDto} from "@taskmanagerjungle/types";
 import {TasksAssignmentService} from "./tasks-assignment/tasks-assignment.service";
 import {TasksHistoryService} from "./tasks-history/tasks-history.service";
+import {RabbitMQService} from "../rabbitmq/rabbitmq.service";
 
 @Injectable()
 export class AppService {
@@ -14,6 +15,7 @@ export class AppService {
         private readonly taskRepository: Repository<TaskEntity>,
         private readonly taskAssignmentService: TasksAssignmentService,
         private readonly taskHistoryService: TasksHistoryService,
+        private readonly rabbitMQService: RabbitMQService,
     ) {}
 
     async findAll() {
@@ -29,7 +31,6 @@ export class AppService {
     }
 
     async findByUser(userId: string) {
-        // Find tasks where user is creator OR assignee
         return await this.taskRepository
             .createQueryBuilder('task')
             .where('task.createdById = :userId', { userId })
@@ -38,12 +39,10 @@ export class AppService {
     }
 
     async findCreatedByUser(userId: string) {
-        // Find tasks created by user
         return await this.taskRepository.find({ where: { createdById: userId } });
     }
 
     async findAssignedToUser(userId: string) {
-        // Find tasks assigned to user
         return await this.taskRepository
             .createQueryBuilder('task')
             .where(':userId = ANY(task.assignees)', { userId })
@@ -51,11 +50,8 @@ export class AppService {
     }
 
     async findCreatedAndAssignedToUser(userId: string) {
-        // Find tasks created by user AND assigned to user
         const createdTasks = await this.findCreatedByUser(userId);
         const assignedTasks = await this.findAssignedToUser(userId);
-        
-        // Combine and remove duplicates
         const taskMap = new Map();
         [...createdTasks, ...assignedTasks].forEach(task => {
             taskMap.set(task.id, task);
@@ -125,6 +121,13 @@ export class AppService {
             });
 
             await Promise.all([...assignmentPromises, historyPromise]);
+
+            try {
+                await this.rabbitMQService.publishTaskCreated(newTask);
+                Logger.log(`Published task.created event for task ${newTask.id}`);
+            } catch (error) {
+                Logger.error(`Failed to publish task.created event for task ${newTask.id}:`, error);
+            }
         }
 
         return newTask;
@@ -229,6 +232,12 @@ export class AppService {
                 oldValue: oldValues,
                 newValue: changes
             });
+            try {
+                await this.rabbitMQService.publishTaskUpdated(updatedTask);
+                Logger.log(`Published task.updated event for task ${updatedTask.id}`);
+            } catch (error) {
+                Logger.error(`Failed to publish task.updated event for task ${updatedTask.id}:`, error);
+            }
         }
 
         return updatedTask;

@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { UsersListSkeleton } from '@/components/users/UsersListSkeleton';
 
 interface User {
   id: string;
@@ -33,7 +34,7 @@ export function UsersList({ users, isLoading, onEdit, onDelete, onChangePassword
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">Carregando...</div>;
+    return <UsersListSkeleton />;
   }
 
   return (

@@ -11,6 +11,7 @@ import {TaskHistoryEntity} from "../entities/task-history.entity";
 import {TasksHistoryService} from "./tasks-history/tasks-history.service";
 import {TaskAssignmentEntity} from "../entities/task-assignment.entity";
 import {TasksAssignmentService} from "./tasks-assignment/tasks-assignment.service";
+import {RabbitMQModule} from "../rabbitmq/rabbitmq.module";
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import {TasksAssignmentService} from "./tasks-assignment/tasks-assignment.servic
             envFilePath: ['.env.local', '.env.docker', '.env'],
         }),
         DatabaseModule,
+        RabbitMQModule,
         TypeOrmModule.forFeature([
             TaskEntity,
             CommentEntity,

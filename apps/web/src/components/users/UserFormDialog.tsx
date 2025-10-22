@@ -37,7 +37,7 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
         email: user.email,
         document: user.document,
         role: user.role,
-        birthday: user.birthday, // Convert to YYYY-MM-DD format
+        birthday: user.birthday,
       });
     } else {
       setFormData({});
@@ -83,11 +83,9 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
     e.preventDefault();
 
     if (isEditing) {
-      // Para edição, removemos o campo de senha
       const { password, ...dataToUpdate } = formData;
       updateUserMutation.mutate(dataToUpdate);
     } else {
-      // Para criação, validamos todos os campos
       const dataWithCreator = {
         ...formData,
         createdById: decoded?.userId || '',

@@ -1,24 +1,4 @@
 # Desafio Full-stack Júnior — Sistema de Gestão de Tarefas Colaborativo
-
-> **Comentarios Diários** 
-> 
-> Dia 1.
->> Encontrei um pouco de dificuldade na hora de realizar o setup do projeto, principalmente na parte de build do docker com docker-compose, 
-> mas consegui resolver pesquisando sobre no google e estou utilizando o chatGPT para tirar algumas duvidas teóricas de algumas stacks e configuração do composer.
-> Apesar de ter uma boa experiência com o NestJS tendo um projeto grande em produção(www.locmoto.com.br), nunca trabalhei
-> com a parte de Microserviços do NestJS, estou conseguindo desenvolver bem depois de assistir os dois videos recomendados. 
-> Apesar de nunca ter trabalhado com RabbitMQ e Docker não encontrei dificuldade para entender como funciona até aqui, até agora o maior desafio continua sendo a parte de configuração do projeto e integrações dos microserviços devido a falta de experiência previa com as ferramentas.
-
-Dia 2.
-> Finalizei a primeira parte das integrações do projeto entre a api-gateway e auth-service com autenticação JWT, 
-> Realizando login pela roda /api/auth/login, retornado JWT para api-gateway, em seguida gateway acessa os dados do usuário com o JWT retornando os dados
-> do mesmo como resposta do login inicialmente.
----
-
-Comentarios Gerais
-> Acredito que a parte de desenvolvimento agora seja mais fluida e rapido, os desafios iniciais encontrados foram mais devido a falta de experiência com 
-> microserviços e as ferramentas exigidas. Todo os dias vou descrever aqui como foi a experiência do desenvolvimento e do progresso de acordo com os requerimentos do projeto.
-
 > 
 > #### Initial Database Details
 >```
@@ -26,7 +6,7 @@ Comentarios Gerais
 >│  users   │1       * │ assignments│ *    1 │   tasks     │
 >├──────────┤          ├────────────┤        ├────────────┤
 >│id (pk)   │          │id (pk)     │        │id (pk)     │
->│email*    │          │user_id (fk)│        │title*      │
+>│41*    │          │user_id (fk)│        │title*      │
 >│username* │          │task_id (fk)│        │description │
 >│password  │          │role        │        │priority*   │ {LOW,MEDIUM,HIGH,URGENT}
 >│created_at│          │created_at  │        │status*     │ {TODO,IN_PROGRESS,REVIEW,DONE}

@@ -10,14 +10,34 @@ export interface UpdateCommentDto {
     content: string;
 }
 
+export interface PaginatedComments {
+    data: TaskComment[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
 export const commentService = () => {
-    const getCommentsByTask = async (taskId: string): Promise<TaskComment[]> => {
+    const getCommentsByTask = async (taskId: string, page: number = 1, size: number = 10): Promise<PaginatedComments> => {
         try {
-            const response = await apiClient.get<TaskComment[]>(`/comments/task/${taskId}`);
+            const response = await apiClient.get<PaginatedComments>(`/tasks/${taskId}/comments`, {
+                params: { page, size }
+            });
             return response.data;
         } catch (error) {
             console.error('Error fetching comments:', error);
-            return [];
+            return {
+                data: [],
+                meta: {
+                    total: 0,
+                    page: 1,
+                    limit: 10,
+                    totalPages: 0
+                }
+            };
         }
     };
 

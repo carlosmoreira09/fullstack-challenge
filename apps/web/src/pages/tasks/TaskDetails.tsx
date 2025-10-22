@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination"
 import {type Task, type TaskComment, type TaskHistoryEntry, TaskPriority, TaskStatus} from "@taskmanagerjungle/types";
 import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
 import {taskService} from "@/service/task.service.ts";
@@ -18,6 +19,7 @@ import {useAuth} from "@/hooks/auth.tsx";
 import {AddAssigneesDialog} from "@/components/tasks/AddAssigneesDialog.tsx";
 import {UpdateTaskDto} from "@taskmanagerjungle/types";
 import {taskHistoryService} from "@/service/taskHistory.service.ts";
+import {TaskDetailsSkeleton} from "@/components/tasks/TaskDetailsSkeleton.tsx";
 
 const PRIORITY_CONFIG: Record<
     TaskPriority,
@@ -65,6 +67,10 @@ function TaskDetails() {
     const [editedTitle, setEditedTitle] = useState("")
     const [editedDescription, setEditedDescription] = useState<string>("")
     const [editedDueDate, setEditedDueDate] = useState("")
+    const [currentPage, setCurrentPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(0)
+    const [totalComments, setTotalComments] = useState(0)
+    const commentsPerPage = 5
 
     const taskApi = useMemo(() => taskService(), [])
     const commentApi = useMemo(() => commentService(), [])
@@ -97,8 +103,10 @@ function TaskDetails() {
         const fetchComments = async () => {
             try {
                 setIsLoadingComments(true)
-                const data = await commentApi.getCommentsByTask(taskId)
-                setComments(data)
+                const response = await commentApi.getCommentsByTask(taskId, currentPage, commentsPerPage)
+                setComments(response.data)
+                setTotalPages(response.meta.totalPages)
+                setTotalComments(response.meta.total)
             } catch (err) {
                 console.error("Erro ao carregar comentários:", err)
             } finally {
@@ -107,7 +115,7 @@ function TaskDetails() {
         }
 
         void fetchComments()
-    }, [commentApi, taskId])
+    }, [commentApi, taskId, currentPage])
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -129,12 +137,16 @@ function TaskDetails() {
         if (!newComment.trim() || !task) return
 
         try {
-            const comment = await commentApi.createComment({
+            await commentApi.createComment({
                 taskId: task.id!,
                 content: newComment,
             })
-            setComments([...comments, comment])
             setNewComment("")
+            
+            const response = await commentApi.getCommentsByTask(taskId, currentPage, commentsPerPage)
+            setComments(response.data)
+            setTotalPages(response.meta.totalPages)
+            setTotalComments(response.meta.total)
 
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
@@ -145,8 +157,10 @@ function TaskDetails() {
 
     const handleEditComment = async (commentId: string, content: string) => {
         try {
-            const updatedComment = await commentApi.updateComment(commentId, { content })
-            setComments(comments.map(c => c.id === commentId ? updatedComment : c))
+            await commentApi.updateComment(commentId, { content })
+            
+            const response = await commentApi.getCommentsByTask(taskId, currentPage, commentsPerPage)
+            setComments(response.data)
 
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
@@ -159,7 +173,11 @@ function TaskDetails() {
     const handleDeleteComment = async (commentId: string) => {
         try {
             await commentApi.deleteComment(commentId)
-            setComments(comments.filter(c => c.id !== commentId))
+            
+            const response = await commentApi.getCommentsByTask(taskId, currentPage, commentsPerPage)
+            setComments(response.data)
+            setTotalPages(response.meta.totalPages)
+            setTotalComments(response.meta.total)
 
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
@@ -185,13 +203,11 @@ function TaskDetails() {
         try {
             await taskApi.updateTask(updateTask)
 
-            // Refresh task data
             const updatedTask = await taskApi.getTaskById(task.id!)
             if (updatedTask) {
                 setTask(updatedTask)
             }
 
-            // Refresh history
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
         } catch (err) {
@@ -217,10 +233,8 @@ function TaskDetails() {
         try {
             await taskApi.updateTask(updateTask)
 
-            // Update local state
             setTask({ ...task, status: newStatus })
 
-            // Refresh history to show the status change
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
         } catch (err) {
@@ -245,10 +259,8 @@ function TaskDetails() {
         try {
             await taskApi.updateTask(updateTask)
 
-            // Update local state
             setTask({ ...task, priority: newPriority })
 
-            // Refresh history to show the priority change
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
         } catch (err) {
@@ -288,8 +300,6 @@ function TaskDetails() {
 
         try {
             await taskApi.updateTask(updateTask)
-
-            // Update local state
             setTask({
                 ...task,
                 title: editedTitle.trim(),
@@ -297,7 +307,6 @@ function TaskDetails() {
                 dueDate: editedDueDate || undefined
             })
 
-            // Refresh history
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
 
@@ -407,11 +416,7 @@ function TaskDetails() {
     }
 
     if (isLoading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <p className="text-muted-foreground">Carregando tarefa...</p>
-            </div>
-        )
+        return <TaskDetailsSkeleton />
     }
 
     if (error || !task) {
@@ -620,12 +625,12 @@ function TaskDetails() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <MessageSquare className="h-5 w-5" />
-                                    Comentários ({comments.length})
+                                    Comentários ({totalComments})
                                 </CardTitle>
                                 <CardDescription>Discussão e atualizações sobre a tarefa</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <ScrollArea className="h-[120px] pr-4">
+                                <div className="space-y-4">
                                     {isLoadingComments ? (
                                         <div className="flex items-center justify-center py-8">
                                             <p className="text-sm text-muted-foreground">Carregando comentários...</p>
@@ -635,20 +640,87 @@ function TaskDetails() {
                                             <p className="text-sm text-muted-foreground">Nenhum comentário ainda. Seja o primeiro!</p>
                                         </div>
                                     ) : (
-                                        <div className="space-y-4">
-                                            {comments.map((comment) => (
-                                                <CommentCard
-                                                    key={comment.id}
-                                                    comment={comment}
-                                                    currentUserId={userId || ""}
-                                                    isAdmin={isAdmin}
-                                                    onEdit={handleEditComment}
-                                                    onDelete={handleDeleteComment}
-                                                />
-                                            ))}
-                                        </div>
+                                        <>
+                                            <div className="space-y-4">
+                                                {comments.map((comment) => (
+                                                    <CommentCard
+                                                        key={comment.id}
+                                                        comment={comment}
+                                                        currentUserId={userId || ""}
+                                                        isAdmin={isAdmin}
+                                                        onEdit={handleEditComment}
+                                                        onDelete={handleDeleteComment}
+                                                    />
+                                                ))}
+                                            </div>
+                                            
+                                            {totalPages > 1 && (
+                                                <Pagination>
+                                                    <PaginationContent>
+                                                        <PaginationItem>
+                                                            <PaginationPrevious
+                                                                size={"sm"}
+                                                                href="#"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault()
+                                                                    if (currentPage > 1) setCurrentPage(currentPage - 1)
+                                                                }}
+                                                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                                            />
+                                                        </PaginationItem>
+                                                        
+                                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                                                            if (
+                                                                page === 1 ||
+                                                                page === totalPages ||
+                                                                (page >= currentPage - 1 && page <= currentPage + 1)
+                                                            ) {
+                                                                return (
+                                                                    <PaginationItem key={page}>
+                                                                        <PaginationLink
+                                                                            size={"sm"}
+                                                                            href="#"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault()
+                                                                                setCurrentPage(page)
+                                                                            }}
+                                                                            isActive={currentPage === page}
+                                                                            className="cursor-pointer"
+                                                                        >
+                                                                            {page}
+                                                                        </PaginationLink>
+                                                                    </PaginationItem>
+                                                                )
+                                                            } else if (
+                                                                page === currentPage - 2 ||
+                                                                page === currentPage + 2
+                                                            ) {
+                                                                return (
+                                                                    <PaginationItem key={page}>
+                                                                        <PaginationEllipsis />
+                                                                    </PaginationItem>
+                                                                )
+                                                            }
+                                                            return null
+                                                        })}
+                                                        
+                                                        <PaginationItem>
+                                                            <PaginationNext
+                                                                size={"sm"}
+                                                                href="#"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault()
+                                                                    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
+                                                                }}
+                                                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                                            />
+                                                        </PaginationItem>
+                                                    </PaginationContent>
+                                                </Pagination>
+                                            )}
+                                        </>
                                     )}
-                                </ScrollArea>
+                                </div>
 
                                 <Separator className="my-4" />
 

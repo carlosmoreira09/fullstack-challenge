@@ -10,6 +10,6 @@ async function bootstrap() {
             port: 3004
         }
     });
-    app.listen()
+     app.listen()
 }
 bootstrap();

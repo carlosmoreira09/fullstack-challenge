@@ -64,7 +64,6 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
 
         void fetchUsers()
         
-        // Set initial status if provided
         if (initialStatus) {
             setFormData(prev => ({ ...prev, status: initialStatus }))
         }
@@ -85,7 +84,6 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
     const validateForm = () => {
         const newErrors: Record<string, string> = {}
 
-        // Title validation
         if (!formData.title.trim()) {
             newErrors.title = "O título é obrigatório"
         } else if (formData.title.length < 3) {
@@ -94,12 +92,10 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
             newErrors.title = "O título deve ter no máximo 100 caracteres"
         }
 
-        // Description validation
         if (formData.description && formData.description.length > 500) {
             newErrors.description = "A descrição deve ter no máximo 500 caracteres"
         }
 
-        // Deadline validation
         if (formData.dueDate) {
             const selectedDate = new Date(formData.dueDate)
             const today = new Date()
@@ -119,7 +115,6 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
         if (validateForm()) {
             onCreateTask(formData)
 
-            // Reset form and errors
             setFormData({
                 title: "",
                 description: "",

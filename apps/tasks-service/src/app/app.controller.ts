@@ -63,8 +63,8 @@ export class AppController {
     }
 
     @MessagePattern('list-comments-by-task')
-    async findCommentsByTask(@Payload() userId: string) {
-        return await this.commentService.findByCreated(userId);
+    async findCommentsByTask(@Payload() data: { taskId: string; page?: number; limit?: number }) {
+        return await this.commentService.findByTask(data.taskId, data.page || 1, data.limit || 10);
     }
 
     @MessagePattern('get-comment')

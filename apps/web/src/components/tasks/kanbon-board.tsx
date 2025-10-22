@@ -12,6 +12,7 @@ import {taskService} from "@/service/task.service.ts";
 import {userService} from "@/service/user.service.ts";
 import {useAuth} from "@/hooks/auth.tsx";
 import type {User} from "@/dto/users/users.dto.ts";
+import {KanbanSkeleton} from "@/components/tasks/KanbanSkeleton.tsx";
 
 const COLUMNS: { id: TaskStatus; title: string }[] = [
     { id: TaskStatus.TODO, title: "To Do" },
@@ -41,7 +42,7 @@ export function KanbanBoard() {
         try {
             setIsLoading(true)
             setError(null)
-            const data = userId && userId !== "all" 
+            const data = userId && userId !== ""
                 ? await taskApi.listTasksByUser(userId, includeAssignedTasks)
                 : await taskApi.listTasks()
             setTasks(data)
@@ -102,7 +103,6 @@ export function KanbanBoard() {
             })
         } catch (err) {
             setError("Não foi possível atualizar a tarefa.")
-            // revert state in case of error
             setTasks((prevTasks) =>
                 prevTasks.map((task) => (task.id === draggedTask.id ? { ...draggedTask, status: draggedTask.status } : task)),
             )
@@ -121,7 +121,6 @@ export function KanbanBoard() {
                 createdById: userId,
             })
             setIsCreateDialogOpen(false)
-            // Reload tasks with current filter
             await fetchTasks(
                 selectedUserId === "all" ? undefined : selectedUserId,
                 includeAssigned
@@ -152,11 +151,7 @@ export function KanbanBoard() {
     }
 
     if (isLoading) {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <p className="text-muted-foreground">Carregando tarefas...</p>
-            </div>
-        )
+        return <KanbanSkeleton />
     }
 
     if (error) {

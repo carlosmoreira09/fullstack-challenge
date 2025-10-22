@@ -1,6 +1,7 @@
 {
   "name": "@taskmanagerjungle/types",
   "version": "1.0.0",
+  "type": "module",
   "description": "Shared DTOs and type definitions for TaskManagerJungle services",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

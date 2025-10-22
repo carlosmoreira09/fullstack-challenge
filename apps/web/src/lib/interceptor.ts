@@ -8,7 +8,7 @@ type RetryableRequestConfig = AxiosRequestConfig & { _retry?: boolean };
 
 const configuredClients = new WeakSet<AxiosInstance>();
 const appConfig = {
-    apiUrl: 'http://localhost:3001',
+    apiUrl: process.env.GATEWAY_URL || 'http://localhost:3001/api',
 }
 
 const refreshClient = axios.create({
