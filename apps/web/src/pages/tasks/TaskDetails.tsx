@@ -1,14 +1,15 @@
 import {createRoute, useNavigate} from "@tanstack/react-router"
 import {useEffect, useMemo, useState} from "react"
-import { ArrowLeft, Calendar, Clock, Flag, MessageSquare, History, User, Send, UserPlus } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Flag, MessageSquare, History, User, Send, UserPlus, Edit2, Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import {type Task, type TaskComment, type TaskHistoryEntry, TaskPriority} from "@taskmanagerjungle/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import {type Task, type TaskComment, type TaskHistoryEntry, TaskPriority, TaskStatus} from "@taskmanagerjungle/types";
 import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
 import {taskService} from "@/service/task.service.ts";
 import {commentService} from "@/service/comment.service.ts";
@@ -28,11 +29,18 @@ const PRIORITY_CONFIG: Record<
     URGENT: { label: "Urgente", variant: "destructive", icon: "🔴" },
 }
 
-const STATUS_LABELS = {
+const STATUS_LABELS: Record<TaskStatus, string> = {
     TODO: "A Fazer",
     IN_PROGRESS: "Em Progresso",
     REVIEW: "Em Revisão",
     DONE: "Concluído",
+}
+
+const STATUS_CONFIG: Record<TaskStatus, { label: string; variant: "default" | "secondary" | "outline" | "success" }> = {
+    TODO: { label: "A Fazer", variant: "secondary" },
+    IN_PROGRESS: { label: "Em Progresso", variant: "default" },
+    REVIEW: { label: "Em Revisão", variant: "outline" },
+    DONE: { label: "Concluído", variant: "success" },
 }
 export const taskDetailsRoute = createRoute({
     getParentRoute: () => authenticatedRoute,
@@ -53,6 +61,10 @@ function TaskDetails() {
     const [isLoadingHistory, setIsLoadingHistory] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [isAssigneesDialogOpen, setIsAssigneesDialogOpen] = useState(false)
+    const [isEditingDetails, setIsEditingDetails] = useState(false)
+    const [editedTitle, setEditedTitle] = useState("")
+    const [editedDescription, setEditedDescription] = useState<string>("")
+    const [editedDueDate, setEditedDueDate] = useState("")
 
     const taskApi = useMemo(() => taskService(), [])
     const commentApi = useMemo(() => commentService(), [])
@@ -178,9 +190,120 @@ function TaskDetails() {
             if (updatedTask) {
                 setTask(updatedTask)
             }
+
+            // Refresh history
+            const updatedHistory = await historyApi.getHistoryByTask(taskId)
+            setHistory(updatedHistory)
         } catch (err) {
             console.error("Erro ao atualizar responsáveis:", err)
             throw err
+        }
+    }
+
+    const handleStatusChange = async (newStatus: TaskStatus) => {
+        if (!task) return
+
+        const updateTask: UpdateTaskDto = {
+            id: task.id!,
+            title: task.title,
+            description: task.description,
+            priority: task.priority,
+            status: newStatus,
+            dueDate: task.dueDate,
+            assignees: task.assignees,
+            createdById: userId
+        }
+
+        try {
+            await taskApi.updateTask(updateTask)
+
+            // Update local state
+            setTask({ ...task, status: newStatus })
+
+            // Refresh history to show the status change
+            const updatedHistory = await historyApi.getHistoryByTask(taskId)
+            setHistory(updatedHistory)
+        } catch (err) {
+            console.error("Erro ao atualizar status:", err)
+        }
+    }
+
+    const handlePriorityChange = async (newPriority: TaskPriority) => {
+        if (!task) return
+
+        const updateTask: UpdateTaskDto = {
+            id: task.id!,
+            title: task.title,
+            description: task.description,
+            priority: newPriority,
+            status: task.status,
+            dueDate: task.dueDate,
+            assignees: task.assignees,
+            createdById: userId
+        }
+
+        try {
+            await taskApi.updateTask(updateTask)
+
+            // Update local state
+            setTask({ ...task, priority: newPriority })
+
+            // Refresh history to show the priority change
+            const updatedHistory = await historyApi.getHistoryByTask(taskId)
+            setHistory(updatedHistory)
+        } catch (err) {
+            console.error("Erro ao atualizar prioridade:", err)
+        }
+    }
+
+    const handleStartEditing = () => {
+        if (!task) return
+
+        setEditedTitle(task.title)
+        setEditedDescription(task.description || '')
+        setEditedDueDate(task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "")
+        setIsEditingDetails(true)
+    }
+
+    const handleCancelEditing = () => {
+        setIsEditingDetails(false)
+        setEditedTitle("")
+        setEditedDescription("")
+        setEditedDueDate("")
+    }
+
+    const handleSaveDetails = async () => {
+        if (!task || !editedTitle.trim()) return
+
+        const updateTask: UpdateTaskDto = {
+            id: task.id!,
+            title: editedTitle.trim(),
+            description: editedDescription.trim(),
+            priority: task.priority,
+            status: task.status,
+            dueDate: editedDueDate || undefined,
+            assignees: task.assignees,
+            createdById: userId
+        }
+
+        try {
+            await taskApi.updateTask(updateTask)
+
+            // Update local state
+            setTask({
+                ...task,
+                title: editedTitle.trim(),
+                description: editedDescription.trim(),
+                dueDate: editedDueDate || undefined
+            })
+
+            // Refresh history
+            const updatedHistory = await historyApi.getHistoryByTask(taskId)
+            setHistory(updatedHistory)
+
+            setIsEditingDetails(false)
+        } catch (err) {
+            console.error("Erro ao atualizar detalhes:", err)
         }
     }
 
@@ -295,7 +418,7 @@ function TaskDetails() {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center gap-4">
                 <p className="text-muted-foreground">{error ?? "Tarefa não encontrada."}</p>
-                <Button variant="outline" onClick={() => navigate({ to: "/" })}>
+                <Button variant="outline" onClick={() => navigate({ to: "/tarefas" })}>
                     Voltar para o quadro
                 </Button>
             </div>
@@ -306,22 +429,72 @@ function TaskDetails() {
         <div className="min-h-screen bg-background">
             <header className="border-b border-border bg-card">
                 <div className="container mx-auto px-6 py-4">
-                    <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/" })} className="mb-2">
+                    <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/tarefas" })} className="mb-2">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Voltar para o quadro
                     </Button>
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                            <h1 className="text-2xl font-semibold text-foreground">{task.title}</h1>
-                            <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
-                                <span>Criado por {task.createdByData?.name ?? task.createdById ?? "-"}</span>
-                                <span>•</span>
-                                <span>{formatDate(task.createdAt)}</span>
-                            </div>
+                            {isEditingDetails ? (
+                                <div>
+                                    <p className="text-xs text-muted-foreground mb-2">Título</p>
+                                    <Input
+                                        value={editedTitle}
+                                        onChange={(e) => setEditedTitle(e.target.value)}
+                                        className="text-lg font-semibold h-9"
+                                        placeholder="Título da tarefa"
+                                    />
+                                </div>
+                            ) : (
+                                <h1 className="text-2xl font-semibold text-foreground">{task.title}</h1>
+                            )}
+                            {!isEditingDetails && (
+                                <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                                    <span>Criado por {task.createdByData?.name ?? task.createdById ?? "-"}</span>
+                                    <span>•</span>
+                                    <span>{formatDate(task.createdAt)}</span>
+                                </div>
+                            )}
                         </div>
-                        <Badge variant={PRIORITY_CONFIG[task.priority].variant} className="text-sm">
-                            {PRIORITY_CONFIG[task.priority].icon} {PRIORITY_CONFIG[task.priority].label}
-                        </Badge>
+                        <div className="flex-shrink-0">
+                            <p className="text-xs text-muted-foreground mb-2 text-right">Prioridade</p>
+                            <Select value={task.priority} onValueChange={(value) => handlePriorityChange(value as TaskPriority)}>
+                                <SelectTrigger className="h-9 w-[160px]">
+                                    <SelectValue>
+                                        <span className="flex items-center gap-2">
+                                            <span>{PRIORITY_CONFIG[task.priority].icon}</span>
+                                            <span>{PRIORITY_CONFIG[task.priority].label}</span>
+                                        </span>
+                                    </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={TaskPriority.LOW}>
+                                        <span className="flex items-center gap-2">
+                                            <span>{PRIORITY_CONFIG[TaskPriority.LOW].icon}</span>
+                                            <span>{PRIORITY_CONFIG[TaskPriority.LOW].label}</span>
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value={TaskPriority.MEDIUM}>
+                                        <span className="flex items-center gap-2">
+                                            <span>{PRIORITY_CONFIG[TaskPriority.MEDIUM].icon}</span>
+                                            <span>{PRIORITY_CONFIG[TaskPriority.MEDIUM].label}</span>
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value={TaskPriority.HIGH}>
+                                        <span className="flex items-center gap-2">
+                                            <span>{PRIORITY_CONFIG[TaskPriority.HIGH].icon}</span>
+                                            <span>{PRIORITY_CONFIG[TaskPriority.HIGH].label}</span>
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value={TaskPriority.URGENT}>
+                                        <span className="flex items-center gap-2">
+                                            <span>{PRIORITY_CONFIG[TaskPriority.URGENT].icon}</span>
+                                            <span>{PRIORITY_CONFIG[TaskPriority.URGENT].label}</span>
+                                        </span>
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -331,12 +504,53 @@ function TaskDetails() {
                     <div className="space-y-6 lg:col-span-2">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Detalhes da Tarefa</CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle>Detalhes da Tarefa</CardTitle>
+                                    {!isEditingDetails ? (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={handleStartEditing}
+                                        >
+                                            <Edit2 className="h-4 w-4 mr-2" />
+                                            Editar
+                                        </Button>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={handleCancelEditing}
+                                            >
+                                                <X className="h-4 w-4 mr-2" />
+                                                Cancelar
+                                            </Button>
+                                            <Button
+                                                variant="default"
+                                                size="sm"
+                                                onClick={handleSaveDetails}
+                                                disabled={!editedTitle.trim()}
+                                            >
+                                                <Check className="h-4 w-4 mr-2" />
+                                                Salvar
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
                                     <h3 className="mb-2 text-sm font-medium text-muted-foreground">Descrição</h3>
-                                    <p className="text-sm leading-relaxed text-foreground">{task.description}</p>
+                                    {isEditingDetails ? (
+                                        <Textarea
+                                            value={editedDescription}
+                                            onChange={(e) => setEditedDescription(e.target.value)}
+                                            className="min-h-[100px] resize-none"
+                                            placeholder="Descrição da tarefa"
+                                        />
+                                    ) : (
+                                        <p className="text-sm leading-relaxed text-foreground">{task.description}</p>
+                                    )}
                                 </div>
 
                                 <Separator />
@@ -346,9 +560,27 @@ function TaskDetails() {
                                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
                                             <Flag className="h-5 w-5 text-muted-foreground" />
                                         </div>
-                                        <div>
-                                            <p className="text-xs text-muted-foreground">Status</p>
-                                            <p className="text-sm font-medium">{STATUS_LABELS[task.status]}</p>
+                                        <div className="flex-1">
+                                            <p className="text-xs text-muted-foreground mb-1">Status</p>
+                                            <Select value={task.status} onValueChange={(value) => handleStatusChange(value as TaskStatus)}>
+                                                <SelectTrigger className="h-8 w-full">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value={TaskStatus.TODO}>
+                                                        {STATUS_CONFIG[TaskStatus.TODO].label}
+                                                    </SelectItem>
+                                                    <SelectItem value={TaskStatus.IN_PROGRESS}>
+                                                        {STATUS_CONFIG[TaskStatus.IN_PROGRESS].label}
+                                                    </SelectItem>
+                                                    <SelectItem value={TaskStatus.REVIEW}>
+                                                        {STATUS_CONFIG[TaskStatus.REVIEW].label}
+                                                    </SelectItem>
+                                                    <SelectItem value={TaskStatus.DONE}>
+                                                        {STATUS_CONFIG[TaskStatus.DONE].label}
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </div>
 
@@ -356,9 +588,18 @@ function TaskDetails() {
                                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
                                             <Calendar className="h-5 w-5 text-muted-foreground" />
                                         </div>
-                                        <div>
-                                            <p className="text-xs text-muted-foreground">Prazo</p>
-                                            <p className="text-sm font-medium">{task.dueDate ? formatDate(task.dueDate) : "Sem prazo"}</p>
+                                        <div className="flex-1">
+                                            <p className="text-xs text-muted-foreground mb-1">Prazo</p>
+                                            {isEditingDetails ? (
+                                                <Input
+                                                    type="date"
+                                                    value={editedDueDate}
+                                                    onChange={(e) => setEditedDueDate(e.target.value)}
+                                                    className="h-8"
+                                                />
+                                            ) : (
+                                                <p className="text-sm font-medium">{task.dueDate ? formatDate(task.dueDate) : "Sem prazo"}</p>
+                                            )}
                                         </div>
                                     </div>
 
