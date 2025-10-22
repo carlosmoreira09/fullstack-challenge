@@ -162,9 +162,6 @@ export class HealthService {
 
   async checkPostgres(): Promise<ServiceHealthResponse> {
     try {
-      // Since we don't have direct Postgres connection in API Gateway,
-      // we'll check if any service that uses Postgres is responding
-      // This is a proxy check - if services are up, Postgres is likely up
       const authCheck = await this.checkAuthService();
       
       return {
@@ -189,7 +186,6 @@ export class HealthService {
     try {
       const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
       
-      // Try to connect to RabbitMQ
       const connection = await amqp.connect(rabbitmqUrl);
       await connection.close();
 

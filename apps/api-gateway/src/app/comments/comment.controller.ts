@@ -38,7 +38,6 @@ export class CommentController {
         return [];
       }
 
-      // Fetch author data for all comments
       const uniqueAuthorIds: string[] = [...new Set(comments.map((c: any) => c.authorId))] as string[];
       const usersMap = new Map<string, UserDto>();
 
@@ -82,7 +81,6 @@ export class CommentController {
         this.taskClient.send('create-comment', commentData)
       );
 
-      // Fetch author data
       try {
         const user = await firstValueFrom(
           this.userClient.send('user-profile', userId)
@@ -117,7 +115,6 @@ export class CommentController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
-      // Fetch the comment to check ownership
       const comment = await firstValueFrom(
         this.taskClient.send('get-comment', id)
       );
@@ -137,7 +134,6 @@ export class CommentController {
         this.taskClient.send('update-comment', { ...updateCommentDto, id })
       );
 
-      // Fetch author data
       try {
         const user = await firstValueFrom(
           this.userClient.send('user-profile', comment.authorId)
@@ -173,7 +169,6 @@ export class CommentController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
-      // Fetch the comment to check ownership
       const comment = await firstValueFrom(
         this.taskClient.send('get-comment', id)
       );
@@ -182,7 +177,6 @@ export class CommentController {
         throw new HttpException('Comment not found', HttpStatus.NOT_FOUND);
       }
 
-      // Only admin can delete any comment, others can only delete their own
       if (userRole !== 'ADMIN' && comment.authorId !== userId) {
         throw new HttpException(
           'Only admins can delete other users comments',

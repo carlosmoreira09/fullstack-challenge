@@ -1,15 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { TaskEntity } from './task.entity';
+import {TaskHistoryAction} from "@taskmanagerjungle/types";
 
-export enum TaskHistoryAction {
-    CREATED = 'CREATED',
-    UPDATED = 'UPDATED',
-    STATUS_CHANGED = 'STATUS_CHANGED',
-    PRIORITY_CHANGED = 'PRIORITY_CHANGED',
-    ASSIGNEE_ADDED = 'ASSIGNEE_ADDED',
-    ASSIGNEE_REMOVED = 'ASSIGNEE_REMOVED',
-    DUE_DATE_CHANGED = 'DUE_DATE_CHANGED',
-}
 
 @Entity({ name: 'task_history', schema: 'tasks' })
 export class TaskHistoryEntity {
