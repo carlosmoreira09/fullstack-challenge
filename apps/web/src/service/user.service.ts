@@ -9,8 +9,8 @@ export const userService = () => {
         return response.data
     }
 
-    const getUserProfile = async (userId: number) => {
-        const response = await apiClient.get<User>(`/users/${userId}`)
+    const getUserProfile = async () => {
+        const response = await apiClient.get<User>(`/users/profile`)
         return response.data
     }
 
@@ -25,7 +25,7 @@ export const userService = () => {
     }
 
     const listUsers = async () => {
-        const response = await apiClient.get<User[]>('/users/all')
+        const response = await apiClient.get<User[]>('/users')
         return response.data
     }
 

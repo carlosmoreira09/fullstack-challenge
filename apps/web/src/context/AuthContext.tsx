@@ -12,6 +12,7 @@ export type Props = {
 const AuthProvider = ({ children }: Props) => {
     const [decoded, setDecoded] = useState<DecodedToken | null>(null);
     const [userId, setUserId] = useState<string>('');
+    const [token, setToken] = useState<string>('');
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const loginService = useMemo(() => authService(), []);
@@ -20,6 +21,7 @@ const AuthProvider = ({ children }: Props) => {
         const decodedToken = jwtDecode<DecodedToken>(response.token);
         setDecoded(decodedToken);
         setUserId(decodedToken.userId);
+        setToken(response.token)
         setIsAuthenticated(true);
 
         Cookies.set('token', response.token);
@@ -29,6 +31,7 @@ const AuthProvider = ({ children }: Props) => {
     const clearAuthState = useCallback(() => {
         Cookies.remove('token');
         Cookies.remove('refreshToken');
+        setToken('')
         setDecoded(null);
         setUserId('');
         setIsAuthenticated(false);
@@ -48,6 +51,7 @@ const AuthProvider = ({ children }: Props) => {
                 return;
             }
             setDecoded(decodedToken);
+            setToken(token)
             setUserId(decodedToken.userId);
             setIsAuthenticated(true);
         } catch (error) {
@@ -97,9 +101,10 @@ const AuthProvider = ({ children }: Props) => {
         decoded,
         login,
         logout,
+        token,
         isAuthenticated,
         refreshAccessToken,
-    }), [userId, decoded, login, logout, isAuthenticated, refreshAccessToken]);
+    }), [userId, token, decoded, login, logout, isAuthenticated, refreshAccessToken]);
 
     return (
         <AuthContext.Provider value={value}>

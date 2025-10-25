@@ -1,37 +1,34 @@
-import {Body, Controller, Inject, Post, Req} from '@nestjs/common';
-import {ClientProxy} from "@nestjs/microservices";
-import * as LoginDTOModule from "./dto/login.dto";
-import {firstValueFrom} from "rxjs";
+import {Body, Controller, Post, Req} from '@nestjs/common';
 import type {Request} from "express";
-import * as RefreshTokenDTOModule from "./dto/refresh-token.dto";
+import {LoginDTO, RefreshTokenDTO} from "@taskmanagerjungle/types";
+import {AuthService} from "./auth.service";
 
 @Controller('auth')
 export class AuthController {
-    constructor(@Inject("AUTH_SERVICE") private readonly authClient: ClientProxy){}
+    constructor(private readonly authService: AuthService){}
 
     @Post('login')
-    async login(@Body() payload: LoginDTOModule.LoginDTO, @Req() req: Request) {
-        const loginPayload = {
-            ...payload,
-            ip: this.extractIp(req),
-        };
-        return await firstValueFrom(this.authClient.send('auth-login', loginPayload));
+    async login(@Body() payload: LoginDTO, @Req() req: Request) {
+        let ip= this.extractIp(req);
+        if(!ip) {
+            ip = "Não identificado";
+        }
+        return await this.authService.login(payload,ip)
     }
 
     @Post('validate')
-    async validate(@Body() payload: LoginDTOModule.LoginDTO) {
-        return await firstValueFrom(this.authClient.send('validate-token', payload));
+    async validate(@Body() payload: LoginDTO) {
+        return await this.authService.validate(payload);
     }
 
     @Post('refresh')
-    async refresh(@Body() payload: RefreshTokenDTOModule.RefreshTokenDTO, @Req() req: Request) {
-        const refreshPayload = {
-            ...payload,
-            ip: this.extractIp(req),
-        };
-        return await firstValueFrom(this.authClient.send('auth-refresh', refreshPayload));
+    async refresh(@Body() payload: RefreshTokenDTO, @Req() req: Request) {
+        let ip= this.extractIp(req);
+        if(!ip) {
+            ip = "Não identificado";
+        }
+        return await this.authService.refresh(payload,ip)
     }
-
 
     private extractIp(req: Request): string | undefined {
         const forwarded = req.headers['x-forwarded-for'];

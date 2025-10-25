@@ -1,7 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import {Controller, Get, UseGuards} from '@nestjs/common';
 import { HealthService } from './health.service';
+import {AuthGuard} from "../../guards/auth/auth.guard";
 
 @Controller('health')
+@UseGuards(AuthGuard)
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 

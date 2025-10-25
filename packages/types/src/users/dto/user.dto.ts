@@ -1,7 +1,7 @@
-import {IsDate, IsString} from "class-validator";
+import {IsDate, IsString, IsUUID} from "class-validator";
 
 export class UserDto {
-    @IsString()
+    @IsUUID()
     id!: string;
     @IsString()
     name!: string;
@@ -13,7 +13,7 @@ export class UserDto {
     email!: string;
     @IsString()
     role!: string;
-    @IsString()
+    @IsUUID()
     createdById!: string;
     @IsDate()
     created_at!: Date;

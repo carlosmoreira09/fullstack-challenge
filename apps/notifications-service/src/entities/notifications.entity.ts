@@ -1,4 +1,5 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {NotificationStatus, NotificationType} from "@taskmanagerjungle/types";
 
 @Entity('notifications')
 export class NotificationsEntity {
@@ -10,8 +11,14 @@ export class NotificationsEntity {
     })
     userId: string;
 
-    @Column({ length: 30 })
-    type: string;
+    @Column({ type: 'varchar', length: 30})
+    type: NotificationType;
+
+    @Column({ type: 'varchar', length: 30 })
+    status: NotificationStatus;
+
+    @Column()
+    title: string;
 
     @Column({
         type: 'jsonb'
@@ -24,4 +31,6 @@ export class NotificationsEntity {
     @CreateDateColumn()
     createdAt: Date;
 
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

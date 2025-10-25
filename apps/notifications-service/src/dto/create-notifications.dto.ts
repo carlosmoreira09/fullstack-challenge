@@ -1,7 +1,7 @@
-import {IsDate, IsNumber, IsString} from "class-validator";
+import { IsDate, IsString, IsUUID} from "class-validator";
 
 export class CreateNotificationsDto {
-    @IsNumber()
+    @IsUUID()
     userId: number;
     @IsString()
     type: string;

@@ -2,10 +2,10 @@ import {IsOptional, IsString} from "class-validator";
 
 export class LoginDTO  {
     @IsString()
-    username: string;
+    username!: string;
 
     @IsString()
-    password: string;
+    password!: string;
 
     @IsOptional()
     @IsString()

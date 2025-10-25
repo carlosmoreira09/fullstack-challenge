@@ -3,6 +3,7 @@ export interface IAuthContext {
     decoded: DecodedToken | null
     login: (user: LoginData) => Promise<AuthResponse | null>;
     logout: () => void;
+    token: string;
     isAuthenticated: boolean;
     refreshAccessToken: () => Promise<AuthResponse | null>;
 }

@@ -1,11 +1,25 @@
-import {Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Post, Put, Query, UseGuards} from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Get,
+    HttpException,
+    HttpStatus,
+    Inject,
+    Injectable,
+    Logger,
+    Param,
+    Post,
+    Put,
+    Query,
+    UseGuards
+} from "@nestjs/common";
 import {ClientProxy} from "@nestjs/microservices";
 import {firstValueFrom} from "rxjs";
-import {TaskDto, UserDto} from "@taskmanagerjungle/types";
+import {CreateTaskDto, TaskDto, UpdateTaskDto, UserDto} from "@taskmanagerjungle/types";
 import {AuthGuard} from "../../guards/auth/auth.guard";
 
-@Controller('tasks')
-export class TaskController {
+@Injectable()
+export class TasksService {
     constructor(
         @Inject("TASKS_SERVICE")
         private readonly taskClient: ClientProxy,
@@ -13,7 +27,6 @@ export class TaskController {
         private readonly userClient: ClientProxy,
     ) {}
 
-    @Get()
     async findAll() {
         const tasks: TaskDto[] = await firstValueFrom(this.taskClient.send('list-tasks', {}));
         
@@ -45,11 +58,8 @@ export class TaskController {
                 .filter(user => user !== undefined)
         }));
     }
-    @Get('user/:userId')
-    async findByUserId(
-        @Param('userId') userId: string,
-        @Query('includeAssigned') includeAssigned?: string
-    ) {
+
+    async findByUserId(userId: string, includeAssigned?: string) {
         let messagePattern = 'list-tasks-created-by-user';
         
         if (includeAssigned === 'true') {
@@ -85,8 +95,7 @@ export class TaskController {
         }));
     }
 
-    @Get(':taskId')
-    async findOne(@Param('taskId') taskId: string) {
+    async findOne(taskId: string) {
         const task: TaskDto = await firstValueFrom(this.taskClient.send('get-task', taskId));
 
         if(!task){
@@ -117,23 +126,15 @@ export class TaskController {
         };
     }
 
-    @Post()
-    async createTask(@Body() task: any) {
+    async createTask(@Body() task: CreateTaskDto) {
         return await firstValueFrom(this.taskClient.send('create-task', task));
     }
 
-    @Put()
-    async updateTask(@Body() task: any) {
+    async updateTask(task: UpdateTaskDto) {
         return await firstValueFrom(this.taskClient.send('update-task', task));
     }
 
-    @Get(':id/comments')
-    @UseGuards(AuthGuard)
-    async getTaskComments(
-        @Param('id') taskId: string,
-        @Query('page') page?: string,
-        @Query('size') size?: string
-    ) {
+    async getTaskComments(taskId: string, page?: string, size?: string) {
         try {
             const pageNum = page ? parseInt(page, 10) : 1;
             const limitNum = size ? parseInt(size, 10) : 10;

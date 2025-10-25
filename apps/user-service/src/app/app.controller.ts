@@ -26,6 +26,10 @@ export class AppController {
     async getAllUsers() {
       return await this.appService.findAll();
     }
+    @MessagePattern("get-one-user-profile")
+    async findOne(@Payload() userId: string) {
+        return await this.appService.findOne(userId);
+    }
 
     @MessagePattern("create-user")
     async createUser(@Payload() userData: CreateUserDto) {

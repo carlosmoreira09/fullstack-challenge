@@ -9,9 +9,10 @@ import {
     NavigationMenuList,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
+import NotificationMenu from "@/components/navigation-menu.tsx";
 
 export default function Header() {
-  const { logout, decoded } = useAuth()
+  const { logout, decoded, userId } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -57,7 +58,9 @@ export default function Header() {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      
+
+        <div></div>
+        <NotificationMenu userId={userId} />
       <div className="flex items-center gap-4">
         {decoded && (
           <span className="text-sm text-gray-300">

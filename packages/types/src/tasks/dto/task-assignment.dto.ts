@@ -1,16 +1,16 @@
-import {IsBoolean, IsDate, IsObject, IsString} from "class-validator";
+import {IsBoolean, IsDate, IsObject, IsString, IsUUID} from "class-validator";
 import {TaskDto} from "./task.dto.js";
 
 export class TaskAssignmentDto {
-    @IsString()
+    @IsUUID()
     id!: string;
-    @IsString()
+    @IsUUID()
     taskId!: string;
-    @IsString()
+    @IsUUID()
     userId?: string;
     @IsObject()
     task!: TaskDto;
-    @IsString()
+    @IsUUID()
     assignedById!: string;
     @IsBoolean()
     isActive!: boolean;

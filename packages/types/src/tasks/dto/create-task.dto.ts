@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import {IsArray, IsOptional, IsString, IsUUID} from 'class-validator';
 import { TaskPriority, TaskStatus } from '../task.enums.js';
 
 export class CreateTaskDto {
@@ -23,6 +23,6 @@ export class CreateTaskDto {
   @IsString({ each: true })
   assignees!: string[];
 
-  @IsString()
+  @IsUUID()
   createdById!: string;
 }

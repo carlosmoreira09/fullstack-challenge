@@ -1,23 +1,15 @@
 import {
-    Body,
-    Controller,
-    Get,
     HttpException,
     HttpStatus,
-    Inject,
-    Param,
-    Patch,
-    Post, Put,
-    Req,
-    UseGuards
+    Inject, Injectable,
 } from '@nestjs/common';
-import { AuthGuard } from "../../guards/auth/auth.guard";
 import {ClientProxy} from "@nestjs/microservices";
 import {firstValueFrom} from "rxjs";
+import {CreateUserDto, UpdateUserDto} from "@taskmanagerjungle/types";
 
 
-@Controller('users')
-export class UserController {
+@Injectable()
+export class UsersService {
 
     constructor(
     @Inject("USERS_SERVICE")
@@ -26,22 +18,19 @@ export class UserController {
     private readonly authClient: ClientProxy
     ){}
 
-    @UseGuards(AuthGuard)
-    @Get()
-    async getUserProfile(@Req() req: any) {
-        const userId = req.user?.userId;
+    async getUserProfile(userId: string) {
         return await firstValueFrom(this.userClient.send("user-profile", userId));
     }
+    async getOneUserProfile(id: string) {
+        return await firstValueFrom(this.userClient.send("get-one-user-profile", id));
+    }
 
-    @UseGuards(AuthGuard)
-    @Get('all')
+
     async getAllUsers() {
         return await firstValueFrom(this.userClient.send("list-users", {}));
     }
 
-    @UseGuards(AuthGuard)
-    @Post()
-    async createUser(@Body() userData: any) {
+    async createUser(userData: CreateUserDto) {
        const createAuth = await firstValueFrom(this.authClient.send('create-auth', userData))
         if(createAuth) {
             return await firstValueFrom(this.userClient.send("create-user", userData));
@@ -49,19 +38,12 @@ export class UserController {
             throw new HttpException("Bad Request", HttpStatus.BAD_REQUEST);
         }
     }
-    @UseGuards(AuthGuard)
-    @Patch(':id/password')
-    async updatePassword(
-        @Param('id') id: string,
-        @Body() userData: { password: string }) {
+
+    async updatePassword(id: string, userData: { password: string }) {
         return await firstValueFrom(this.authClient.send('update-password',{...userData, id: id}))
     }
 
-    @UseGuards(AuthGuard)
-    @Put(':id')
-    async updateUser(
-        @Param('id') id: string,
-        @Body() userData: any) {
+    async updateUser( id: string, userData: UpdateUserDto) {
         return await firstValueFrom(this.userClient.send('update-user',{...userData, id: id}))
     }
 }

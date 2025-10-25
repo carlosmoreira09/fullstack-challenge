@@ -1,13 +1,13 @@
-import {IsBoolean, IsDate, IsString} from "class-validator";
+import {IsBoolean, IsDate, IsString, IsUUID} from "class-validator";
 
 export class CreateTaskAssignmentDto {
-    @IsString()
+    @IsUUID()
     taskId!: string;
 
-    @IsString()
+    @IsUUID()
     userId!: string;
 
-    @IsString()
+    @IsUUID()
     assignedById!: string;
 
     @IsBoolean()

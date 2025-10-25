@@ -4,51 +4,43 @@ import { AppService } from './app.service';
 import {ClientsModule} from "@nestjs/microservices/module/clients.module";
 import {Transport} from "@nestjs/microservices";
 import { AuthController } from './auth/auth.controller';
-import { UserController } from './user/user.controller';
+import { UsersController } from './user/users.controller';
 import { HealthController } from './health/health.controller';
 import { HealthService } from './health/health.service';
-import {TaskController} from "./tasks/task.controller";
-import {CommentController} from "./comments/comment.controller";
+import {TasksController} from "./tasks/tasks.controller";
+import {CommentsController} from "./comments/comments.controller";
 import {TasksHistoryController} from "./tasks/tasks-history.controller";
+import {AuthModule} from "./auth/auth.module";
+import {CommentsModule} from "./comments/comments.module";
+import {NotificationsModule} from "./notifications/notifications.module";
+import {TasksModule} from "./tasks/tasks.module";
+import {UsersModule} from "./user/users.module";
+import {ConfigModule} from "@nestjs/config";
+import {APP_GUARD} from "@nestjs/core";
+import {ThrottlerGuard, ThrottlerModule} from "@nestjs/throttler";
 
 @Module({
   imports: [
-      ClientsModule.register([
-          {
-              name: 'AUTH_SERVICE',
-              transport: Transport.TCP,
-              options: {
-                  host: '127.0.0.1',
-                  port: 3002
-              }
-          },
-          {
-              name: 'NOTIFICATIONS_SERVICE',
-              transport: Transport.TCP,
-              options: {
-                  host: '127.0.0.1',
-                  port: 3003
-              }
-          },
-          {
-              name: 'TASKS_SERVICE',
-              transport: Transport.TCP,
-              options: {
-                  host: '127.0.0.1',
-                  port: 3004
-              }
-          },
-          {
-              name: 'USERS_SERVICE',
-              transport: Transport.TCP,
-              options: {
-                  host: '127.0.0.1',
-                  port: 3005
-              }
-          }
-      ])
+      ConfigModule.forRoot({
+          isGlobal: true,
+      }),
+      ThrottlerModule.forRoot({
+          throttlers: [{
+              ttl: 1000,
+              limit: 10,
+          }],
+      }),
+      AuthModule,
+      CommentsModule,
+      NotificationsModule,
+      TasksModule,
+      UsersModule
   ],
-  controllers: [AppController, AuthController, UserController, HealthController, TaskController, CommentController, TasksHistoryController],
-  providers: [AppService, HealthService],
+  controllers: [AppController, HealthController],
+  providers: [AppService, HealthService,
+      {
+          provide: APP_GUARD,
+          useClass: ThrottlerGuard,
+      },],
 })
 export class AppModule {}

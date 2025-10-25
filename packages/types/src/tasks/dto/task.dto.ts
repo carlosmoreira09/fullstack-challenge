@@ -1,9 +1,9 @@
 import { TaskPriority, TaskStatus } from '../task.enums.js';
-import {IsArray, IsDate, IsString} from "class-validator";
+import {IsArray, IsDate, IsString, IsUUID} from "class-validator";
 import {User} from "../../users";
 
 export class TaskDto {
-    @IsString()
+    @IsUUID()
     id!: string;
     @IsString()
     title!: string;
@@ -15,7 +15,7 @@ export class TaskDto {
     status!: TaskStatus;
     @IsDate()
     dueDate?: Date | null;
-    @IsString()
+    @IsUUID()
     createdById!: string;
     @IsArray()
     assignees!: string[];

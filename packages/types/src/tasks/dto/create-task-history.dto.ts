@@ -1,11 +1,11 @@
-import { IsDate, IsObject, IsOptional, IsString} from "class-validator";
+import {IsDate, IsObject, IsOptional, IsString, IsUUID} from "class-validator";
 import {TaskHistoryAction} from "../task.enums.js";
 
 export class CreateTaskHistoryDto {
-    @IsString()
+    @IsUUID()
     taskId!: string;
 
-    @IsString()
+    @IsUUID()
     userId!: string;
 
     @IsString()

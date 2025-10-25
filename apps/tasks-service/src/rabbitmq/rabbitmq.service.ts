@@ -1,7 +1,9 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {Injectable, Logger, OnModuleDestroy, OnModuleInit} from '@nestjs/common';
 import * as amqp from 'amqp-connection-manager';
-import { ChannelWrapper } from 'amqp-connection-manager';
-import { ConfirmChannel } from 'amqplib';
+import {ChannelWrapper} from 'amqp-connection-manager';
+import {ConfirmChannel} from 'amqplib';
+import {CreateNotificationsDto, NotificationDTO, NotificationStatus, NotificationType} from "@taskmanagerjungle/types";
+import {TaskEntity} from "../entities/task.entity";
 
 @Injectable()
 export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
@@ -22,7 +24,7 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
         try {
             const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
             
-            this.logger.log(`Connecting to RabbitMQ at ${rabbitmqUrl}`);
+            this.logger.log(`Connecting to RabbitMQ: ${rabbitmqUrl}`);
             
             this.connection = amqp.connect([rabbitmqUrl], {
                 heartbeatIntervalInSeconds: 30,
@@ -30,17 +32,17 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
             });
 
             this.connection.on('connect', () => {
-                this.logger.log('Connected to RabbitMQ');
+                this.logger.log('Connected  RabbitMQ');
             });
 
             this.connection.on('disconnect', (err) => {
-                this.logger.error('Disconnected from RabbitMQ', err);
+                this.logger.error('Disconnected RabbitMQ', err);
             });
 
             this.channelWrapper = this.connection.createChannel({
                 setup: async (channel: ConfirmChannel) => {
                     await channel.assertExchange(this.exchange, 'topic', { durable: true });
-                    this.logger.log(`Exchange "${this.exchange}" asserted`);
+                    this.logger.log(`Exchanged "${this.exchange}" asserted`);
                 },
             });
 
@@ -90,11 +92,19 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    async publishTaskCreated(task: any): Promise<void> {
+    async publishTaskCreated(task: TaskEntity): Promise<void> {
+        const createNotification: CreateNotificationsDto = {
+            userId: task.createdById,
+            payload: task.description,
+            status: NotificationStatus.UNREAD,
+            title: task.title,
+            readAt: null,
+            type: NotificationType.TASK_ASSIGNED,
+        }
         await this.publishEvent('task.created', {
             eventType: 'task.created',
             timestamp: new Date().toISOString(),
-            data: task,
+            data: createNotification,
         });
     }
 

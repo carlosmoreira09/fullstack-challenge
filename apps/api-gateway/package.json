@@ -23,8 +23,9 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/microservices": "^11.0.1",
-    "@taskmanagerjungle/types": "workspace:*",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/throttler": "^6.4.0",
+    "@taskmanagerjungle/types": "workspace:*",
     "amqplib": "^0.10.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
