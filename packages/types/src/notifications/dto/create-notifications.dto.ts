@@ -1,5 +1,5 @@
 import {IsDate, IsOptional, IsString, IsUUID} from "class-validator";
-import {NotificationStatus, NotificationType} from "../notifications.enums";
+import {NotificationStatus, NotificationType} from "../notifications.enums.js";
 
 export class CreateNotificationsDto {
     @IsUUID()
@@ -7,12 +7,15 @@ export class CreateNotificationsDto {
     @IsString()
     type!: NotificationType;
     @IsString()
-    payload?: string | null;
-    @IsString()
     status!: NotificationStatus
     @IsString()
     title!: string;
+    @IsString()
+    @IsOptional()
+    payload?: string;
+    @IsOptional()
+    metadata?: any;
     @IsDate()
     @IsOptional()
-    readAt?: Date | null;
+    read_at?: Date | null;
 }

@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 
-export const notificationsSocket: Socket = io('http://localhost:3003', {
+export const notificationsSocket: Socket = io('http://localhost:3006/notifications', {
     autoConnect: true,
     reconnection: true,
     reconnectionAttempts: 5,

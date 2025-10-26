@@ -2,9 +2,6 @@ import {
     Body,
     Controller,
     Get,
-    HttpException,
-    HttpStatus,
-    Inject,
     Param,
     Patch,
     Post, Put,
@@ -12,8 +9,6 @@ import {
     UseGuards
 } from '@nestjs/common';
 import { AuthGuard } from "../../guards/auth/auth.guard";
-import {ClientProxy} from "@nestjs/microservices";
-import {firstValueFrom} from "rxjs";
 import {UsersService} from "./users.service";
 import {CreateUserDto, UpdateUserDto} from "@taskmanagerjungle/types";
 

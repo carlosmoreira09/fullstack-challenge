@@ -37,7 +37,8 @@ export function TaskCard({ task, onDragStart, onDragEnd, onClick }: TaskCardProp
         onClick?.(task)
     }
 
-    const getInitials = (name: string) => {
+    const getInitials = (name?: string) => {
+        if (!name) return "??";
         return name
             .split(" ")
             .map((n) => n[0])
@@ -84,19 +85,19 @@ export function TaskCard({ task, onDragStart, onDragEnd, onClick }: TaskCardProp
                     {task.assigneesData && task.assigneesData.length > 0 ? (
                         <>
                             {task.assigneesData.slice(0, 3).map((user) => (
-                                <Avatar key={user.id} className="h-6 w-6 border border-border" title={user.name}>
-                                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{getInitials(user.name)}</AvatarFallback>
+                                <Avatar key={user.id} className="h-6 w-6 border border-border" title={user?.name || 'Unknown'}>
+                                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{getInitials(user?.name)}</AvatarFallback>
                                 </Avatar>
                             ))}
                             {task.assigneesData.length > 3 && (
                                 <span className="ml-1 text-xs text-muted-foreground">+{task.assigneesData.length - 3}</span>
                             )}
                         </>
-                    ) : task.assignees.length > 0 ? (
+                    ) : task.assignees && task.assignees.length > 0 ? (
                         <>
                             {task.assignees.slice(0, 3).map((userId, index) => (
-                                <Avatar key={index} className="h-6 w-6 border border-border">
-                                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{getInitials(userId)}</AvatarFallback>
+                                <Avatar key={index} className="h-6 w-6 border border-border" title={userId}>
+                                    <AvatarFallback className="text-[10px] bg-primary/10 text-primary">??</AvatarFallback>
                                 </Avatar>
                             ))}
                             {task.assignees.length > 3 && (

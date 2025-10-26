@@ -5,6 +5,7 @@ import { CreateCommentDto, TaskHistoryAction, UpdateCommentDto } from '@taskmana
 import { CommentEntity } from '../../entities/comment.entity';
 import { TasksHistoryService } from '../tasks-history/tasks-history.service';
 import { RabbitMQService } from '../../rabbitmq/rabbitmq.service';
+import { TaskEntity } from '../../entities/task.entity';
 
 @Injectable()
 export class CommentService {
@@ -12,6 +13,8 @@ export class CommentService {
     constructor(
         @InjectRepository(CommentEntity)
         private readonly commentRepository: Repository<CommentEntity>,
+        @InjectRepository(TaskEntity)
+        private readonly taskRepository: Repository<TaskEntity>,
         private readonly tasksHistoryService: TasksHistoryService,
         private readonly rabbitMQService: RabbitMQService,
     ) {}
@@ -56,7 +59,7 @@ export class CommentService {
     }
 
 
-    async create(createTask: CreateCommentDto) {
+    async create(createTask: CreateCommentDto, userID: string) {
         const addTask = this.commentRepository.create({
             ...createTask,
             task: { id: createTask.taskId }
@@ -66,7 +69,7 @@ export class CommentService {
         try {
             await this.tasksHistoryService.create({
                 taskId: createTask.taskId,
-                userId: createTask.authorId,
+                userId: createTask.authorId ? createTask.authorId : userID,
                 action: TaskHistoryAction.COMMENT_ADDED,
                 oldValue: null,
                 newValue: {
@@ -79,7 +82,8 @@ export class CommentService {
         }
 
         try {
-            await this.rabbitMQService.publishCommentCreated(newComment);
+            const task = await this.taskRepository.findOne({ where: { id: createTask.taskId } });
+            await this.rabbitMQService.publishCommentCreated(newComment, task);
             Logger.log(`Published task.comment.created event for comment ${newComment.id}`);
         } catch (error) {
             Logger.error(`Failed to publish task.comment.created event for comment ${newComment.id}:`, error);

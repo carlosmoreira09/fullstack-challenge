@@ -110,22 +110,28 @@ export function KanbanBoard() {
     }
 
     const handleCreateTask = async (newTask: Omit<Task, "id">) => {
+        console.log('handleCreateTask called with:', newTask)
+        
         if (!userId) {
+            console.error('User not authenticated')
             setError("Usuário não autenticado.")
             return
         }
 
         try {
-            await taskApi.createTask({
+            console.log('Creating task with userId:', userId)
+            const result = await taskApi.createTask({
                 ...newTask,
                 createdById: userId,
             })
+            console.log('Task created successfully:', result)
             setIsCreateDialogOpen(false)
             await fetchTasks(
                 selectedUserId === "all" ? undefined : selectedUserId,
                 includeAssigned
             )
         } catch (err) {
+            console.error('Error creating task:', err)
             setError("Não foi possível criar a tarefa.")
         }
     }
@@ -195,7 +201,7 @@ export function KanbanBoard() {
                                             .filter((user): user is User & { id: string } => Boolean(user.id))
                                             .map((user) => (
                                                 <SelectItem key={user.id} value={user.id}>
-                                                    {user.name}
+                                                    {user?.name}
                                                 </SelectItem>
                                             ))
                                     )}

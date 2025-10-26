@@ -150,6 +150,7 @@ function TaskDetails() {
 
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
+            console.log('💬 Comment added, notification will arrive via WebSocket')
         } catch (err) {
             console.error("Erro ao adicionar comentário:", err)
         }
@@ -210,6 +211,8 @@ function TaskDetails() {
 
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
+
+            console.log('👥 Assignees updated, notification will arrive via WebSocket')
         } catch (err) {
             console.error("Erro ao atualizar responsáveis:", err)
             throw err
@@ -237,6 +240,7 @@ function TaskDetails() {
 
             const updatedHistory = await historyApi.getHistoryByTask(taskId)
             setHistory(updatedHistory)
+            console.log('📊 Status changed, notification will arrive via WebSocket')
         } catch (err) {
             console.error("Erro ao atualizar status:", err)
         }

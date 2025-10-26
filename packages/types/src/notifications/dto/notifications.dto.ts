@@ -1,4 +1,4 @@
-import {NotificationStatus, NotificationType} from "../notifications.enums";
+import {NotificationStatus, NotificationType} from "../notifications.enums.js";
 
 export interface NotificationDTO {
     id: string
@@ -7,7 +7,7 @@ export interface NotificationDTO {
     title: string
     payload: string
     status: NotificationStatus
-    readAt: string;
+    read_at: string;
     createdAt: string
     updatedAt: string
 }

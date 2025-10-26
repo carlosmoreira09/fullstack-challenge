@@ -9,7 +9,7 @@ import {
     NavigationMenuList,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
-import NotificationMenu from "@/components/navigation-menu.tsx";
+import NotificationMenu from "@/components/notification-menu.tsx";
 
 export default function Header() {
   const { logout, decoded, userId } = useAuth()

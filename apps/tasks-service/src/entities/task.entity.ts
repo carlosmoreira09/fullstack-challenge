@@ -20,7 +20,7 @@ export class TaskEntity {
     title: string;
 
     @Column({ type: 'text', nullable: true })
-    description?: string | null;
+    description: string;
 
     @Column({ type: 'varchar', length: 10, default: TaskPriority.LOW })
     priority: TaskPriority;

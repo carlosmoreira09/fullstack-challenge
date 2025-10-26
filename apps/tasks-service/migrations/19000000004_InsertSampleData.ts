@@ -6,12 +6,12 @@ export class InsertSampleData190000000004 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`SET search_path TO tasks`);
 
-        const taskId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-        const taskAssignmentId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
-        const taskHistoryId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
-        const commentId = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
-        const creatorId = '11111111-1111-1111-1111-111111111111';
-        const assigneeId = '22222222-2222-2222-2222-222222222222';
+        const taskId = 'a1bbcc33-3c1b-4bb4-8e2d-2ee2bd491c77';
+        const taskAssignmentId = 'b2ccdd44-4d2c-4cc5-9f3e-3ff3ce5a2d88';
+        const taskHistoryId = 'c3ddee55-5e3d-4dd6-aa4f-4aa4df6b3e99';
+        const commentId = 'd4eeff66-6f4e-4ee7-bb5a-5bb5ea7c4faa';
+        const creatorId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+        const assigneeId = 'b1ffcd88-8d1a-4ef9-9c7e-7cc8ce491b22';
 
         await queryRunner.query(`
             INSERT INTO tasks.tasks (id, title, description, priority, status, due_date, "created_by_id", assignees)
@@ -72,16 +72,16 @@ export class InsertSampleData190000000004 implements MigrationInterface {
         await queryRunner.query(`SET search_path TO tasks`);
 
         await queryRunner.query(`
-            DELETE FROM tasks.task_history WHERE id = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+            DELETE FROM tasks.task_history WHERE id = 'c3ddee55-5e3d-4dd6-aa4f-4aa4df6b3e99';
         `);
         await queryRunner.query(`
-            DELETE FROM tasks.task_assignments WHERE id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+            DELETE FROM tasks.task_assignments WHERE id = 'b2ccdd44-4d2c-4cc5-9f3e-3ff3ce5a2d88';
         `);
         await queryRunner.query(`
-            DELETE FROM tasks.comments WHERE id = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
+            DELETE FROM tasks.comments WHERE id = 'd4eeff66-6f4e-4ee7-bb5a-5bb5ea7c4faa';
         `);
         await queryRunner.query(`
-            DELETE FROM tasks.tasks WHERE id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+            DELETE FROM tasks.tasks WHERE id = 'a1bbcc33-3c1b-4bb4-8e2d-2ee2bd491c77';
         `);
 
         await queryRunner.query(`SET search_path TO public`);

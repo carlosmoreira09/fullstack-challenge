@@ -74,7 +74,10 @@ export class AppController {
 
     @MessagePattern('create-comment')
     async createComment(@Payload() createComment: CreateCommentDto) {
-        return await this.commentService.create(createComment);
+      if(!createComment.authorId) {
+         throw new Error("Author ID is required.");
+      }
+        return await this.commentService.create(createComment, createComment.authorId);
     }
 
     @MessagePattern('update-comment')

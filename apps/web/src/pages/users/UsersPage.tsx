@@ -38,7 +38,7 @@ export default function UsersPage() {
   const { data: users = [], isLoading } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      const response = await apiClient.get('/users/all');
+      const response = await apiClient.get('/users');
       return response.data;
     },
   });

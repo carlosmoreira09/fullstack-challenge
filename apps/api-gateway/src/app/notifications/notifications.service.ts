@@ -3,8 +3,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { CreateCommentDto, UpdateCommentDto, UserDto } from '@taskmanagerjungle/types';
-import {AuthGuard} from "../../guards/auth/auth.guard";
+import { CreateNotificationsDto} from '@taskmanagerjungle/types';
 
 @Injectable()
 export class NotificationsService {
@@ -13,13 +12,20 @@ export class NotificationsService {
     private readonly notificationsClient: ClientProxy,
   ) {}
 
-  async createNotifications(createCommentDto: CreateCommentDto, userId: string) {
-    return await firstValueFrom(this.notificationsClient.send('create-notification', {...createCommentDto, userId: userId}));
+  async createNotifications(createNotificationDto: CreateNotificationsDto) {
+    return await firstValueFrom(this.notificationsClient.send('create-notification', createNotificationDto));
   }
+  async findAll(userId: string) {
+        return await firstValueFrom(this.notificationsClient.send('list-notifications', { userId }));
+    }
   async markAsRead(notificationId: string, userId: string){
     return await firstValueFrom(this.notificationsClient.send('mark-as-read', {notificationId, userId}));
   }
   async markAllAsRead(userId: string){
       return await firstValueFrom(this.notificationsClient.send('mark-all-as-read', { userId }));
+  }
+  
+  async countUnread(userId: string) {
+      return await firstValueFrom(this.notificationsClient.send('count-unread', { userId }));
   }
 }

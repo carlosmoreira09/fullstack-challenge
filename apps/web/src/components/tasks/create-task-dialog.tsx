@@ -111,7 +111,6 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-
         if (validateForm()) {
             onCreateTask(formData)
 
@@ -125,6 +124,8 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
             })
             setErrors({})
             onOpenChange(false)
+        } else {
+            console.error('Form validation failed:', errors)
         }
     }
 

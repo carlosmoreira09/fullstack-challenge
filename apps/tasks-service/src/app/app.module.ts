@@ -12,8 +12,6 @@ import {TasksHistoryService} from "./tasks-history/tasks-history.service";
 import {TaskAssignmentEntity} from "../entities/task-assignment.entity";
 import {TasksAssignmentService} from "./tasks-assignment/tasks-assignment.service";
 import {RabbitMQModule} from "../rabbitmq/rabbitmq.module";
-import {ClientsModule, Transport} from "@nestjs/microservices";
-
 @Module({
     imports: [
 

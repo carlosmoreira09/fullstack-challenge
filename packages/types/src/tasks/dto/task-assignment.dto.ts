@@ -1,4 +1,4 @@
-import {IsBoolean, IsDate, IsObject, IsString, IsUUID} from "class-validator";
+import {IsBoolean, IsDate, IsObject, IsUUID} from "class-validator";
 import {TaskDto} from "./task.dto.js";
 
 export class TaskAssignmentDto {

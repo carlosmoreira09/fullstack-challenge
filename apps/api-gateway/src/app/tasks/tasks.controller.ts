@@ -1,7 +1,5 @@
-import {Body, Controller, Get, HttpException, HttpStatus, Inject, Logger, Param, Post, Put, Query, UseGuards} from "@nestjs/common";
-import {ClientProxy} from "@nestjs/microservices";
-import {firstValueFrom} from "rxjs";
-import {CreateTaskDto, TaskDto, UpdateTaskDto, UserDto} from "@taskmanagerjungle/types";
+import {Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards} from "@nestjs/common";
+import {CreateTaskDto, UpdateTaskDto} from "@taskmanagerjungle/types";
 import {AuthGuard} from "../../guards/auth/auth.guard";
 import {TasksService} from "./tasks.service";
 
@@ -33,8 +31,12 @@ export class TasksController {
     }
 
     @Put()
-    async updateTask(@Body() task: UpdateTaskDto) {
-        return await this.taskService.updateTask(task)
+    async updateTask(@Body() task: any) {
+        const updateTask: UpdateTaskDto = {
+            ...task,
+            id: task.id
+        }
+        return await this.taskService.updateTask(updateTask)
     }
 
     @Get(':id/comments')

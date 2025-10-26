@@ -12,14 +12,18 @@ export class CreateNotificationsTable1800000000000 implements MigrationInterface
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
         "userId" uuid NOT NULL,
         "type" varchar(30) NOT NULL,
-        "payload" jsonb NOT NULL,
-        "read_at" timestamptz,
-        created_at timestamptz NOT NULL DEFAULT now()
+        "status" varchar(30) NOT NULL,
+        "title" varchar(255) NOT NULL,
+        "payload" text,
+        "metadata" jsonb,
+        "read_at" timestamp,
+        "createdAt" timestamptz NOT NULL DEFAULT now(),
+        "updatedAt" timestamptz NOT NULL DEFAULT now()
       );
     `);
 
         await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_user" ON notifications."notifications" ("userId");`);
-        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_created" ON notifications."notifications" ("created_at");`);
+        await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_notif_created" ON notifications."notifications" ("createdAt");`);
         await queryRunner.query(`SET search_path TO public`);
     }
 

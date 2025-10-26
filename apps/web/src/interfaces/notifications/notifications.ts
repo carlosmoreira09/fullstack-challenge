@@ -14,9 +14,10 @@ export interface Notification {
     userId: string
     type: NotificationType
     title: string
-    message: string
+    payload: string
     metadata: any
     status: NotificationStatus
+    read_at?: string
     createdAt: string
     updatedAt: string
 }

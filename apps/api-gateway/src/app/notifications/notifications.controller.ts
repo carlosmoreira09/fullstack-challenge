@@ -1,16 +1,11 @@
 import {
-    Body,
-    Controller,
-    Delete,
+    Controller, Get,
     HttpException,
     HttpStatus,
     Param,
-    Post,
-    Put, Req,
-    Request,
+    Patch, Req,
     UseGuards,
 } from '@nestjs/common';
-import { CreateCommentDto } from '@taskmanagerjungle/types';
 import {AuthGuard} from "../../guards/auth/auth.guard";
 import {NotificationsService} from "./notifications.service";
 
@@ -20,15 +15,36 @@ export class NotificationsController {
   constructor(
     private readonly notificationsService: NotificationsService,
   ) {}
+    @Get()
+    async findAll(@Req() req: any) {
+        const userId = req.user?.userId;
+        return await this.notificationsService.findAll(userId)
+    }
 
-  @Post()
-  async createNotifications(@Body() createCommentDto: CreateCommentDto, @Request() req: any) {
-      const userId = req.user?.userId;
+    @Get('unread/count')
+    async countUnread(@Req() req: any) {
+        const userId = req.user?.userId;
+        const count = await this.notificationsService.countUnread(userId);
+        return { count };
+    }
 
-      return await this.notificationsService.createNotifications(createCommentDto, userId)
+  @Patch('read-all')
+  async markAllAsRead(@Req() req: any) {
+    try {
+        const userId = req.user?.userId;
+        return this.notificationsService.markAllAsRead(userId)
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Failed to mark all notifications as read',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
-  @Put(':id')
+  @Patch(':id/read')
   async markAsRead(
     @Param('id') id: string,
     @Req() req: any
@@ -41,25 +57,9 @@ export class NotificationsController {
               throw error;
           }
           throw new HttpException(
-              'Failed to delete comment',
+              'Failed to mark notification as read',
               HttpStatus.INTERNAL_SERVER_ERROR
           );
       }
-  }
-
-  @Put('all')
-  async markAllAsRead(@Req() req: any) {
-    try {
-        const userId = req.user?.userId;
-        return this.notificationsService.markAllAsRead(userId)
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Failed to delete comment',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
   }
 }

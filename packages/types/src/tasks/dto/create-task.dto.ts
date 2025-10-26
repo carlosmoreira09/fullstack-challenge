@@ -7,7 +7,7 @@ export class CreateTaskDto {
 
   @IsOptional()
   @IsString()
-  description?: string | null;
+  description!: string;
 
   @IsString()
   priority!: TaskPriority;

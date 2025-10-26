@@ -1,4 +1,4 @@
-import {IsBoolean, IsDate, IsString, IsUUID} from "class-validator";
+import {IsBoolean, IsDate, IsUUID} from "class-validator";
 
 export class CreateTaskAssignmentDto {
     @IsUUID()

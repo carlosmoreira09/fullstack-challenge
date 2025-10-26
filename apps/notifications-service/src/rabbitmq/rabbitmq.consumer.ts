@@ -3,6 +3,7 @@ import * as amqp from 'amqp-connection-manager';
 import { ChannelWrapper } from 'amqp-connection-manager';
 import { ConfirmChannel, ConsumeMessage } from 'amqplib';
 import { NotificationsGateway } from '../websocket/websocket.gateway';
+import { AppService } from '../app/app.service';
 
 @Injectable()
 export class RabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
@@ -11,7 +12,10 @@ export class RabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
     private channelWrapper: ChannelWrapper;
     private readonly exchange = 'tasks_exchange';
 
-    constructor(private readonly websocketGateway: NotificationsGateway) {}
+    constructor(
+        private readonly websocketGateway: NotificationsGateway,
+        private readonly notificationService: AppService
+    ) {}
 
     async onModuleInit() {
         await this.connect();
@@ -117,13 +121,12 @@ export class RabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    private handleTaskCreated(msg: ConsumeMessage, channel: ConfirmChannel) {
+    private async handleTaskCreated(msg: ConsumeMessage, channel: ConfirmChannel) {
         try {
             const content = msg.content.toString();
             const event = JSON.parse(content);
             
             this.logger.log(`Received task.created event for task: ${event.data?.id}`);
-            
             this.websocketGateway.emitTaskCreated(event.data);
             
             channel.ack(msg);
@@ -133,12 +136,14 @@ export class RabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    private handleTaskUpdated(msg: ConsumeMessage, channel: ConfirmChannel) {
+    private async handleTaskUpdated(msg: ConsumeMessage, channel: ConfirmChannel) {
         try {
             const content = msg.content.toString();
             const event = JSON.parse(content);
             this.logger.log(`Received task.updated event for task: ${event.data?.id}`);
+
             this.websocketGateway.emitTaskUpdated(event.data);
+            
             channel.ack(msg);
         } catch (error) {
             this.logger.error('Error handling task.updated event', error);
@@ -146,13 +151,15 @@ export class RabbitMQConsumer implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    private handleCommentCreated(msg: ConsumeMessage, channel: ConfirmChannel) {
+    private async handleCommentCreated(msg: ConsumeMessage, channel: ConfirmChannel) {
         try {
             const content = msg.content.toString();
             const event = JSON.parse(content);
             
             this.logger.log(`Received task.comment.created event for comment: ${event.data?.id}`);
+
             this.websocketGateway.emitCommentNew(event.data);
+            
             channel.ack(msg);
         } catch (error) {
             this.logger.error('Error handling task.comment.created event', error);

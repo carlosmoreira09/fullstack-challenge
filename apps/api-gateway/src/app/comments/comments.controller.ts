@@ -2,22 +2,16 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   HttpException,
   HttpStatus,
-  Inject,
   Param,
   Post,
   Put,
-  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 import { CreateCommentDto, UpdateCommentDto, UserDto } from '@taskmanagerjungle/types';
 import {AuthGuard} from "../../guards/auth/auth.guard";
-import {CommentService} from "tasks-service/dist/src/app/comment/comment.service";
 import {CommentsService} from "./comments.service";
 
 @Controller('comments')

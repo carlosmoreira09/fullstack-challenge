@@ -28,7 +28,7 @@ export class TaskDto {
 export interface Task {
     id?: string;
     title: string;
-    description?: string | null;
+    description: string;
     priority: TaskPriority;
     status: TaskStatus;
     dueDate?: string | null;

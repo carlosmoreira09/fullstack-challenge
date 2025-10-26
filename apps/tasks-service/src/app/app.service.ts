@@ -60,14 +60,14 @@ export class AppService {
         return Array.from(taskMap.values());
     }
 
-    async findByAssignee(assigneeId: number) {
+    async findByAssignee(assigneeId: string) {
         return await this.taskRepository
             .createQueryBuilder('task')
             .where(':assigneeId = ANY(task.assignees)', { assigneeId })
             .getMany();
     }
 
-    async findByAssigneeAndStatus(assigneeId: number, status: TaskStatus) {
+    async findByAssigneeAndStatus(assigneeId: string, status: TaskStatus) {
         return await this.taskRepository
             .createQueryBuilder('task')
             .where(':assigneeId = ANY(task.assignees)', { assigneeId })
@@ -75,7 +75,7 @@ export class AppService {
             .getMany();
     }
 
-    async findByAssigneeAndPriority(assigneeId: number, priority: TaskPriority) {
+    async findByAssigneeAndPriority(assigneeId: string, priority: TaskPriority) {
         return await this.taskRepository
             .createQueryBuilder('task')
             .where(':assigneeId = ANY(task.assignees)', { assigneeId })
@@ -133,7 +133,10 @@ export class AppService {
         return newTask;
     }
 
-    async update(id: string, updateTask: UpdateTaskDto) {
+    async update(id: string | undefined, updateTask: UpdateTaskDto) {
+        if(!id) {
+            throw new Error("Task ID is required.");
+        }
         const task = await this.findOne(id)
         if(!task) {
             throw new Error("Task not found.");

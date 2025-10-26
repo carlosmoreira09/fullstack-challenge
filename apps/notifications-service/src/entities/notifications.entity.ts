@@ -4,7 +4,7 @@ import {NotificationStatus, NotificationType} from "@taskmanagerjungle/types";
 @Entity('notifications')
 export class NotificationsEntity {
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
     @Column({
         type: 'uuid'
@@ -17,16 +17,20 @@ export class NotificationsEntity {
     @Column({ type: 'varchar', length: 30 })
     status: NotificationStatus;
 
-    @Column()
+    @Column({ type: 'varchar', length: 255 })
     title: string;
 
-    @Column({
-        type: 'jsonb'
-    })
-    payload: string;
+    @Column({ type: 'text', nullable: true })
+    payload?: string;
 
-    @Column({ nullable: true })
-    readAt: Date;
+    @Column({
+        type: 'jsonb',
+        nullable: true
+    })
+    metadata?: any;
+
+    @Column({ type: 'timestamp', nullable: true })
+    read_at?: Date | null;
 
     @CreateDateColumn()
     createdAt: Date;
