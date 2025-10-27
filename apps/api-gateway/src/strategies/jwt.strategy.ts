@@ -30,8 +30,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-      Logger.log('JwtStrategy validating payload:', payload);
-    
     if (!payload.sub || !payload.username) {
       throw new UnauthorizedException('Invalid token payload');
     }

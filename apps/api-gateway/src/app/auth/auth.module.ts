@@ -10,6 +10,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from '../../strategies/jwt.strategy';
 import { JwtHelper } from '../../helpers/jwt.helper';
+import { getMicroserviceConfig } from '../../helpers/microservice.helper';
 
 @Module({
     imports: [
@@ -27,10 +28,7 @@ import { JwtHelper } from '../../helpers/jwt.helper';
         ClientsModule.register([{
             name: 'AUTH_SERVICE',
             transport: Transport.TCP,
-            options: {
-                host: '127.0.0.1',
-                port: 3002
-            }
+            options: getMicroserviceConfig('AUTH_SERVICE_URL', 'localhost', 3002)
         }
     ])],
     controllers: [AuthController],

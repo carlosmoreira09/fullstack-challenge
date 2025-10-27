@@ -8,6 +8,7 @@ import {TasksHistoryController} from "./tasks-history.controller";
 import {TasksService} from "./tasks.service";
 import {NotificationsModule} from "../notifications/notifications.module";
 import {AuthModule} from "../auth/auth.module";
+import { getMicroserviceConfig } from '../../helpers/microservice.helper';
 
 
 
@@ -19,26 +20,17 @@ import {AuthModule} from "../auth/auth.module";
             {
                 name: 'TASKS_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3004
-                }
+                options: getMicroserviceConfig('TASKS_SERVICE_URL', 'localhost', 3004)
             },
             {
                 name: 'AUTH_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3002
-                }
+                options: getMicroserviceConfig('AUTH_SERVICE_URL', 'localhost', 3002)
             },
             {
                 name: 'USERS_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3005
-                }
+                options: getMicroserviceConfig('USER_SERVICE_URL', 'localhost', 3005)
             }
         ])
     ],

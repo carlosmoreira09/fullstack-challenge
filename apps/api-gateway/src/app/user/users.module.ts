@@ -6,6 +6,7 @@ import {Transport} from "@nestjs/microservices";
 import {UsersController} from "./users.controller";
 import {UsersService} from "./users.service";
 import {AuthModule} from "../auth/auth.module";
+import { getMicroserviceConfig } from '../../helpers/microservice.helper';
 
 
 
@@ -16,18 +17,12 @@ import {AuthModule} from "../auth/auth.module";
             {
                 name: 'USERS_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3005
-                }
+                options: getMicroserviceConfig('USER_SERVICE_URL', 'localhost', 3005)
             },
             {
                 name: 'AUTH_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3002
-                }
+                options: getMicroserviceConfig('AUTH_SERVICE_URL', 'localhost', 3002)
             }
         ])
     ],

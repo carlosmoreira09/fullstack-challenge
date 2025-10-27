@@ -5,6 +5,7 @@ import {HealthController} from "./health.controller";
 import {HealthService} from "./health.service";
 import {Transport, ClientsModule} from "@nestjs/microservices";
 import {AuthModule} from "../auth/auth.module";
+import { getMicroserviceConfig } from '../../helpers/microservice.helper';
 
 
 
@@ -51,10 +52,7 @@ import {AuthModule} from "../auth/auth.module";
             {
                 name: 'USERS_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3005
-                }
+                options: getMicroserviceConfig('USER_SERVICE_URL', 'localhost', 3005)
             }
         ])
     ],

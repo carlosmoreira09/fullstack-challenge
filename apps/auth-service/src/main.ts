@@ -22,7 +22,7 @@ async function bootstrap() {
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.TCP,
         options: {
-            host: '127.0.0.1',
+            host: '0.0.0.0',
             port: 3002
         }
     });
@@ -32,7 +32,7 @@ async function bootstrap() {
 
     Logger.log('Auth Service is running on:');
     Logger.log('- HTTP: http://localhost:3007');
-    Logger.log('- TCP: 127.0.0.1:3002');
+    Logger.log('- TCP: 0.0.0.0:3002');
     Logger.log(`- RabbitMQ: ${rabbitmqUrl} (queue: auth_queue)`);
 }
 bootstrap().then();

@@ -6,6 +6,7 @@ import {Transport} from "@nestjs/microservices";
 import {NotificationsController} from "./notifications.controller";
 import {NotificationsService} from "./notifications.service";
 import {AuthModule} from "../auth/auth.module";
+import { getMicroserviceConfig } from '../../helpers/microservice.helper';
 
 
 
@@ -16,26 +17,17 @@ import {AuthModule} from "../auth/auth.module";
             {
                 name: 'NOTIFICATIONS_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3003
-                }
+                options: getMicroserviceConfig('NOTIFS_SERVICE_URL', 'localhost', 3003)
             },
             {
                 name: 'AUTH_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3002
-                }
+                options: getMicroserviceConfig('AUTH_SERVICE_URL', 'localhost', 3002)
             },
             {
                 name: 'TASKS_SERVICE',
                 transport: Transport.TCP,
-                options: {
-                    host: '127.0.0.1',
-                    port: 3004
-                }
+                options: getMicroserviceConfig('TASKS_SERVICE_URL', 'localhost', 3004)
             }
         ])
     ],

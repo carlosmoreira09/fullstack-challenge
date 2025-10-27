@@ -35,14 +35,16 @@ services:
       - PORT=3001
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - AUTH_SERVICE_URL=tcp://auth-service:3002
-      - TASKS_SERVICE_URL=tcp://tasks-service:3003
-      - NOTIFS_SERVICE_URL=tcp://notifications-service:3004
-      - USER_SERVICE_URL=tcp://notifications-service:3005
+      - TASKS_SERVICE_URL=tcp://tasks-service:3004
+      - NOTIFS_SERVICE_URL=tcp://notifications-service:3003
+      - USER_SERVICE_URL=tcp://user-service:3005
+      - JWT_SECRET=supersecret
+      - JWT_REFRESH_SECRET=superrefresh
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     networks:
       - challenge-network
 
@@ -55,6 +57,7 @@ services:
       target: development
     ports:
       - '3002:3002'
+      - '3007:3007'
     volumes:
       - .:/app
       - ./packages:/app/packages
@@ -63,15 +66,20 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3002
-      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - JWT_SECRET=supersecret
       - JWT_REFRESH_SECRET=superrefresh
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     networks:
       - challenge-network
 
@@ -84,6 +92,7 @@ services:
       target: development
     ports:
       - '3004:3004'
+      - '3008:3008'
     volumes:
       - .:/app
       - ./packages:/app/packages
@@ -92,13 +101,19 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3003
-      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
+      - MICROSERVICE_PORT=3004
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     networks:
       - challenge-network
 
@@ -111,6 +126,7 @@ services:
       target: development
     ports:
       - '3003:3003'
+      - '3006:3006'
     volumes:
       - .:/app
       - ./packages:/app/packages
@@ -119,14 +135,19 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3004
-      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - WS_PORT=3004
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     networks:
       - challenge-network
   # Notifications Service
@@ -146,13 +167,18 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3005
-      - DATABASE_URL=postgres://postgres:password@db:5432/task-manager-jungle
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
     networks:
       - challenge-network
 
@@ -172,6 +198,11 @@ services:
       POSTGRES_DB: task-manager-jungle
     networks:
       - challenge-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d task-manager-jungle"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # RabbitMQ
   rabbitmq:
@@ -188,6 +219,11 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - challenge-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
