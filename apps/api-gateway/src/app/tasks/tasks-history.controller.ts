@@ -8,10 +8,10 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { TaskHistoryDto, UserDto } from '@taskmanagerjungle/types';
-import { AuthGuard } from "../../guards/auth/auth.guard";
+import { JwtAuthGuard } from "../../guards/jwt-auth/jwt-auth.guard";
 
 @Controller('tasks-history')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class TasksHistoryController {
   constructor(
     @Inject('TASKS_SERVICE')
