@@ -1,11 +1,11 @@
+import { createRoute } from '@tanstack/react-router'
 import { useAuth } from '@/hooks/auth'
-import {createRoute} from "@tanstack/react-router";
-import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
+import { authenticatedRoute } from '@/components/ProtectedRoute.tsx'
 
 export const homeRoute = createRoute({
-    getParentRoute: () => authenticatedRoute,
-    path: '/',
-    component: Home,
+  getParentRoute: () => authenticatedRoute,
+  path: '/',
+  component: Home,
 })
 
 export function Home() {
@@ -18,16 +18,22 @@ export function Home() {
           Bem-vindo ao TaskManagerJungle
         </h1>
         <div className="space-y-4">
-          <p className="text-gray-600">
-            Você está logado com sucesso!
-          </p>
+          <p className="text-gray-600">Você está logado com sucesso!</p>
           {decoded && (
             <div className="bg-gray-50 p-4 rounded-md">
-              <h2 className="text-lg font-semibold mb-2">Informações do Usuário</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Informações do Usuário
+              </h2>
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Email:</span> {decoded.email}</p>
-                <p><span className="font-medium">User ID:</span> {decoded.userId}</p>
-                <p><span className="font-medium">Role:</span> {decoded.role}</p>
+                <p>
+                  <span className="font-medium">Email:</span> {decoded.email}
+                </p>
+                <p>
+                  <span className="font-medium">User ID:</span> {decoded.userId}
+                </p>
+                <p>
+                  <span className="font-medium">Role:</span> {decoded.role}
+                </p>
               </div>
             </div>
           )}

@@ -1,27 +1,31 @@
-import {Outlet, createRootRoute, createRouter, createRoute} from '@tanstack/react-router'
+import {
+  Outlet,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { Toaster } from "@/components/ui/sonner"
-import  Login  from "@/pages/login/Login"
-import {authenticatedRoute} from "@/components/ProtectedRoute"
-import { systemStatusRoute} from "@/pages/system/SystemInfo.tsx";
-import {usersRoute} from "@/pages/users/UsersPage.tsx";
-import {tasksRoute} from "@/pages/tasks/ListTasks.tsx";
 import * as TanStackQueryProvider from '../tanstack-query/queryclient.tsx'
-import {taskDetailsRoute} from "@/pages/tasks/TaskDetails.tsx";
-import {homeRoute} from "@/pages/Home.tsx";
+import { Toaster } from '@/components/ui/sonner'
+import Login from '@/pages/login/Login'
+import { authenticatedRoute } from '@/components/ProtectedRoute'
+import { systemStatusRoute } from '@/pages/system/SystemInfo.tsx'
+import { usersRoute } from '@/pages/users/UsersPage.tsx'
+import { tasksRoute } from '@/pages/tasks/ListTasks.tsx'
+import { taskDetailsRoute } from '@/pages/tasks/TaskDetails.tsx'
+import { homeRoute } from '@/pages/Home.tsx'
 
 export const rootRoute = createRootRoute({
   component: () => (
     <>
       <Outlet />
       <Toaster />
-        <TanStackRouterDevtools position="bottom-left" />
+      <TanStackRouterDevtools position="bottom-left" />
     </>
   ),
 })
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
-
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -29,25 +33,22 @@ const loginRoute = createRoute({
   component: Login,
 })
 
-
 export const routeTree = rootRoute.addChildren([
   loginRoute,
   authenticatedRoute.addChildren([
-      homeRoute,
-      systemStatusRoute,
-      usersRoute,
-      tasksRoute.addChildren([
-          taskDetailsRoute
-      ]),
+    homeRoute,
+    systemStatusRoute,
+    usersRoute,
+    tasksRoute.addChildren([taskDetailsRoute]),
   ]),
 ])
 
 export const router = createRouter({
   routeTree,
-    defaultPreload: 'intent',
-    scrollRestoration: true,
-    defaultStructuralSharing: true,
-    defaultPreloadStaleTime: 0,
+  defaultPreload: 'intent',
+  scrollRestoration: true,
+  defaultStructuralSharing: true,
+  defaultPreloadStaleTime: 0,
   context: {
     ...TanStackQueryProviderContext,
     auth: undefined!,

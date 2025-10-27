@@ -8,7 +8,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @MessagePattern({ cmd: 'health' })
-  async health() {
+  health() {
     return {
       status: 'ok',
       service: 'users-service',

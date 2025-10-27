@@ -1,21 +1,21 @@
-import {IsBoolean, IsDate, IsUUID} from "class-validator";
+import { IsBoolean, IsDate, IsUUID } from "class-validator";
 
 export class CreateTaskAssignmentDto {
-    @IsUUID()
-    taskId!: string;
+  @IsUUID()
+  taskId!: string;
 
-    @IsUUID()
-    userId!: string;
+  @IsUUID()
+  userId!: string;
 
-    @IsUUID()
-    assignedById!: string;
+  @IsUUID()
+  assignedById!: string;
 
-    @IsBoolean()
-    isActive?: boolean;
+  @IsBoolean()
+  isActive?: boolean;
 
-    @IsDate()
-    assignedAt?: Date;
+  @IsDate()
+  assignedAt?: Date;
 
-    @IsDate()
-    unassignedAt?: Date
+  @IsDate()
+  unassignedAt?: Date;
 }

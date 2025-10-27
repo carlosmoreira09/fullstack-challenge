@@ -52,7 +52,9 @@ export class HealthService {
         this.authClient.send({ cmd: 'health' }, {}).pipe(
           timeout(3000),
           catchError((error) => {
-            this.logger.error(`Auth service health check failed: ${error.message}`);
+            this.logger.error(
+              `Auth service health check failed: ${error.message}`,
+            );
             throw error;
           }),
         ),
@@ -80,7 +82,9 @@ export class HealthService {
         this.tasksClient.send({ cmd: 'health' }, {}).pipe(
           timeout(3000),
           catchError((error) => {
-            this.logger.error(`Tasks service health check failed: ${error.message}`);
+            this.logger.error(
+              `Tasks service health check failed: ${error.message}`,
+            );
             throw error;
           }),
         ),
@@ -138,7 +142,9 @@ export class HealthService {
         this.usersClient.send({ cmd: 'health' }, {}).pipe(
           timeout(3000),
           catchError((error) => {
-            this.logger.error(`Users service health check failed: ${error.message}`);
+            this.logger.error(
+              `Users service health check failed: ${error.message}`,
+            );
             throw error;
           }),
         ),
@@ -163,12 +169,12 @@ export class HealthService {
   async checkPostgres(): Promise<ServiceHealthResponse> {
     try {
       const authCheck = await this.checkAuthService();
-      
+
       return {
         service: 'postgres',
         status: authCheck.status,
-        message: authCheck.status 
-          ? 'Database is accessible through services' 
+        message: authCheck.status
+          ? 'Database is accessible through services'
           : 'Database may be unavailable',
         timestamp: new Date().toISOString(),
       };
@@ -184,8 +190,9 @@ export class HealthService {
 
   async checkRabbitMQ(): Promise<ServiceHealthResponse> {
     try {
-      const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
-      
+      const rabbitmqUrl =
+        process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
+
       const connection = await amqp.connect(rabbitmqUrl);
       await connection.close();
 

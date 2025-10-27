@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function KanbanSkeleton() {
   return (
@@ -40,7 +40,7 @@ export function KanbanSkeleton() {
                   <Skeleton className="h-5 w-3/4 mb-3" />
                   <Skeleton className="h-4 w-full mb-2" />
                   <Skeleton className="h-4 w-5/6 mb-4" />
-                  
+
                   <div className="flex items-center justify-between">
                     <Skeleton className="h-5 w-16 rounded-full" />
                     <Skeleton className="h-8 w-8 rounded-full" />

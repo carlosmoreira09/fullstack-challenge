@@ -1,15 +1,15 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { LogOut, Users, ListTodo } from 'lucide-react'
+import { ListTodo, LogOut, Users } from 'lucide-react'
 import { useAuth } from '@/hooks/auth'
 import { Button } from '@/components/ui/button'
 import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    navigationMenuTriggerStyle,
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
-import NotificationMenu from "@/components/notification-menu.tsx";
+import NotificationMenu from '@/components/notification-menu.tsx'
 
 export default function Header() {
   const { logout, decoded, userId } = useAuth()
@@ -28,19 +28,27 @@ export default function Header() {
             TaskManagerJungle
           </Link>
         </h1>
-        
+
         <NavigationMenu>
           <NavigationMenuList className="flex-wrap">
             <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                    <Link to="/usuarios" className="flex hover:bg-gray-800 hover:text-white p-2 rounded-2xl block">
-
-                        <Users size={18} className="mr-2" /> Usuários
-                    </Link>
-                </NavigationMenuLink>
+              <NavigationMenuLink asChild>
+                <Link
+                  to="/usuarios"
+                  className="flex hover:bg-gray-800 hover:text-white p-2 rounded-2xl block"
+                >
+                  <Users size={18} className="mr-2" /> Usuários
+                </Link>
+              </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + " bg-transparent text-white hover:bg-gray-700 hover:text-white"}>
+              <NavigationMenuLink
+                asChild
+                className={
+                  navigationMenuTriggerStyle() +
+                  ' bg-transparent text-white hover:bg-gray-700 hover:text-white'
+                }
+              >
                 <Link to="/tarefas">
                   <ListTodo size={18} className="mr-2" />
                   Tarefas
@@ -48,7 +56,13 @@ export default function Header() {
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + " bg-transparent text-white hover:bg-gray-700 hover:text-white"}>
+              <NavigationMenuLink
+                asChild
+                className={
+                  navigationMenuTriggerStyle() +
+                  ' bg-transparent text-white hover:bg-gray-700 hover:text-white'
+                }
+              >
                 <Link to="/system">
                   <ListTodo size={18} className="mr-2" />
                   Status do Sistema
@@ -59,13 +73,11 @@ export default function Header() {
         </NavigationMenu>
       </div>
 
-        <div></div>
-        <NotificationMenu userId={userId} />
+      <div></div>
+      <NotificationMenu userId={userId} />
       <div className="flex items-center gap-4">
         {decoded && (
-          <span className="text-sm text-gray-300">
-            {decoded.email}
-          </span>
+          <span className="text-sm text-gray-300">{decoded.email}</span>
         )}
         <Button
           onClick={handleLogout}

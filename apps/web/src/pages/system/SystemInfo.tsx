@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { LucideIcon } from 'lucide-react'
 import {
   Activity,
   BellRing,
@@ -9,8 +8,9 @@ import {
   Lock,
   Server,
 } from 'lucide-react'
-import {createRoute} from "@tanstack/react-router";
-import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
+import { createRoute } from '@tanstack/react-router'
+import type { LucideIcon } from 'lucide-react'
+import { authenticatedRoute } from '@/components/ProtectedRoute.tsx'
 
 type Microservice = {
   id: string
@@ -24,7 +24,7 @@ type Microservice = {
   healthUrl?: string
 }
 
-const microservices: Microservice[] = [
+const microservices: Array<Microservice> = [
   {
     id: 'web',
     name: 'Web Client',
@@ -100,7 +100,12 @@ const microservices: Microservice[] = [
   },
 ]
 
-type ServiceState = 'loading' | 'online' | 'degraded' | 'offline' | 'not-monitored'
+type ServiceState =
+  | 'loading'
+  | 'online'
+  | 'degraded'
+  | 'offline'
+  | 'not-monitored'
 
 type ServiceStatus = {
   state: ServiceState
@@ -109,9 +114,9 @@ type ServiceStatus = {
 }
 
 export const systemStatusRoute = createRoute({
-    getParentRoute: () => authenticatedRoute,
-    path: '/system',
-    component: MicroservicesDashboard,
+  getParentRoute: () => authenticatedRoute,
+  path: '/system',
+  component: MicroservicesDashboard,
 })
 
 export function MicroservicesDashboard() {
@@ -154,11 +159,14 @@ export function MicroservicesDashboard() {
         }
 
         try {
-          const apiGatewayResponse = await fetch('http://localhost:3001/api/health', {
-            method: 'GET',
-            cache: 'no-store',
-            mode: 'cors',
-          })
+          const apiGatewayResponse = await fetch(
+            'http://localhost:3001/api/health',
+            {
+              method: 'GET',
+              cache: 'no-store',
+              mode: 'cors',
+            },
+          )
           if (!cancelled) {
             setStatuses((prev) => ({
               ...prev,
@@ -181,12 +189,27 @@ export function MicroservicesDashboard() {
         }
 
         const serviceChecks = [
-            { id: 'api-gateway', endpoint: 'http://localhost:3001/api/health' },
-            { id: 'auth-service', endpoint: 'http://localhost:3001/api/health/auth' },
-          { id: 'tasks-service', endpoint: 'http://localhost:3001/api/health/tasks' },
-          { id: 'notifications-service', endpoint: 'http://localhost:3001/api/health/notifications' },
-          { id: 'postgres', endpoint: 'http://localhost:3001/api/health/postgres' },
-          { id: 'rabbitmq', endpoint: 'http://localhost:3001/api/health/rabbitmq' },
+          { id: 'api-gateway', endpoint: 'http://localhost:3001/api/health' },
+          {
+            id: 'auth-service',
+            endpoint: 'http://localhost:3001/api/health/auth',
+          },
+          {
+            id: 'tasks-service',
+            endpoint: 'http://localhost:3001/api/health/tasks',
+          },
+          {
+            id: 'notifications-service',
+            endpoint: 'http://localhost:3001/api/health/notifications',
+          },
+          {
+            id: 'postgres',
+            endpoint: 'http://localhost:3001/api/health/postgres',
+          },
+          {
+            id: 'rabbitmq',
+            endpoint: 'http://localhost:3001/api/health/rabbitmq',
+          },
         ]
 
         await Promise.all(
@@ -306,9 +329,10 @@ export function MicroservicesDashboard() {
             Visão geral
           </h1>
           <p className="text-base text-muted-foreground">
-              Um rápido resumo de todos os serviços que alimentam a plataforma TaskManager Jungle.
-              Use esses detalhes para verificar se cada contêiner está ativo e
-              escutando na porta esperada enquanto você desenvolve localmente.
+            Um rápido resumo de todos os serviços que alimentam a plataforma
+            TaskManager Jungle. Use esses detalhes para verificar se cada
+            contêiner está ativo e escutando na porta esperada enquanto você
+            desenvolve localmente.
           </p>
         </header>
 
@@ -327,7 +351,9 @@ export function MicroservicesDashboard() {
                       <Icon className="h-5 w-5 text-primary" />
                     </span>
                     <div>
-                      <h2 className="text-lg font-semibold text-foreground">{service.name}</h2>
+                      <h2 className="text-lg font-semibold text-foreground">
+                        {service.name}
+                      </h2>
                       <p className="text-sm text-muted-foreground">
                         {service.description}
                       </p>
@@ -339,15 +365,21 @@ export function MicroservicesDashboard() {
                 <dl className="mt-6 grid gap-2 text-sm">
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Container</dt>
-                    <dd className="font-mono text-foreground">{service.container}</dd>
+                    <dd className="font-mono text-foreground">
+                      {service.container}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Protocol</dt>
-                    <dd className="font-mono text-foreground">{service.protocol}</dd>
+                    <dd className="font-mono text-foreground">
+                      {service.protocol}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Port</dt>
-                    <dd className="font-mono text-foreground">{service.port}</dd>
+                    <dd className="font-mono text-foreground">
+                      {service.port}
+                    </dd>
                   </div>
                 </dl>
 

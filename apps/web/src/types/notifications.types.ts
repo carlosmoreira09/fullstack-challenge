@@ -16,28 +16,28 @@ export enum NotificationStatus {
  * Notification Interfaces
  */
 export interface NotificationDTO {
-  id: string;
-  userId: string;
-  type: NotificationType;
-  title: string;
-  metadata?: any;
-  payload: string;
-  status: NotificationStatus;
-  read_at: string;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  userId: string
+  type: NotificationType
+  title: string
+  metadata?: any
+  payload: string
+  status: NotificationStatus
+  read_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface CreateNotificationDto {
-  userId: string;
-  type: NotificationType;
-  title: string;
-  payload?: string;
-  status?: NotificationStatus;
+  userId: string
+  type: NotificationType
+  title: string
+  payload?: string
+  status?: NotificationStatus
 }
 
 export interface UpdateNotificationDto {
-  id: string;
-  status?: NotificationStatus;
-  read_at?: string;
+  id: string
+  status?: NotificationStatus
+  read_at?: string
 }

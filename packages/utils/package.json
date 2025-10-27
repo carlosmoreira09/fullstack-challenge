@@ -1,13 +1,19 @@
 {
-  "name": "utils",
+  "name": "@taskmanagerjungle/utils",
   "version": "1.0.0",
-  "description": "",
+  "description": "Shared utilities for TaskManagerJungle",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint src --max-warnings 0",
+    "lint:fix": "eslint src --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@taskmanagerjungle/eslint-config": "workspace:*",
+    "typescript-eslint": "^8.20.0"
+  },
   "packageManager": "pnpm@10.18.3"
 }

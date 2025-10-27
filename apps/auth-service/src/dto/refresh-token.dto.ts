@@ -1,10 +1,10 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString } from 'class-validator';
 
 export class RefreshTokenDTO {
-    @IsString()
-    refreshToken: string;
+  @IsString()
+  refreshToken: string;
 
-    @IsOptional()
-    @IsString()
-    ip?: string;
+  @IsOptional()
+  @IsString()
+  ip?: string;
 }

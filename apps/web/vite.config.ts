@@ -1,9 +1,9 @@
+import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 import tanstackRouter from '@tanstack/router-plugin/vite'
-import { resolve } from 'node:path'
 
 export default defineConfig({
   plugins: [
@@ -14,7 +14,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      'react': resolve(__dirname, './node_modules/react'),
+      react: resolve(__dirname, './node_modules/react'),
       'react-dom': resolve(__dirname, './node_modules/react-dom'),
     },
     dedupe: ['react', 'react-dom'],

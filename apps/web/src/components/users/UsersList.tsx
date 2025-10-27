@@ -1,5 +1,5 @@
-import { Pencil, Trash2, Key } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Key, Pencil, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -7,34 +7,40 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { UsersListSkeleton } from '@/components/users/UsersListSkeleton';
+} from '@/components/ui/table'
+import { UsersListSkeleton } from '@/components/users/UsersListSkeleton'
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  document: string;
-  role: string;
-  birthday: string;
-  created_at: string;
+  id: string
+  name: string
+  email: string
+  document: string
+  role: string
+  birthday: string
+  created_at: string
 }
 
 interface UsersListProps {
-  users: User[];
-  isLoading: boolean;
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
-  onChangePassword: (user: User) => void;
+  users: Array<User>
+  isLoading: boolean
+  onEdit: (user: User) => void
+  onDelete: (user: User) => void
+  onChangePassword: (user: User) => void
 }
 
-export function UsersList({ users, isLoading, onEdit, onDelete, onChangePassword }: UsersListProps) {
+export function UsersList({
+  users,
+  isLoading,
+  onEdit,
+  onDelete,
+  onChangePassword,
+}: UsersListProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
+    return new Date(dateString).toLocaleDateString('pt-BR')
+  }
 
   if (isLoading) {
-    return <UsersListSkeleton />;
+    return <UsersListSkeleton />
   }
 
   return (
@@ -54,7 +60,10 @@ export function UsersList({ users, isLoading, onEdit, onDelete, onChangePassword
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell
+                colSpan={7}
+                className="text-center py-8 text-muted-foreground"
+              >
                 Nenhum usuário encontrado
               </TableCell>
             </TableRow>
@@ -101,5 +110,5 @@ export function UsersList({ users, isLoading, onEdit, onDelete, onChangePassword
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

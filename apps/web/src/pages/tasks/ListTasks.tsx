@@ -1,17 +1,17 @@
-import {KanbanBoard} from "@/components/tasks/kanbon-board.tsx";
-import {createRoute} from "@tanstack/react-router";
-import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
+import { createRoute } from '@tanstack/react-router'
+import { KanbanBoard } from '@/components/tasks/kanbon-board.tsx'
+import { authenticatedRoute } from '@/components/ProtectedRoute.tsx'
 
 export const tasksRoute = createRoute({
-    getParentRoute: () => authenticatedRoute,
-    path: '/tarefas',
-    component: ListTasks,
+  getParentRoute: () => authenticatedRoute,
+  path: '/tarefas',
+  component: ListTasks,
 })
 
 function ListTasks() {
-    return (
-        <div className="container mx-auto py-8">
-            <KanbanBoard />
-        </div>
-    )
+  return (
+    <div className="container mx-auto py-8">
+      <KanbanBoard />
+    </div>
+  )
 }

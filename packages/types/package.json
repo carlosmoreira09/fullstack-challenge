@@ -20,7 +20,9 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [
     "dto",
@@ -33,6 +35,10 @@
     "@nestjs/swagger": "^11.2.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2"
+  },
+  "devDependencies": {
+    "@taskmanagerjungle/eslint-config": "workspace:*",
+    "typescript-eslint": "^8.20.0"
   },
   "packageManager": "pnpm@10.18.3"
 }

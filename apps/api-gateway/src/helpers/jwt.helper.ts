@@ -1,7 +1,6 @@
-import {Injectable, Logger} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import {reverseObjectKeys} from "@nestjs/swagger/dist/utils/reverse-object-keys.util";
+import {ConfigService} from "@nestjs/config";
 
 export interface JwtPayload {
   sub: string;
@@ -35,11 +34,11 @@ export class JwtHelper {
         Logger.error('JWT_SECRET not found in environment');
         return false;
       }
-      
+
       await this.jwtService.verifyAsync(token, { secret });
       return true;
     } catch (error) {
-        Logger.error('JWT validation error:', error.message);
+      Logger.error('JWT validation error:', error.message);
       return false;
     }
   }
@@ -48,26 +47,26 @@ export class JwtHelper {
     try {
       const secret = this.configService.get<string>('JWT_SECRET');
       if (!secret) {
-          Logger.error('JWT_SECRET not found in environment');
+        Logger.error('JWT_SECRET not found in environment');
         return null;
       }
 
       const payload = await this.jwtService.verifyAsync(token, { secret });
-      
+
       if (!payload.sub || !payload.username) {
-          Logger.error('Invalid payload structure:', payload);
+        Logger.error('Invalid payload structure:', payload);
         return null;
       }
 
       return {
-          userId: payload.userId,
-          sub: payload.sub,
-          email: payload.email,
-          username: payload.username,
-          role: payload.role
+        userId: payload.userId,
+        sub: payload.sub,
+        email: payload.email,
+        username: payload.username,
+        role: payload.role,
       };
     } catch (error) {
-        Logger.error('JWT decode error:', error.message);
+      Logger.error('JWT decode error:', error.message);
       return null;
     }
   }

@@ -100,12 +100,6 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(express@5.1.0)
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.2.0
-        version: 3.3.1
-      '@eslint/js':
-        specifier: ^9.18.0
-        version: 9.37.0
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.10(@types/node@22.18.10)
@@ -115,6 +109,9 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)
+      '@taskmanagerjungle/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@types/amqplib':
         specifier: ^0.10.5
         version: 0.10.7
@@ -133,15 +130,6 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.37.0(jiti@2.6.1)
-      eslint-config-prettier:
-        specifier: ^10.0.1
-        version: 10.1.8(eslint@9.37.0(jiti@2.6.1))
-      eslint-plugin-prettier:
-        specifier: ^5.2.2
-        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.1)))(eslint@9.37.0(jiti@2.6.1))(prettier@3.6.2)
-      globals:
-        specifier: ^16.0.0
-        version: 16.4.0
       jest:
         specifier: ^30.0.0
         version: 30.2.0(@types/node@22.18.10)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
@@ -209,12 +197,6 @@ importers:
         specifier: ^0.3.27
         version: 0.3.27(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.2.0
-        version: 3.3.1
-      '@eslint/js':
-        specifier: ^9.18.0
-        version: 9.37.0
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.10(@types/node@22.18.10)
@@ -224,6 +206,9 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)
+      '@taskmanagerjungle/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.3
@@ -239,15 +224,6 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.37.0(jiti@2.6.1)
-      eslint-config-prettier:
-        specifier: ^10.0.1
-        version: 10.1.8(eslint@9.37.0(jiti@2.6.1))
-      eslint-plugin-prettier:
-        specifier: ^5.2.2
-        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.1)))(eslint@9.37.0(jiti@2.6.1))(prettier@3.6.2)
-      globals:
-        specifier: ^16.0.0
-        version: 16.4.0
       jest:
         specifier: ^30.0.0
         version: 30.2.0(@types/node@22.18.10)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
@@ -315,12 +291,6 @@ importers:
         specifier: ^4.8.1
         version: 4.8.1
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.2.0
-        version: 3.3.1
-      '@eslint/js':
-        specifier: ^9.18.0
-        version: 9.37.0
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.10(@types/node@22.18.10)
@@ -330,6 +300,9 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)
+      '@taskmanagerjungle/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.3
@@ -345,15 +318,6 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.37.0(jiti@2.6.1)
-      eslint-config-prettier:
-        specifier: ^10.0.1
-        version: 10.1.8(eslint@9.37.0(jiti@2.6.1))
-      eslint-plugin-prettier:
-        specifier: ^5.2.2
-        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.1)))(eslint@9.37.0(jiti@2.6.1))(prettier@3.6.2)
-      globals:
-        specifier: ^16.0.0
-        version: 16.4.0
       jest:
         specifier: ^30.0.0
         version: 30.2.0(@types/node@22.18.10)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
@@ -424,12 +388,6 @@ importers:
         specifier: ^0.3.27
         version: 0.3.27(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.2.0
-        version: 3.3.1
-      '@eslint/js':
-        specifier: ^9.18.0
-        version: 9.37.0
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.10(@types/node@22.18.10)
@@ -439,6 +397,9 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)
+      '@taskmanagerjungle/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.3
@@ -454,15 +415,6 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.37.0(jiti@2.6.1)
-      eslint-config-prettier:
-        specifier: ^10.0.1
-        version: 10.1.8(eslint@9.37.0(jiti@2.6.1))
-      eslint-plugin-prettier:
-        specifier: ^5.2.2
-        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.1)))(eslint@9.37.0(jiti@2.6.1))(prettier@3.6.2)
-      globals:
-        specifier: ^16.0.0
-        version: 16.4.0
       jest:
         specifier: ^30.0.0
         version: 30.2.0(@types/node@22.18.10)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
@@ -527,12 +479,6 @@ importers:
         specifier: ^0.3.27
         version: 0.3.27(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.2.0
-        version: 3.3.1
-      '@eslint/js':
-        specifier: ^9.18.0
-        version: 9.37.0
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.10(@types/node@22.18.10)
@@ -542,6 +488,9 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@nestjs/microservices@11.1.6)(@nestjs/platform-express@11.1.6)
+      '@taskmanagerjungle/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.3
@@ -557,15 +506,6 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.37.0(jiti@2.6.1)
-      eslint-config-prettier:
-        specifier: ^10.0.1
-        version: 10.1.8(eslint@9.37.0(jiti@2.6.1))
-      eslint-plugin-prettier:
-        specifier: ^5.2.2
-        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.1)))(eslint@9.37.0(jiti@2.6.1))(prettier@3.6.2)
-      globals:
-        specifier: ^16.0.0
-        version: 16.4.0
       jest:
         specifier: ^30.0.0
         version: 30.2.0(@types/node@22.18.10)(ts-node@10.9.2(@types/node@22.18.10)(typescript@5.9.3))
@@ -757,6 +697,30 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
 
+  packages/eslint-config:
+    dependencies:
+      '@eslint/js':
+        specifier: ^9.37.0
+        version: 9.37.0
+      eslint:
+        specifier: ^9.37.0
+        version: 9.37.0(jiti@2.6.1)
+      eslint-plugin-prettier:
+        specifier: ^5.2.1
+        version: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.1)))(eslint@9.37.0(jiti@2.6.1))(prettier@3.6.2)
+      globals:
+        specifier: ^15.14.0
+        version: 15.15.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.20.0
+        version: 8.46.1(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)
+
   packages/types:
     dependencies:
       '@nestjs/swagger':
@@ -768,8 +732,22 @@ importers:
       class-validator:
         specifier: ^0.14.2
         version: 0.14.2
+    devDependencies:
+      '@taskmanagerjungle/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      typescript-eslint:
+        specifier: ^8.20.0
+        version: 8.46.1(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)
 
-  packages/utils: {}
+  packages/utils:
+    devDependencies:
+      '@taskmanagerjungle/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      typescript-eslint:
+        specifier: ^8.20.0
+        version: 8.46.1(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)
 
 packages:
 
@@ -9416,6 +9394,7 @@ snapshots:
   eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.1)):
     dependencies:
       eslint: 9.37.0(jiti@2.6.1)
+    optional: true
 
   eslint-import-context@0.1.9(unrs-resolver@1.11.1):
     dependencies:

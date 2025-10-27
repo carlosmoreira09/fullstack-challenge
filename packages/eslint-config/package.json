@@ -1,0 +1,29 @@
+{
+  "name": "@taskmanagerjungle/eslint-config",
+  "version": "1.0.0",
+  "description": "Shared ESLint configuration for TaskManagerJungle",
+  "main": "index.mjs",
+  "type": "module",
+  "files": [
+    "index.mjs"
+  ],
+  "scripts": {},
+  "keywords": [
+    "eslint",
+    "config"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@eslint/js": "^9.37.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.20.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.37.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.18.3"
+}

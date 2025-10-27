@@ -7,17 +7,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@/components/ui/alert-dialog'
 
 interface ConfirmDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  title?: string;
-  description?: string;
-  confirmText?: string;
-  cancelText?: string;
-  variant?: 'default' | 'destructive';
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => void
+  title?: string
+  description?: string
+  confirmText?: string
+  cancelText?: string
+  variant?: 'default' | 'destructive'
 }
 
 export function ConfirmDialog({
@@ -31,9 +31,9 @@ export function ConfirmDialog({
   variant = 'destructive',
 }: ConfirmDialogProps) {
   const handleConfirm = () => {
-    onConfirm();
-    onOpenChange(false);
-  };
+    onConfirm()
+    onOpenChange(false)
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -57,5 +57,5 @@ export function ConfirmDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }
