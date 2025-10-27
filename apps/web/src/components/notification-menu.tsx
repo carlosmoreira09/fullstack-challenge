@@ -61,7 +61,7 @@ export default function NotificationMenu({ userId }: NotificationMenuProps) {
             const existingNotifications =  await notificationsApi.listNotifications()
             setNotifications(existingNotifications)
         } catch (error) {
-            console.error('Failed to load notifications:', error)
+            toast.error('Failed to load notifications: '+ error)
         } finally {
             setIsLoading(false)
         }
@@ -84,14 +84,11 @@ export default function NotificationMenu({ userId }: NotificationMenuProps) {
 
     useEffect(() => {
         if (!userId) {
-            console.warn('⚠️ NotificationMenu: userId is not provided')
+            toast.error('⚠️ NotificationMenu: userId is not provided')
             return
         }
 
         function onConnect() {
-            console.log('✅ WebSocket connected, authenticating...')
-            console.log('   Socket ID:', notificationsSocket.id)
-            console.log('   User ID:', userId)
             if (userId) {
                 notificationsSocket.emit('authenticate', { userId })
             }
@@ -115,14 +112,8 @@ export default function NotificationMenu({ userId }: NotificationMenuProps) {
         }
 
         function onNewNotification(notification: Notification) {
-            console.log('🔔 NEW NOTIFICATION RECEIVED!')
-            console.log('   Notification ID:', notification.id)
-            console.log('   Title:', notification.title)
-            console.log('   Payload:', notification.payload)
-            console.log('   Full notification:', notification)
             
             setNotifications((prev) => {
-                console.log('   Adding to list. Current count:', prev.length)
                 return [notification, ...prev]
             })
 
@@ -152,14 +143,12 @@ export default function NotificationMenu({ userId }: NotificationMenuProps) {
         }
         notificationsSocket.onAny(debugListener)
         if (notificationsSocket.connected) {
-            console.log('🔄 Socket already connected, authenticating...')
             notificationsSocket.emit('authenticate', { userId })
         } else {
             console.log('⏳ Socket not connected yet, waiting for connection...')
         }
 
         return () => {
-            console.log('🧹 Cleaning up WebSocket listeners for user:', userId)
             notificationsSocket.off('connect', onConnect)
             notificationsSocket.off('disconnect', onDisconnect)
             notificationsSocket.off('authenticated', onAuthenticate)

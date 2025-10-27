@@ -1,7 +1,7 @@
 import {useNavigate} from "@tanstack/react-router";
 import {useAuth} from "@/hooks/auth.tsx";
-import React, {useEffect, useState} from "react";
-import type {DecodedToken, LoginDTO} from "@/types";
+import {useEffect, useState} from "react";
+import type {DecodedToken} from "@/types";
 import { jwtDecode } from "jwt-decode";
 import Cookies from 'js-cookie'
 import {ArrowLeft} from "lucide-react";
@@ -10,19 +10,24 @@ import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
 import type {LoginData} from "@/dto/auth/auth.dto.ts";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginFormData } from "@/schemas/auth.schema";
 
 export default function Login() {
     const navigate = useNavigate();
     const auth = useAuth();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
-    const [errors, setErrors] = useState({
-        email: '',
-        password: ''
-    });
     const [isLoading, setIsLoading] = useState(false);
+    
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
+        mode: 'onBlur',
+    });
+
     useEffect(() => {
         const checkToken = async () => {
             try {
@@ -40,31 +45,11 @@ export default function Login() {
 
         checkToken().then();
     }, []);
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
 
-        let hasErrors = false;
-        const newErrors = {
-            email: '',
-            password: ''
-        };
-
-        if (!formData.email) {
-            newErrors.email = 'E-mail é obrigatório';
-            hasErrors = true;
-        }
-
-        if (!formData.password) {
-            newErrors.password = 'Senha é obrigatória';
-            hasErrors = true;
-        }
-
-        setErrors(newErrors);
-
-        if (hasErrors) return;
+    const onSubmit = async (data: LoginFormData) => {
         const loginData: LoginData = {
-            username: formData.email,
-            password: formData.password
+            username: data.username,
+            password: data.password
         }
         try {
             setIsLoading(true);
@@ -82,11 +67,6 @@ export default function Login() {
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-background">
             <div className="flex flex-row absolute top-5 left-10 text-2xl cursor-pointer text-foreground">
@@ -100,34 +80,28 @@ export default function Login() {
                     <h2 className="text-2xl font-bold text-foreground">Área Admin</h2>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-2">
                         <Input
-                            type="email"
-                            name="email"
+                            type="username"
                             placeholder="E-mail"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className={`w-full ${errors.email ? 'border-red-500' : ''}`}
-                            required
+                            {...register('username')}
+                            className={`w-full ${errors.username ? 'border-red-500' : ''}`}
                         />
-                        {errors.email && (
-                            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                        {errors.username && (
+                            <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
                         )}
                     </div>
 
                     <div className="space-y-2">
                         <Input
                             type="password"
-                            name="password"
                             placeholder="Senha"
-                            value={formData.password}
-                            onChange={handleChange}
+                            {...register('password')}
                             className={`w-full ${errors.password ? 'border-red-500' : ''}`}
-                            required
                         />
                         {errors.password && (
-                            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                            <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
                         )}
                     </div>
 

@@ -159,8 +159,6 @@ export function MicroservicesDashboard() {
             cache: 'no-store',
             mode: 'cors',
           })
-            console.log(apiGatewayResponse)
-
           if (!cancelled) {
             setStatuses((prev) => ({
               ...prev,

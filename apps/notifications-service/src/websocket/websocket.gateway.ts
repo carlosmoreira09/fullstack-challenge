@@ -23,7 +23,7 @@ export class NotificationsGateway
     server: Server;
 
     private logger: Logger = new Logger('NotificationsGateway');
-    private userSockets: Map<string, string> = new Map(); // userId -> socketId
+    private userSockets: Map<string, string> = new Map();
 
     afterInit(server: Server) {
         this.logger.log('WebSocket Gateway initialized');

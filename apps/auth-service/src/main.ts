@@ -7,8 +7,6 @@ async function bootstrap() {
     const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
     
     const app = await NestFactory.create(AppModule);
-
-    // Connect to RabbitMQ
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.RMQ,
         options: {
@@ -21,8 +19,6 @@ async function bootstrap() {
             persistent: true
         }
     });
-
-    // Connect to TCP
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.TCP,
         options: {

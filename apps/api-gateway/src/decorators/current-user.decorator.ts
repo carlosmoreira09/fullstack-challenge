@@ -5,22 +5,6 @@ export interface UserPayload {
   username: string;
   role: string;
 }
-
-/**
- * CurrentUser Decorator
- * 
- * Extracts the authenticated user from the request object.
- * Must be used with JwtAuthGuard or AuthGuard.
- * 
- * @example
- * ```typescript
- * @Get()
- * @UseGuards(JwtAuthGuard)
- * async findAll(@CurrentUser() user: UserPayload) {
- *   console.log(user.userId, user.username, user.role);
- * }
- * ```
- */
 export const CurrentUser = createParamDecorator(
   (data: keyof UserPayload | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();

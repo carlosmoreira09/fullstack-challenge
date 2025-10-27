@@ -1,9 +1,9 @@
 import {
-  Controller,
-  Get,
-  Inject,
-  Param,
-  UseGuards,
+    Controller,
+    Get,
+    Inject, Logger,
+    Param,
+    UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
@@ -42,7 +42,7 @@ export class TasksHistoryController {
             );
             usersMap.set(userId, user);
           } catch (error) {
-            console.error(`Failed to fetch user ${userId}:`, error);
+            Logger.error(`Failed to fetch user ${userId}:`, error);
           }
         })
       );
@@ -53,7 +53,7 @@ export class TasksHistoryController {
         userEmail: usersMap.get(entry.userId)?.email || '',
       }));
     } catch (error) {
-      console.error('Error fetching task history:', error);
+      Logger.error('Error fetching task history:', error);
       return [];
     }
   }

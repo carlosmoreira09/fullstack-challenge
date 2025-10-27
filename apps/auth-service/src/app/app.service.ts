@@ -134,10 +134,6 @@ export class AppService {
               role: user.role
           }
 
-          console.log('=== Auth Service Token Generation ===');
-          console.log('JWT_SECRET first 20 chars:', process.env.JWT_SECRET?.substring(0, 20));
-          console.log('JWT_SECRET length:', process.env.JWT_SECRET?.length);
-          
           return this.jwtService.sign(payload, {
               secret: process.env.JWT_SECRET,
           });

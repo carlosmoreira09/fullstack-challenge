@@ -1,6 +1,5 @@
 "use client"
 
-import type React from "react"
 import {useCallback, useEffect, useMemo, useState} from "react"
 import {Button} from "@/components/ui/button"
 import {
@@ -19,6 +18,9 @@ import type {User} from "@/types";
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {userService} from "@/service/user.service.ts";
 import {type Task, TaskPriority, TaskStatus} from "@/types";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createTaskSchema, type CreateTaskFormData } from "@/schemas/task.schema";
 
 interface CreateTaskDialogProps {
     open: boolean
@@ -28,21 +30,34 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStatus }: CreateTaskDialogProps) {
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        status: TaskStatus.TODO,
-        priority: TaskPriority.MEDIUM,
-        dueDate: "",
-        assignees: [] as string[],
-    })
-
-    const [errors, setErrors] = useState<Record<string, string>>({})
     const [users, setUsers] = useState<User[]>([])
     const [isLoadingUsers, setIsLoadingUsers] = useState(false)
     const [usersError, setUsersError] = useState<string | null>(null)
 
     const usersApi = useMemo(() => userService(), [])
+
+    const {
+        register,
+        handleSubmit,
+        control,
+        watch,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm<CreateTaskFormData>({
+        resolver: zodResolver(createTaskSchema),
+        defaultValues: {
+            title: "",
+            description: "",
+            status: initialStatus || TaskStatus.TODO,
+            priority: TaskPriority.MEDIUM,
+            dueDate: "",
+            assignees: [],
+        },
+        mode: 'onBlur',
+    })
+
+    const assignees = watch('assignees')
 
     const fetchUsers = useCallback(async () => {
         try {
@@ -65,68 +80,23 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
         void fetchUsers()
         
         if (initialStatus) {
-            setFormData(prev => ({ ...prev, status: initialStatus }))
+            setValue('status', initialStatus)
         }
-    }, [open, fetchUsers, initialStatus])
+    }, [open, fetchUsers, initialStatus, setValue])
 
     const handleToggleAssignee = (userId: string) => {
-        setFormData((prev) => {
-            const alreadySelected = prev.assignees.includes(userId)
-            return {
-                ...prev,
-                assignees: alreadySelected
-                    ? prev.assignees.filter((id) => id !== userId)
-                    : [...prev.assignees, userId],
-            }
-        })
+        const currentAssignees = assignees || []
+        const alreadySelected = currentAssignees.includes(userId)
+        const newAssignees = alreadySelected
+            ? currentAssignees.filter((id) => id !== userId)
+            : [...currentAssignees, userId]
+        setValue('assignees', newAssignees)
     }
 
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {}
-
-        if (!formData.title.trim()) {
-            newErrors.title = "O título é obrigatório"
-        } else if (formData.title.length < 3) {
-            newErrors.title = "O título deve ter pelo menos 3 caracteres"
-        } else if (formData.title.length > 100) {
-            newErrors.title = "O título deve ter no máximo 100 caracteres"
-        }
-
-        if (formData.description && formData.description.length > 500) {
-            newErrors.description = "A descrição deve ter no máximo 500 caracteres"
-        }
-
-        if (formData.dueDate) {
-            const selectedDate = new Date(formData.dueDate)
-            const today = new Date()
-            today.setHours(0, 0, 0, 0)
-            if (selectedDate < today) {
-                newErrors.dueDate = "O prazo não pode ser no passado"
-            }
-        }
-
-        setErrors(newErrors)
-        return Object.keys(newErrors).length === 0
-    }
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (validateForm()) {
-            onCreateTask(formData)
-
-            setFormData({
-                title: "",
-                description: "",
-                status: TaskStatus.TODO,
-                priority: TaskPriority.MEDIUM,
-                dueDate: "",
-                assignees: [],
-            })
-            setErrors({})
-            onOpenChange(false)
-        } else {
-            console.error('Form validation failed:', errors)
-        }
+    const onSubmit = (data: CreateTaskFormData) => {
+        onCreateTask(data)
+        reset()
+        onOpenChange(false)
     }
 
     return (
@@ -136,7 +106,7 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
                     <DialogTitle>Criar Nova Tarefa</DialogTitle>
                     <DialogDescription>Preencha os detalhes da tarefa. Clique em criar quando terminar.</DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid gap-4 py-4">
                         {/* Title */}
                         <div className="grid gap-2">
@@ -144,16 +114,10 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
                             <Input
                                 id="title"
                                 placeholder="Ex: Implementar autenticação JWT"
-                                value={formData.title}
-                                onChange={(e) => {
-                                    setFormData({ ...formData, title: e.target.value })
-                                    if (errors.title) {
-                                        setErrors({ ...errors, title: "" })
-                                    }
-                                }}
+                                {...register('title')}
                                 className={errors.title ? "border-red-500" : ""}
                             />
-                            {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                            {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
                         </div>
 
                         {/* Description */}
@@ -162,74 +126,68 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
                             <Textarea
                                 id="description"
                                 placeholder="Descreva os detalhes da tarefa..."
-                                value={formData.description}
-                                onChange={(e) => {
-                                    setFormData({ ...formData, description: e.target.value })
-                                    if (errors.description) {
-                                        setErrors({ ...errors, description: "" })
-                                    }
-                                }}
+                                {...register('description')}
                                 rows={3}
                                 className={errors.description ? "border-red-500" : ""}
                             />
-                            {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+                            {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
                         </div>
 
                         {/* Priority and Status */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="priority">Prioridade</Label>
-                                <Select
-                                    value={formData.priority}
-                                    onValueChange={(value: TaskPriority) => setFormData({ ...formData, priority: value })}
-                                >
-                                    <SelectTrigger id="priority">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="LOW">Baixa</SelectItem>
-                                        <SelectItem value="MEDIUM">Média</SelectItem>
-                                        <SelectItem value="HIGH">Alta</SelectItem>
-                                        <SelectItem value="URGENT">Urgente</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <Controller
+                                    name="priority"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select value={field.value} onValueChange={field.onChange}>
+                                            <SelectTrigger id="priority">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="LOW">Baixa</SelectItem>
+                                                <SelectItem value="MEDIUM">Média</SelectItem>
+                                                <SelectItem value="HIGH">Alta</SelectItem>
+                                                <SelectItem value="URGENT">Urgente</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="status">Status</Label>
-                                <Select
-                                    value={formData.status}
-                                    onValueChange={(value: TaskStatus) => setFormData({ ...formData, status: value })}
-                                >
-                                    <SelectTrigger id="status">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="TODO">To Do</SelectItem>
-                                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                                        <SelectItem value="REVIEW">Review</SelectItem>
-                                        <SelectItem value="DONE">Done</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select value={field.value} onValueChange={field.onChange}>
+                                            <SelectTrigger id="status">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="TODO">To Do</SelectItem>
+                                                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                                                <SelectItem value="REVIEW">Review</SelectItem>
+                                                <SelectItem value="DONE">Done</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
                             </div>
                         </div>
 
                         {/* Deadline */}
                         <div className="grid gap-2">
-                            <Label htmlFor="deadline">Prazo</Label>
+                            <Label htmlFor="dueDate">Prazo</Label>
                             <Input
-                                id="deadline"
+                                id="dueDate"
                                 type="date"
-                                value={formData.dueDate}
-                                onChange={(e) => {
-                                    setFormData({ ...formData, dueDate: e.target.value })
-                                    if (errors.deadline) {
-                                        setErrors({ ...errors, deadline: "" })
-                                    }
-                                }}
-                                className={errors.deadline ? "border-red-500" : ""}
+                                {...register('dueDate')}
+                                className={errors.dueDate ? "border-red-500" : ""}
                             />
-                            {errors.deadline && <p className="text-sm text-red-500">{errors.deadline}</p>}
+                            {errors.dueDate && <p className="text-sm text-red-500">{errors.dueDate.message}</p>}
                         </div>
 
                         {/* Assignees */}
@@ -256,7 +214,7 @@ export function CreateTaskDialog({ open, onOpenChange, onCreateTask, initialStat
                                             users
                                                 .filter((user): user is User & { id: string } => typeof user.id === "string" && user.id.length > 0)
                                                 .map((user) => {
-                                                    const checked = formData.assignees.includes(user.id)
+                                                    const checked = assignees?.includes(user.id) || false
                                                     return (
                                                         <label
                                                             key={user.id}

@@ -8,8 +8,6 @@ async function bootstrap() {
     const tcpPort = parseInt(process.env.MICROSERVICE_PORT as string) || 3004;
     
     const app = await NestFactory.create(AppModule);
-
-    // Connect to RabbitMQ
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.RMQ,
         options: {
@@ -22,8 +20,6 @@ async function bootstrap() {
             persistent: true
         }
     });
-
-    // Connect to TCP
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.TCP,
         options: {

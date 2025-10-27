@@ -62,9 +62,9 @@ export interface UpdateTaskDto {
   description?: string;
   priority: TaskPriority;
   status: TaskStatus;
-  dueDate: string | null;
+  dueDate?: string | null;
   assignees: string[];
-  createdById: string;
+  createdById: string | null;
 }
 
 export interface ListTasksParams {
@@ -91,7 +91,7 @@ export interface CreateCommentDto {
 }
 
 export interface UpdateCommentDto {
-  id: string;
+  id?: string;
   content: string;
 }
 
