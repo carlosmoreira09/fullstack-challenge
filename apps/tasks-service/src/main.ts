@@ -1,25 +1,44 @@
-
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { Logger } from "@nestjs/common/services/logger.service";
 import {AppModule} from "./app/app.module";
 
 async function bootstrap() {
-    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-        AppModule,
-        {
-            transport: Transport.TCP,
-            options: {
-                host: "0.0.0.0", // Bind to all interfaces for Docker networking
-                port: parseInt(process.env.MICROSERVICE_PORT as string) || 3004,
-            },
-        }
-    );
+    const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
+    const tcpPort = parseInt(process.env.MICROSERVICE_PORT as string) || 3004;
+    
+    const app = await NestFactory.create(AppModule);
 
-    await app.listen();
-    Logger.log(
-        `Tasks service microservice running on TCP port ${process.env.MICROSERVICE_PORT || 3004}`
-    );
+    // Connect to RabbitMQ
+    app.connectMicroservice<MicroserviceOptions>({
+        transport: Transport.RMQ,
+        options: {
+            urls: [rabbitmqUrl],
+            queue: 'tasks_queue',
+            queueOptions: {
+                durable: true
+            },
+            noAck: false,
+            persistent: true
+        }
+    });
+
+    // Connect to TCP
+    app.connectMicroservice<MicroserviceOptions>({
+        transport: Transport.TCP,
+        options: {
+            host: "0.0.0.0",
+            port: tcpPort,
+        },
+    });
+
+    await app.startAllMicroservices();
+    await app.listen(3008);
+
+    Logger.log('Tasks Service is running on:');
+    Logger.log('- HTTP: http://localhost:3008');
+    Logger.log(`- TCP: 0.0.0.0:${tcpPort}`);
+    Logger.log(`- RabbitMQ: ${rabbitmqUrl} (queue: tasks_queue)`);
 }
 
 bootstrap();

@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import type {Task} from "@taskmanagerjungle/types";
+import type {Task} from "@/types";
 
 interface TaskCardProps {
     task: Task

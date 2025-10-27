@@ -4,11 +4,13 @@ import {
 import {HealthController} from "./health.controller";
 import {HealthService} from "./health.service";
 import {Transport, ClientsModule} from "@nestjs/microservices";
+import {AuthModule} from "../auth/auth.module";
 
 
 
 @Module({
     imports: [
+        AuthModule,
         ClientsModule.register([
             {
                 name: 'AUTH_SERVICE',

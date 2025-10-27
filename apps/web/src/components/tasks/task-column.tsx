@@ -1,5 +1,5 @@
 import type React from "react"
-import type {Task} from "@taskmanagerjungle/types";
+import type {Task} from "@/types";
 import {TaskCard} from "@/components/tasks/task-card.tsx";
 
 interface TaskColumnProps {

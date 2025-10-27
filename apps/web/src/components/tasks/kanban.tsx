@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import type {Task, TaskStatus} from "@taskmanagerjungle/types";
+import type {Task, TaskStatus} from "@/types";
 import {TaskCard} from "@/components/tasks/task-card.tsx";
 
 interface KanbanColumnProps {

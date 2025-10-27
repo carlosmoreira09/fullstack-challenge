@@ -1,5 +1,5 @@
 import apiClient from "@/lib/interceptor.ts";
-import type {User} from "@/dto/users/users.dto.ts";
+import type {User} from "@/types";
 
 
 export const userService = () => {

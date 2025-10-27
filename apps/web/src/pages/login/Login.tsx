@@ -1,7 +1,7 @@
 import {useNavigate} from "@tanstack/react-router";
 import {useAuth} from "@/hooks/auth.tsx";
 import React, {useEffect, useState} from "react";
-import type {DecodedToken, LoginData} from "@/dto/auth/auth.dto.ts";
+import type {DecodedToken, LoginDTO} from "@/types";
 import { jwtDecode } from "jwt-decode";
 import Cookies from 'js-cookie'
 import {ArrowLeft} from "lucide-react";
@@ -9,6 +9,7 @@ import {toast} from "sonner";
 import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
+import type {LoginData} from "@/dto/auth/auth.dto.ts";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -67,7 +68,7 @@ export default function Login() {
         }
         try {
             setIsLoading(true);
-            const response = await auth.login(     loginData);
+            const response = await auth.login(loginData);
             if (response?.token) {
                 toast.success('Login realizado com sucesso!');
                 navigate({ to: '/' });

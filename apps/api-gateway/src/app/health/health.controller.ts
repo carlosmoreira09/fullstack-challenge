@@ -1,9 +1,9 @@
-import {Controller, Get, UseGuards} from '@nestjs/common';
+import {Controller, Get} from '@nestjs/common';
 import { HealthService } from './health.service';
-import {JwtAuthGuard} from "../../guards/jwt-auth/jwt-auth.guard";
+import { Public } from '../../decorators/public.decorator';
 
 @Controller('health')
-@UseGuards(JwtAuthGuard)
+@Public()
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 

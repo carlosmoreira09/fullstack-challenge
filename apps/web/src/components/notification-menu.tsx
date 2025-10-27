@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/popover'
 import { notificationsSocket} from "@/service/notificationsWebSocket.ts";
 import {notificationService} from "@/service/notificationsService.ts";
-import {type Notification, NotificationStatus} from "@/interfaces/notifications/notifications.ts";
+import {type NotificationDTO as Notification, NotificationStatus} from "@/types";
 
 const formatNotificationDate = (dateString: string): string => {
     const date = new Date(dateString)

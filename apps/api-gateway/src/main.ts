@@ -26,8 +26,6 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
-
-    // Swagger Configuration
     const config = new DocumentBuilder()
         .setTitle('TaskManager Jungle API')
         .setDescription('API Gateway for TaskManager Jungle - A comprehensive task management system')

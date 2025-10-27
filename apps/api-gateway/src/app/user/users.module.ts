@@ -5,11 +5,13 @@ import {ClientsModule} from "@nestjs/microservices/module/clients.module";
 import {Transport} from "@nestjs/microservices";
 import {UsersController} from "./users.controller";
 import {UsersService} from "./users.service";
+import {AuthModule} from "../auth/auth.module";
 
 
 
 @Module({
     imports: [
+        AuthModule,
         ClientsModule.register([
             {
                 name: 'USERS_SERVICE',

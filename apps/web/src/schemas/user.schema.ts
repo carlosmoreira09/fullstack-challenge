@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createUserSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
-  birthday: z.string().min(1, 'Data de nascimento é obrigatória'),
+  birthday: z.string().min(1,'Data de nascimento é obrigatória'),
   document: z.string().min(1, 'Documento é obrigatório'),
   role: z.string().min(1, 'Função é obrigatória'),
   email: z.string().email('Email inválido'),

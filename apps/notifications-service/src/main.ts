@@ -34,7 +34,7 @@ async function bootstrap() {
     });
 
   await app.startAllMicroservices();
-  await app.listen(3006); // HTTP server on different port for WebSocket
+  await app.listen(3006);
   
   Logger.log('Notifications Service is running on:');
     Logger.log('- HTTP/WebSocket: http://localhost:3006');

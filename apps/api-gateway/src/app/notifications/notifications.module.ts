@@ -5,11 +5,13 @@ import {ClientsModule} from "@nestjs/microservices/module/clients.module";
 import {Transport} from "@nestjs/microservices";
 import {NotificationsController} from "./notifications.controller";
 import {NotificationsService} from "./notifications.service";
+import {AuthModule} from "../auth/auth.module";
 
 
 
 @Module({
     imports: [
+        AuthModule,
         ClientsModule.register([
             {
                 name: 'NOTIFICATIONS_SERVICE',

@@ -1,14 +1,5 @@
 import apiClient from "@/lib/interceptor.ts";
-import type { TaskComment } from "@taskmanagerjungle/types";
-
-export interface CreateCommentDto {
-    taskId: string;
-    content: string;
-}
-
-export interface UpdateCommentDto {
-    content: string;
-}
+import type { TaskComment, CreateCommentDto, UpdateCommentDto } from "@/types";
 
 export interface PaginatedComments {
     data: TaskComment[];

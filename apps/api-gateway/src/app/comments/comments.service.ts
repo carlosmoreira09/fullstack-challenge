@@ -38,8 +38,8 @@ export class CommentsService {
           }
           
           const notificationRecipients = [task.createdById, ...task.assignees]
-            .filter((recipientId, index, self) => self.indexOf(recipientId) === index) // Remove duplicates
-            .filter(recipientId => recipientId !== userId); // Don't notify the comment author
+            .filter((recipientId, index, self) => self.indexOf(recipientId) === index)
+            .filter(recipientId => recipientId !== userId);
           
           const notificationPromises = notificationRecipients.map(async (recipientId) => {
             try {

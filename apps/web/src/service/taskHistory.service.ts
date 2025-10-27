@@ -1,16 +1,5 @@
 import apiClient from "@/lib/interceptor.ts";
-
-export interface TaskHistoryEntry {
-    id: string;
-    taskId: string;
-    userId: string;
-    userName: string;
-    userEmail: string;
-    action: string;
-    oldValue: Record<string, unknown> | null;
-    newValue: Record<string, unknown> | null;
-    createdAt: string;
-}
+import { type TaskHistoryEntry} from "@/types";
 
 export const taskHistoryService = () => {
     const getHistoryByTask = async (taskId: string): Promise<TaskHistoryEntry[]> => {

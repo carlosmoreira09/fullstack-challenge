@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { userService } from "@/service/user.service.ts";
-import type { User } from "@/dto/users/users.dto.ts";
+import type { User } from "@/types";
 
 interface AddAssigneesDialogProps {
     open: boolean;

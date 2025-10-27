@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {AuthContext} from "@/context/context.ts";
-import type {AuthResponse, DecodedToken, LoginData} from "@/dto/auth/auth.dto.ts";
+import type {AuthResponse, DecodedToken, LoginDTO} from "@/types";
 import {authService} from "@/service/auth.service.ts";
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
@@ -37,33 +37,65 @@ const AuthProvider = ({ children }: Props) => {
         setIsAuthenticated(false);
     }, []);
 
-    const restoreSessionFromCookies = useCallback(() => {
+    const restoreSessionFromCookies = useCallback(async () => {
         const token = Cookies.get('token');
-        if(!token) {
+        const refreshToken = Cookies.get('refreshToken');
+        
+        if(!token && !refreshToken) {
             clearAuthState();
             return;
         }
 
         try {
-            const decodedToken = jwtDecode<DecodedToken>(token);
-            if(decodedToken.exp * 1000 < Date.now()) {
-                clearAuthState();
-                return;
+            if(token) {
+                const decodedToken = jwtDecode<DecodedToken>(token);
+                const isExpired = decodedToken.exp * 1000 < Date.now();
+                
+                if(isExpired && refreshToken) {
+                    const response = await loginService.refresh();
+                    if(response?.token && response?.refreshToken) {
+                        handleAuthSuccess(response);
+                        return;
+                    }
+                    clearAuthState();
+                    return;
+                }
+                
+                if(!isExpired) {
+                    setDecoded(decodedToken);
+                    setToken(token)
+                    setUserId(decodedToken.userId);
+                    setIsAuthenticated(true);
+                    return;
+                }
             }
-            setDecoded(decodedToken);
-            setToken(token)
-            setUserId(decodedToken.userId);
-            setIsAuthenticated(true);
+            clearAuthState();
         } catch (error) {
             clearAuthState();
         }
-    }, [clearAuthState]);
+    }, [clearAuthState, loginService, handleAuthSuccess]);
 
     useEffect(() => {
-        restoreSessionFromCookies();
+        void restoreSessionFromCookies();
     }, [restoreSessionFromCookies]);
 
-    const login = useCallback(async (logindData: LoginData) => {
+    useEffect(() => {
+        if(!decoded || !isAuthenticated) return;
+
+        const expiresAt = decoded.exp * 1000;
+        const now = Date.now();
+        const timeUntilExpiry = expiresAt - now;
+        const refreshBuffer = 2 * 60 * 1000; // 2 minutos
+        const timeUntilRefresh = Math.max(0, timeUntilExpiry - refreshBuffer);
+
+        const timerId = setTimeout(() => {
+            void refreshAccessToken();
+        }, timeUntilRefresh);
+
+        return () => clearTimeout(timerId);
+    }, [decoded, isAuthenticated]);
+
+    const login = useCallback(async (logindData: LoginDTO) => {
         const response = await loginService.login(logindData);
         if(response?.token && response?.refreshToken) {
             handleAuthSuccess(response);

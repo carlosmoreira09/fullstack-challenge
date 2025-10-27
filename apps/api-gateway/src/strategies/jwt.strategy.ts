@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {Injectable, Logger, UnauthorizedException} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +6,9 @@ import { ConfigService } from '@nestjs/config';
 export interface JwtPayload {
   sub: string;
   username: string;
+  email: string;
+  userId: string;
+  id: string;
   role: string;
   iat?: number;
   exp?: number;
@@ -13,9 +16,8 @@ export interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private configService: ConfigService) {
-    const jwtSecret = configService.get<string>('JWT_SECRET');
-    
+  constructor() {
+    const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined in environment variables');
     }
@@ -28,14 +30,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
+      Logger.log('JwtStrategy validating payload:', payload);
+    
     if (!payload.sub || !payload.username) {
       throw new UnauthorizedException('Invalid token payload');
     }
 
     return {
-      userId: payload.sub,
-      username: payload.username,
-      role: payload.role,
+        sub: payload.sub,
+        email: payload.email,
+        userId: payload.userId,
+        username: payload.username,
+        role: payload.role
     };
   }
 }

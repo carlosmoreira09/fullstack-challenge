@@ -82,9 +82,15 @@ export class AppService {
                 const decoded = this.jwtService.verify(token, {
                     secret: process.env.JWT_SECRET,
                 });
-                return { valid: true, userId: decoded.userId, email: decoded.email, role: decoded.role }
+                return { 
+                    valid: true, 
+                    userId: decoded.userId, 
+                    username: decoded.username,
+                    email: decoded.email, 
+                    role: decoded.role 
+                }
             } catch (error) {
-                return { valid: false, userId: null, role: null, email: null }
+                return { valid: false, userId: null, username: null, role: null, email: null }
             }
 
       }
@@ -121,11 +127,17 @@ export class AppService {
 
       private generateAccessToken(user: AuthEntity) {
           const payload = {
-              userId: user.id,
+              sub: user.id,
               email: user.email,
+              userId: user.id,
+              username: user.username,
               role: user.role
           }
 
+          console.log('=== Auth Service Token Generation ===');
+          console.log('JWT_SECRET first 20 chars:', process.env.JWT_SECRET?.substring(0, 20));
+          console.log('JWT_SECRET length:', process.env.JWT_SECRET?.length);
+          
           return this.jwtService.sign(payload, {
               secret: process.env.JWT_SECRET,
           });

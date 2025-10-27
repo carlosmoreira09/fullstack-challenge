@@ -7,11 +7,11 @@ import {Label} from "@/components/ui/label"
 import {useNavigate} from "@tanstack/react-router";
 import {KanbanColumn} from "@/components/tasks/kanban.tsx";
 import {CreateTaskDialog} from "@/components/tasks/create-task-dialog.tsx";
-import {type Task, TaskStatus} from "@taskmanagerjungle/types";
+import {type Task, TaskStatus} from "@/types";
 import {taskService} from "@/service/task.service.ts";
 import {userService} from "@/service/user.service.ts";
 import {useAuth} from "@/hooks/auth.tsx";
-import type {User} from "@/dto/users/users.dto.ts";
+import type {User} from "@/types";
 import {KanbanSkeleton} from "@/components/tasks/KanbanSkeleton.tsx";
 
 const COLUMNS: { id: TaskStatus; title: string }[] = [

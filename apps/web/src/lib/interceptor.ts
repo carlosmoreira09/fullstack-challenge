@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
-import type { AuthResponse } from "@/dto/auth/auth.dto.ts";
+import type {AuthResponse} from "@/types";
 
 type RetryableRequestConfig = AxiosRequestConfig & { _retry?: boolean };
 

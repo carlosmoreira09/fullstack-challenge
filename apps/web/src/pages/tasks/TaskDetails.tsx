@@ -10,14 +10,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination"
-import {type Task, type TaskComment, type TaskHistoryEntry, TaskPriority, TaskStatus} from "@taskmanagerjungle/types";
+import {type Task, type TaskComment, type TaskHistoryEntry, TaskPriority, TaskStatus} from "@/types";
 import {authenticatedRoute} from "@/components/ProtectedRoute.tsx";
 import {taskService} from "@/service/task.service.ts";
 import {commentService} from "@/service/comment.service.ts";
 import {CommentCard} from "@/components/tasks/CommentCard.tsx";
 import {useAuth} from "@/hooks/auth.tsx";
 import {AddAssigneesDialog} from "@/components/tasks/AddAssigneesDialog.tsx";
-import {UpdateTaskDto} from "@taskmanagerjungle/types";
+import {type UpdateTaskDto} from "@/types";
 import {taskHistoryService} from "@/service/taskHistory.service.ts";
 import {TaskDetailsSkeleton} from "@/components/tasks/TaskDetailsSkeleton.tsx";
 

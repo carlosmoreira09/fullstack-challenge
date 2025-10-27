@@ -1,13 +1,13 @@
 import apiClient from "@/lib/interceptor.ts";
-import type { CreateTaskDto, UpdateTaskDto, ListTasksParams, Task } from "@taskmanagerjungle/types";
+import type { CreateTaskDto, UpdateTaskDto, ListTasksParams, Task } from "@/types";
 
 type TaskPayload = CreateTaskDto & { id?: string };
 
 const normalizeTaskPayload = (data: TaskPayload) => {
     const payload: Record<string, unknown> = {
         id: data.id,
-        title: data.title.trim(),
-        description: data.description?.trim(),
+        title: data.title?.trim() || '',
+        description: data.description?.trim() || '',
         priority: data.priority ?? "LOW",
         status: data.status ?? "TODO",
         dueDate: data.dueDate ?? null,

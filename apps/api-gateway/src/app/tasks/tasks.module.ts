@@ -7,11 +7,13 @@ import {TasksController} from "./tasks.controller";
 import {TasksHistoryController} from "./tasks-history.controller";
 import {TasksService} from "./tasks.service";
 import {NotificationsModule} from "../notifications/notifications.module";
+import {AuthModule} from "../auth/auth.module";
 
 
 
 @Module({
     imports: [
+        AuthModule,
         NotificationsModule,
         ClientsModule.register([
             {
