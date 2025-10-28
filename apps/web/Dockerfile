@@ -10,6 +10,7 @@ COPY apps/api-gateway/package.json ./apps/api-gateway/
 COPY apps/auth-service/package.json ./apps/auth-service/
 COPY apps/tasks-service/package.json ./apps/tasks-service/
 COPY apps/notifications-service/package.json ./apps/notifications-service/
+COPY apps/user-service/package.json ./apps/user-service/
 COPY apps/web/package.json ./apps/web/
 RUN pnpm install --frozen-lockfile
 

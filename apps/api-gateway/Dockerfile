@@ -1,61 +1,60 @@
-# syntax=docker/dockerfile:1.7
-FROM node:22.12-alpine AS base
-WORKDIR /app
-# Flags para CI
-ENV CI=true HUSKY=0 NODE_OPTIONS=--max-old-space-size=512
-RUN npm install -g pnpm@10.18.3
+# Multi-stage Dockerfile for API Gateway Service
 
-# ---------- deps (instala TODAS as dependências, inclusive dev) ----------
+# Base image with Node.js
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# Dependencies stage
 FROM base AS deps
-# Manifests do monorepo
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-# Package manifests para melhor cache
-COPY packages ./packages
+COPY package.json pnpm-lock.yaml* ./
+COPY packages/types/package.json ./packages/types/
+COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY apps/api-gateway/package.json ./apps/api-gateway/
-COPY apps/auth-service/package.json ./apps/auth-service/
-COPY apps/tasks-service/package.json ./apps/tasks-service/
-COPY apps/notifications-service/package.json ./apps/notifications-service/
-COPY apps/web/package.json ./apps/web/
 
-# Instala com devDependencies (necessário pro build do Nest)
-RUN pnpm install --no-frozen-lockfile --prefer-offline --no-optional --prod=false
+RUN pnpm install --frozen-lockfile
 
-# ---------- build ----------
-FROM deps AS build
-# Copia código completo
-COPY packages ./packages
-COPY apps ./apps
-
-# 1) Build dos tipos (sem turbo)
-RUN pnpm --filter @taskmanagerjungle/types run build \
-  || pnpm exec tsc -p packages/types/tsconfig.json
-
-# 2) Build do API Gateway
-WORKDIR /app/apps/api-gateway
-RUN pnpm run build
-
-FROM node:22.12-alpine AS production
+# Build stage
+FROM base AS builder
 WORKDIR /app
-ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
-# Copia manifests do workspace para instalar dependências
-COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build /app/apps/api-gateway/package.json ./apps/api-gateway/
-COPY --from=build /app/packages ./packages
+# Build shared packages first
+RUN pnpm build --filter=@task-management/types
 
-# Remove dependência dos types e instala apenas produção
-RUN sed -i '/"@taskmanagerjungle\/types"/d' apps/api-gateway/package.json
+# Build the API Gateway
+RUN pnpm build --filter=api-gateway
 
-RUN pnpm install --prod --prefer-offline --no-optional --no-frozen-lockfile --filter ./apps/api-gateway
+# Development stage
+FROM base AS development
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
-# Reintroduz pacote de types gerado no build
-RUN mkdir -p node_modules/@taskmanagerjungle/types
-COPY --from=build /app/packages/types/package.json ./node_modules/@taskmanagerjungle/types/package.json
-COPY --from=build /app/packages/types/dist ./node_modules/@taskmanagerjungle/types/dist
+# Install dependencies for development
+RUN pnpm install
 
-# Copia o dist compilado para o diretório atual
-COPY --from=build /app/apps/api-gateway/dist ./dist
+EXPOSE 3001
 
-EXPOSE 4000
-CMD ["node", "dist/main.js"]
+# Start in development mode with hot reload
+CMD ["pnpm", "--filter=api-gateway", "start:dev"]
+
+# Production stage
+FROM base AS production
+WORKDIR /app
+
+# Copy built application
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/apps/api-gateway/package.json ./apps/api-gateway/package.json
+
+EXPOSE 3001
+
+# Start in production mode
+CMD ["node", "dist/apps/api-gateway/main.js"]
