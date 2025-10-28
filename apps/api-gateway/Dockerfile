@@ -34,27 +34,24 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
 WORKDIR /app/apps/api-gateway
 RUN pnpm run build
 
-# ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 RUN npm install -g pnpm@10.18.3
 
+# Copia manifests do workspace para instalar dependências
+COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=build /app/apps/api-gateway/package.json ./apps/api-gateway/
+
 # Remove dependência dos types e instala apenas produção
-RUN sed -i '/"@taskmanagerjungle\\/types"/d' apps/api-gateway/package.json \
-  && pnpm install --prod --prefer-offline --no-optional --no-frozen-lockfile --filter ./apps/api-gateway...
+RUN sed -i '/"@taskmanagerjungle\/types"/d' apps/api-gateway/package.json
+
+RUN pnpm install --prod --prefer-offline --no-optional --no-frozen-lockfile --filter ./apps/api-gateway
 
 # Reintroduz pacote de types gerado no build
 RUN mkdir -p node_modules/@taskmanagerjungle/types
 COPY --from=build /app/packages/types/package.json ./node_modules/@taskmanagerjungle/types/package.json
 COPY --from=build /app/packages/types/dist ./node_modules/@taskmanagerjungle/types/dist
-
-# Copia manifests do workspace para instalar dependências
-COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build /app/packages ./packages
-
-# Instala apenas dependências de produção
-RUN pnpm install --prod --frozen-lockfile
 
 # Copia o dist compilado para o diretório atual
 COPY --from=build /app/apps/api-gateway/dist ./dist
