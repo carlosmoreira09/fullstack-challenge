@@ -28,7 +28,6 @@ RUN pnpm run build
 
 ########## PROD (Caddy) ##########
 FROM caddy:2-alpine AS production
-RUN npm install -g pnpm@10.18.3
 
 # Copia build do Vite
 COPY --from=build /app/apps/web/dist /srv

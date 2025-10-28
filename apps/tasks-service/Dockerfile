@@ -33,7 +33,6 @@ FROM deps AS build
 # Copia código completo
 COPY packages ./packages
 COPY apps ./apps
-RUN npm install -g pnpm@10.18.3
 
 # 1) Build dos tipos (sem turbo)
 RUN pnpm --filter @taskmanagerjungle/types run build \

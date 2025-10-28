@@ -45,7 +45,6 @@ RUN pnpm --filter ./apps/notifications-service run build
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
 
 # Remove dependência dos types e instala apenas produção
 RUN sed -i '/"@taskmanagerjungle\\/types"/d' apps/notifications-service/package.json \
