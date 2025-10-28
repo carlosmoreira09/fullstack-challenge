@@ -46,18 +46,14 @@ RUN pnpm --filter ./apps/notifications-service run build
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
 
 # Copia dist e package.json
 COPY --from=build /app/apps/notifications-service/dist ./dist
 COPY --from=build /app/apps/notifications-service/package.json ./package.json
 
-# Copia tipos buildados
-COPY --from=build /app/packages/types ./packages/types
-
-# Substitui workspace: por file: e instala
-RUN sed -i 's|"@taskmanagerjungle/types": "workspace:\*"|"@taskmanagerjungle/types": "file:./packages/types"|g' package.json && \
-    pnpm install --prod
+# Copia node_modules do build (já tem tudo instalado)
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages ./packages
 
 EXPOSE 3004
 CMD ["node", "dist/main.js"]
