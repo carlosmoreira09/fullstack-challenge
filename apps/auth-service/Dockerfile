@@ -47,13 +47,13 @@ FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production NODE_PATH=/app/node_modules
 
-# Copia dist e package.json
-COPY --from=build ../auth-service/dist ./dist
-COPY --from=build ../auth-service/package.json ./package.json
+# Copia dist e package.json do serviço
+COPY --from=build /app/apps/auth-service/dist ./dist
+COPY --from=build /app/apps/auth-service/package.json ./package.json
 
-# Copia node_modules da raiz (workspace) e packages
-COPY --from=build /app/auth-service ./node_modules
-COPY --from=build /app/auth-service/node_modules/@taskmanagerjungle/types ./node_modules/@taskmanagerjungle/types
+# Copia node_modules da raiz (workspace) e packages compartilhados
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages ./packages
 
 EXPOSE 3002
 CMD ["node", "dist/main.js"]
