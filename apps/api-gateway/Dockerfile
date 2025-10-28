@@ -39,6 +39,7 @@ RUN pnpm --filter ./apps/api-gateway run build
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
+RUN npm install -g pnpm@10.18.3
 
 # Copia dist e package.json
 COPY --from=build /app/apps/api-gateway/dist ./dist
