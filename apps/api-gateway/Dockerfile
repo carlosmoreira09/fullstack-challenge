@@ -13,7 +13,6 @@ FROM base AS deps
 COPY package.json pnpm-lock.yaml* ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/eslint-config/package.json ./packages/eslint-config/
-COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY apps/api-gateway/package.json ./apps/api-gateway/
 
 RUN pnpm install --frozen-lockfile

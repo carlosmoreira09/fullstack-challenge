@@ -12,9 +12,7 @@ RUN npm install -g pnpm
 FROM base AS deps
 COPY package.json pnpm-lock.yaml* ./
 COPY packages/types/package.json ./packages/types/
-COPY packages/exceptions/package.json ./packages/exceptions/
 COPY packages/eslint-config/package.json ./packages/eslint-config/
-COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY apps/tasks-service/package.json ./apps/tasks-service/
 RUN pnpm install --frozen-lockfile
 
@@ -26,7 +24,6 @@ COPY . .
 
 # Build shared packages first
 RUN pnpm build --filter=@task-management/types
-RUN pnpm build --filter=@task-management/exceptions
 
 # Build the Tasks Service
 RUN pnpm build --filter=tasks-service

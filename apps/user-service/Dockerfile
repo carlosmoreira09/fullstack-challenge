@@ -12,9 +12,7 @@ RUN npm install -g pnpm
 FROM base AS deps
 COPY package.json pnpm-lock.yaml* ./
 COPY packages/types/package.json ./packages/types/
-COPY packages/exceptions/package.json ./packages/exceptions/
 COPY packages/eslint-config/package.json ./packages/eslint-config/
-COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY apps/user-service/package.json ./apps/user-service/
 
 RUN pnpm install --frozen-lockfile
