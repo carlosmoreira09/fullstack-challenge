@@ -33,6 +33,12 @@ importers:
       '@types/node':
         specifier: ^24.7.2
         version: 24.7.2
+      ajv:
+        specifier: ^8.17.1
+        version: 8.17.1
+      ajv-formats:
+        specifier: ^3.0.1
+        version: 3.0.1(ajv@8.17.1)
       eslint:
         specifier: ^9.37.0
         version: 9.37.0(jiti@2.6.1)
