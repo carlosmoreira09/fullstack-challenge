@@ -50,11 +50,12 @@ RUN npm install -g pnpm@10.18.3
 
 # Copia apenas runtime necessário
 COPY --from=build /app/apps/notifications-service/dist ./dist
-COPY --from=build /app/apps/notifications-service/package.json ./
-COPY --from=build /app/pnpm-lock.yaml ./
+COPY --from=build /app/apps/notifications-service/package.json ./package.json
+COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=build /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 # Instala apenas dependências de produção
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+RUN pnpm install --prod --no-frozen-lockfile --ignore-scripts
 
 EXPOSE 3004
 CMD ["node", "dist/main.js"]
