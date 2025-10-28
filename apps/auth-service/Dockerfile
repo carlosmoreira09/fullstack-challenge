@@ -56,9 +56,11 @@ COPY --from=build /app/apps/auth-service/package.json ./apps/auth-service/
 # Instala apenas dependências de produção
 RUN pnpm install --prod --frozen-lockfile
 
-# Copia o dist compilado
-COPY --from=build /app/apps/auth-service/dist ./apps/auth-service/dist
-
+# Muda para o diretório do serviço
 WORKDIR /app/apps/auth-service
+
+# Copia o dist compilado para o diretório atual
+COPY --from=build /app/apps/auth-service/dist ./dist
+
 EXPOSE 3002
 CMD ["node", "dist/main.js"]

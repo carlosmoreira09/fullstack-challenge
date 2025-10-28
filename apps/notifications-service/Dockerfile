@@ -56,9 +56,11 @@ COPY --from=build /app/apps/notifications-service/package.json ./apps/notificati
 # Instala apenas dependências de produção
 RUN pnpm install --prod --frozen-lockfile
 
-# Copia o dist compilado
-COPY --from=build /app/apps/notifications-service/dist ./apps/notifications-service/dist
-
+# Muda para o diretório do serviço
 WORKDIR /app/apps/notifications-service
+
+# Copia o dist compilado para o diretório atual
+COPY --from=build /app/apps/notifications-service/dist ./dist
+
 EXPOSE 3004
 CMD ["node", "dist/main.js"]

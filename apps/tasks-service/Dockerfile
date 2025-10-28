@@ -56,9 +56,11 @@ COPY --from=build /app/apps/tasks-service/package.json ./apps/tasks-service/
 # Instala apenas dependências de produção
 RUN pnpm install --prod --frozen-lockfile
 
-# Copia o dist compilado
-COPY --from=build /app/apps/tasks-service/dist ./apps/tasks-service/dist
-
+# Muda para o diretório do serviço
 WORKDIR /app/apps/tasks-service
+
+# Copia o dist compilado para o diretório atual
+COPY --from=build /app/apps/tasks-service/dist ./dist
+
 EXPOSE 3003
 CMD ["node", "dist/main.js"]

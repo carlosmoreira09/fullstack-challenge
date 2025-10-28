@@ -57,9 +57,11 @@ COPY --from=build /app/apps/user-service/package.json ./apps/user-service/
 # Instala apenas dependências de produção
 RUN pnpm install --prod --frozen-lockfile
 
-# Copia o dist compilado
-COPY --from=build /app/apps/user-service/dist ./apps/user-service/dist
-
+# Muda para o diretório do serviço
 WORKDIR /app/apps/user-service
+
+# Copia o dist compilado para o diretório atual
+COPY --from=build /app/apps/user-service/dist ./dist
+
 EXPOSE 3005
 CMD ["node", "dist/main.js"]

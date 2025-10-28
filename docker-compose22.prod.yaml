@@ -1,0 +1,219 @@
+services:
+  # Web Frontend (Production)
+  web:
+    container_name: fullstack-challenge-prod-web
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      target: production
+    ports:
+      - '80:80'
+    networks:
+      - challenge-network-prod
+    restart: unless-stopped
+
+  # API Gateway (Production)
+  api-gateway:
+    container_name: fullstack-challenge-prod-api-gateway
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+      target: production
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - AUTH_SERVICE_URL=tcp://auth-service:3002
+      - TASKS_SERVICE_URL=tcp://tasks-service:3004
+      - NOTIFS_SERVICE_URL=tcp://notifications-service:3003
+      - USER_SERVICE_URL=tcp://user-service:3005
+      - JWT_SECRET=${JWT_SECRET:-supersecret}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-superrefresh}
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      tasks-service:
+        condition: service_started
+      notifications-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+    networks:
+      - challenge-network-prod
+    restart: unless-stopped
+
+  # Auth Service (Production)
+  auth-service:
+    container_name: fullstack-challenge-prod-auth-service
+    build:
+      context: .
+      dockerfile: ./apps/auth-service/Dockerfile
+      target: production
+    ports:
+      - '3002:3002'
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - JWT_SECRET=${JWT_SECRET:-supersecret}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-superrefresh}
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - challenge-network-prod
+    restart: unless-stopped
+
+  # Tasks Service (Production)
+  tasks-service:
+    container_name: fullstack-challenge-prod-tasks-service
+    build:
+      context: .
+      dockerfile: ./apps/tasks-service/Dockerfile
+      target: production
+    ports:
+      - '3004:3004'
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - MICROSERVICE_PORT=3004
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - challenge-network-prod
+    restart: unless-stopped
+
+  # Notifications Service (Production)
+  notifications-service:
+    container_name: fullstack-challenge-prod-notifications-service
+    build:
+      context: .
+      dockerfile: ./apps/notifications-service/Dockerfile
+      target: production
+    ports:
+      - '3003:3003'
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - MICROSERVICE_PORT=3003
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - WS_PORT=3003
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - challenge-network-prod
+    restart: unless-stopped
+
+  # User Service (Production)
+  user-service:
+    container_name: fullstack-challenge-prod-user-service
+    build:
+      context: .
+      dockerfile: ./apps/user-service/Dockerfile
+      target: production
+    ports:
+      - '3005:3005'
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - DATABASE_URL=postgres://admin:admin@db:5432/task-manager-jungle
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=task-manager-jungle
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - challenge-network-prod
+    restart: unless-stopped
+
+  # Postgres Database
+  db:
+    image: postgres:17.5-alpine3.21
+    container_name: fullstack-challenge-prod-db
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: task-manager-jungle
+    networks:
+      - challenge-network-prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d task-manager-jungle"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: fullstack-challenge-prod-rabbitmq
+    restart: unless-stopped
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data_prod:/var/lib/rabbitmq
+    networks:
+      - challenge-network-prod
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data_prod:
+    driver: local
+  rabbitmq_data_prod:
+    driver: local
+
+networks:
+  challenge-network-prod:
+    driver: bridge

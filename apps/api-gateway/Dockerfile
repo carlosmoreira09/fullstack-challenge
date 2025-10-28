@@ -49,9 +49,11 @@ COPY --from=build /app/apps/api-gateway/package.json ./apps/api-gateway/
 # Instala apenas dependências de produção
 RUN pnpm install --prod --frozen-lockfile
 
-# Copia o dist compilado
-COPY --from=build /app/apps/api-gateway/dist ./apps/api-gateway/dist
-
+# Muda para o diretório do serviço
 WORKDIR /app/apps/api-gateway
+
+# Copia o dist compilado para o diretório atual
+COPY --from=build /app/apps/api-gateway/dist ./dist
+
 EXPOSE 4000
 CMD ["node", "dist/main.js"]
