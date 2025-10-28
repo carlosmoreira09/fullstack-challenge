@@ -39,15 +39,16 @@ RUN pnpm --filter ./apps/api-gateway run build
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
 
-# Copia apenas runtime necessário
+# Copia dist e package.json
 COPY --from=build /app/apps/api-gateway/dist ./dist
 COPY --from=build /app/apps/api-gateway/package.json ./package.json
-COPY --from=build /app/node_modules ./node_modules
 
-# Copia dependências já instaladas do build stage
-COPY --from=build /app/apps/api-gateway/node_modules ./node_modules
+# Copia tipos buildados
+COPY --from=build /app/packages/types ./node_modules/@taskmanagerjungle/types
+
+# Instala apenas dependências de produção (sem workspace deps)
+RUN npm install --omit=dev --ignore-scripts
 
 EXPOSE 4000
 CMD ["node", "dist/main.js"]
