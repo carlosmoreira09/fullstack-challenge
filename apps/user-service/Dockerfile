@@ -52,11 +52,10 @@ RUN npm install -g pnpm@10.18.3
 # Copia apenas runtime necessário
 COPY --from=build /app/apps/user-service/dist ./dist
 COPY --from=build /app/apps/user-service/package.json ./package.json
-COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=build /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=build /app/node_modules ./node_modules
 
-# Instala apenas dependências de produção
-RUN pnpm install --prod --no-frozen-lockfile --ignore-scripts
+# Copia dependências já instaladas do build stage
+COPY --from=build /app/apps/user-service/node_modules ./node_modules
 
 EXPOSE 3005
 CMD ["node", "dist/main.js"]
