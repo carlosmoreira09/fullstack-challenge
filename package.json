@@ -1,5 +1,5 @@
 {
-  "name": "TaskManagerJungle",
+  "name": "task-manager-jungle",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -20,6 +20,8 @@
   "packageManager": "pnpm@10.18.3",
   "devDependencies": {
     "@nestjs/cli": "^11.0.10",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "@types/node": "^24.7.2",
     "eslint": "^9.37.0",
     "prettier": "^3.6.2",
