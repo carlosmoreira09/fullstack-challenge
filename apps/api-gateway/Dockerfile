@@ -28,8 +28,9 @@ FROM deps AS build
 COPY packages ./packages
 COPY apps ./apps
 
-# 1) build do pacote de tipos (e o que ele depender)
-RUN pnpm -w --filter @taskmanagerjungle/types... build
+# build ONLY the types package, no dependents
+RUN pnpm -w --filter @taskmanagerjungle/types build
+
 
 # 2) build do próprio gateway
 RUN pnpm --filter ./apps/api-gateway build
