@@ -51,7 +51,8 @@ RUN npm install -g pnpm@10.18.3
 
 # Copia apenas runtime necessário
 COPY --from=build /app/apps/user-service/dist ./dist
-COPY apps/user-service/package.json ./
+COPY --from=build /app/apps/user-service/package.json ./
+COPY --from=build /app/pnpm-lock.yaml ./
 
 # Instala apenas dependências de produção
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
