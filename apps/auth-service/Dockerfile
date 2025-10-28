@@ -56,7 +56,7 @@ ENV NODE_ENV=production
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/auth-service/node_modules ./node_modules
 COPY --from=build /app/packages/types ./packages/types
 COPY --from=build /app/apps/auth-service/package.json ./apps/auth-service/package.json
 
