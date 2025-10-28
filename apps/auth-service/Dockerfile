@@ -59,7 +59,6 @@ COPY --from=build /app/packages/types/dist ./node_modules/@taskmanagerjungle/typ
 # Copia manifests do workspace para instalar dependências
 COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 COPY --from=build /app/packages ./packages
-COPY --from=build /app/apps/auth-service/package.json ./apps/auth-service/
 
 # Instala apenas dependências de produção
 RUN pnpm install --prod --frozen-lockfile
