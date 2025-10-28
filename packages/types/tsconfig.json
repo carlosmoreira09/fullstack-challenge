@@ -1,22 +1,24 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
-    "resolvePackageJsonExports": true,
-    "esModuleInterop": true,
+    "module": "commonjs",
     "declaration": true,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2020",
+    "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    "baseUrl": "./",
+    "incremental": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": false
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
   },
   "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

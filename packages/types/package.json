@@ -1,44 +1,21 @@
 {
   "name": "@taskmanagerjungle/types",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Shared DTOs and type definitions for TaskManagerJungle services",
+  "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./frontend": {
-      "types": "./dist/frontend/index.d.ts",
-      "default": "./dist/frontend/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "src"
-  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "lint": "eslint . --max-warnings 0",
-    "lint:fix": "eslint . --fix"
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
   },
-  "keywords": [
-    "dto",
-    "types",
-    "nestjs"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@nestjs/swagger": "^11.2.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2"
   },
   "devDependencies": {
-    "@taskmanagerjungle/eslint-config": "workspace:*",
-    "typescript-eslint": "^8.20.0"
-  },
-  "packageManager": "pnpm@10.18.3"
+    "typescript": "^5.2.2"
+  }
 }

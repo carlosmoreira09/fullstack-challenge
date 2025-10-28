@@ -6,15 +6,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install pnpm globally
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.18.3
 
 # Dependencies stage
 FROM base AS deps
 COPY package.json pnpm-lock.yaml* ./
-COPY packages/types/package.json ./packages/types/
-COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY pnpm-workspace.yaml turbo.json ./
+COPY packages ./packages
 COPY apps/user-service/package.json ./apps/user-service/
-
 RUN pnpm install --frozen-lockfile
 
 # Build stage
