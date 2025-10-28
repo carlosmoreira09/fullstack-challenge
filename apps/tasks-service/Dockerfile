@@ -23,7 +23,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build shared packages first
-RUN pnpm build --filter=@task-management/types
+RUN pnpm build --filter=@taskmanagerjungle/types
 
 # Build the Tasks Service
 RUN pnpm build --filter=tasks-service
