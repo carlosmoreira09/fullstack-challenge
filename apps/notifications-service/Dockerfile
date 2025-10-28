@@ -46,6 +46,7 @@ RUN pnpm --filter ./apps/notifications-service run build
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
+RUN npm install -g pnpm@10.18.3
 
 # Copia apenas runtime necessário
 COPY --from=build /app/apps/notifications-service/dist ./dist
