@@ -35,9 +35,6 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
 # 2) Build the API Gateway
 RUN pnpm --filter ./apps/api-gateway run build
 
-# 3) Produce slim runtime for the gateway only
-RUN pnpm --filter api-gateway deploy --prod /out
-
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app
