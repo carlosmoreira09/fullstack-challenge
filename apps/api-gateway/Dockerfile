@@ -36,7 +36,7 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
 RUN pnpm --filter ./apps/api-gateway run build
 
 # 3) Produce slim runtime for the gateway only
-RUN pnpm -w --filter ./apps/api-gateway deploy --prod /out
+RUN pnpm --filter api-gateway deploy --prod /out
 
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
