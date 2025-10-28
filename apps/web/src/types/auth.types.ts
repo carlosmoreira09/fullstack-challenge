@@ -27,10 +27,3 @@ export interface DecodedToken {
   iat?: number
   exp: number
 }
-
-export interface IAuthContext {
-  login: (data: LoginDTO) => Promise<AuthResponse | null>
-  logout: () => void
-  decoded: DecodedToken | null
-  userId: string | null
-}

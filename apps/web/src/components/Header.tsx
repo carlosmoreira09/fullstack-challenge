@@ -35,7 +35,7 @@ export default function Header() {
               <NavigationMenuLink asChild>
                 <Link
                   to="/usuarios"
-                  className="flex hover:bg-gray-800 hover:text-white p-2 rounded-2xl block"
+                  className="flex hover:bg-gray-800 hover:text-white p-2 rounded-2xl"
                 >
                   <Users size={18} className="mr-2" /> Usuários
                 </Link>

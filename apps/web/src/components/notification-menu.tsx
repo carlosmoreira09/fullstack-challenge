@@ -34,7 +34,7 @@ const formatNotificationDate = (dateString: string): string => {
 }
 
 interface NotificationMenuProps {
-  userId: string
+  userId: string | null
 }
 
 function Dot({ className }: { className?: string }) {
