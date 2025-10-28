@@ -36,9 +36,6 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
 WORKDIR /app/apps/auth-service
 RUN pnpm run build
 
-# Retorna para a raiz e remove devDependencies, mantendo apenas o necessário para produção
-WORKDIR /app
-RUN pnpm prune --prod
 
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
