@@ -1,45 +1,52 @@
 # syntax=docker/dockerfile:1.7
+
+# ---------- base ----------
 FROM node:22.12-alpine AS base
 WORKDIR /app
+ENV CI=true HUSKY=0 NODE_ENV=production NODE_OPTIONS=--max-old-space-size=512
+# use corepack (recomendado) ou pnpm global; deixei pnpm global como você já usava
 RUN npm install -g pnpm@10.18.3
 
-# --- dependencies workspace ---
+# ---------- deps (instala dependências do workspace com cache) ----------
 FROM base AS deps
-# Copia manifestos do monorepo
+# Manifests do workspace (melhor cache)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-# Copia apenas manifests dos pacotes para resolver dependências corretamente
+# Manifests dos pacotes/apps (apenas package.json para cache fino)
 COPY packages ./packages
 COPY apps/api-gateway/package.json ./apps/api-gateway/
 COPY apps/auth-service/package.json ./apps/auth-service/
 COPY apps/tasks-service/package.json ./apps/tasks-service/
 COPY apps/notifications-service/package.json ./apps/notifications-service/
 COPY apps/web/package.json ./apps/web/
-# Instala deps de todo o workspace (eficiente com pnpm)
-RUN pnpm install --frozen-lockfile
 
-# --- development (hot-reload) ---
-FROM deps AS development
-# Copia o código da app
-COPY apps/api-gateway ./apps/api-gateway
-WORKDIR /app/apps/api-gateway
-EXPOSE 3001
-# O compose normalmente define o comando, mas deixamos um default:
-CMD ["pnpm","run","dev"]
+# Instala dependências do monorepo (sem opcional, determinístico)
+RUN pnpm install --frozen-lockfile --prefer-offline --no-optional
 
-# --- build de produção ---
+# ---------- build ----------
 FROM deps AS build
-COPY apps/api-gateway ./apps/api-gateway
-WORKDIR /app/apps/api-gateway
-RUN pnpm run build
+# Agora precisamos do CÓDIGO completo para compilar tipos + gateway
+COPY packages ./packages
+COPY apps ./apps
 
-# --- produção enxuta ---
+# 1) build do pacote de tipos (e o que ele depender)
+RUN pnpm -w --filter @taskmanagerjungle/types... build
+
+# 2) build do próprio gateway
+RUN pnpm --filter ./apps/api-gateway build
+
+# 3) preparar artefatos de runtime enxutos (node_modules só do gateway + dist)
+#    pnpm deploy cria uma pasta pronta para produção
+RUN pnpm -w --filter ./apps/api-gateway deploy --prod /out
+
+# ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
-# Copia apenas runtime
-COPY --from=build /app/apps/api-gateway/dist ./dist
-COPY apps/api-gateway/package.json ./
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
-EXPOSE 3001
-CMD ["node","dist/main.js"]
+
+# Copia o bundle pronto do deploy (contém package.json, node_modules e dist do gateway)
+COPY --from=build /out/ .
+
+# Porta do API Gateway (alinha com seu compose)
+EXPOSE 4000
+
+CMD ["node", "dist/main.js"]
