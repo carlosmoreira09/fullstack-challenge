@@ -45,16 +45,15 @@ RUN pnpm --filter ./apps/auth-service run build
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app
-ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
+ENV NODE_ENV=production NODE_PATH=/app/node_modules
 
 # Copia dist e package.json
 COPY --from=build /app/apps/auth-service/dist ./dist
 COPY --from=build /app/apps/auth-service/package.json ./package.json
 
-# Copia node_modules do build (já tem tudo instalado)
+# Copia node_modules da raiz (workspace) e packages
 COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages ./packages
-RUN pnpm install
+COPY --from=build /app/packages/types ./node_modules/@taskmanagerjungle/types
+
 EXPOSE 3002
 CMD ["node", "dist/main.js"]

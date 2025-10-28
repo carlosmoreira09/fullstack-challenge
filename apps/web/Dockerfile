@@ -24,9 +24,7 @@ CMD ["pnpm","run","dev","--","--host","0.0.0.0","--port","3000"]
 ########## BUILD PROD ##########
 FROM development AS build
 WORKDIR /app/apps/web
-RUN npm install -g pnpm@10.18.3
 RUN pnpm run build
-RUN pnpm install --prod
 
 ########## PROD (Caddy) ##########
 FROM caddy:2-alpine AS production

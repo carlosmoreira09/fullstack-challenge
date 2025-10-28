@@ -38,13 +38,15 @@ RUN pnpm --filter ./apps/api-gateway run build
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app
-ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
+ENV NODE_ENV=production NODE_PATH=/app/node_modules
 
 # Copia dist e package.json
 COPY --from=build /app/apps/api-gateway/dist ./dist
 COPY --from=build /app/apps/api-gateway/package.json ./package.json
 
-RUN pnpm install
+# Copia node_modules da raiz (workspace) e packages
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages/types ./node_modules/@taskmanagerjungle/types
+
 EXPOSE 4000
 CMD ["node", "dist/main.js"]
