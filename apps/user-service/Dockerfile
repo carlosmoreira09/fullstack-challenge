@@ -41,7 +41,8 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
   || pnpm exec tsc -p packages/types/tsconfig.json
 
 # 2) Build do User Service
-RUN pnpm --filter ./apps/user-service run build
+WORKDIR /app/apps/user-service
+RUN pnpm run build
 
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
