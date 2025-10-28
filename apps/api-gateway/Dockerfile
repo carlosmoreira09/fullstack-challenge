@@ -44,9 +44,6 @@ ENV NODE_ENV=production
 COPY --from=build /app/apps/api-gateway/dist ./dist
 COPY --from=build /app/apps/api-gateway/package.json ./package.json
 
-# Copia node_modules do build (já tem tudo instalado)
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages ./packages
-
+RUN pnpm install
 EXPOSE 4000
 CMD ["node", "dist/main.js"]

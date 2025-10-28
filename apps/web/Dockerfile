@@ -30,7 +30,7 @@ RUN pnpm run build
 FROM caddy:2-alpine AS production
 # Copia build do Vite
 COPY --from=build /app/apps/web/dist /srv
-
+RUN pnpm install --prod
 EXPOSE 80
 EXPOSE 443
 CMD ["caddy", "file-server", "--root", "/srv", "--listen", ":80"]

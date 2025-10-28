@@ -55,6 +55,6 @@ COPY --from=build /app/apps/user-service/package.json ./package.json
 # Copia node_modules do build (já tem tudo instalado)
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
-
+RUN pnpm install --prod
 EXPOSE 3005
 CMD ["node", "dist/main.js"]
