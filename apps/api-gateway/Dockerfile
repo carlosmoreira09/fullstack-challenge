@@ -39,7 +39,9 @@ RUN pnpm --filter ./apps/api-gateway run build
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
-# Copy minimal runtime produced above
-COPY --from=build /out/ .
-EXPOSE 4000
-CMD ["node", "dist/main.js"]
+RUN npm install -g pnpm@10.18.3
+COPY --from=build /app/apps/api-gateway/dist ./dist
+COPY apps/api-gateway/package.json ./
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+EXPOSE 3002
+CMD ["node","dist/main.js"]
