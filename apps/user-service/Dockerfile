@@ -49,12 +49,12 @@ WORKDIR /app
 ENV NODE_ENV=production NODE_PATH=/app/node_modules
 
 # Copia dist e package.json
-COPY --from=build /app/apps/user-service/dist ./dist
-COPY --from=build /app/apps/user-service/package.json ./package.json
+COPY --from=build ../user-service/dist ./dist
+COPY --from=build ../user-service/package.json ./package.json
 
 # Copia node_modules da raiz (workspace) e packages
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages/types ./node_modules/@taskmanagerjungle/types
+COPY --from=build /app/user-service ./node_modules
+COPY --from=build /app/user-service/node_modules/@taskmanagerjungle/types ./node_modules/@taskmanagerjungle/types
 
 EXPOSE 3005
 CMD ["node", "dist/main.js"]
