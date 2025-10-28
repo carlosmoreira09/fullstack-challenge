@@ -36,10 +36,6 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
 WORKDIR /app/apps/api-gateway
 RUN pnpm run build
 
-# Retorna à raiz e remove devDependencies
-WORKDIR /app
-RUN pnpm prune --prod
-
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app

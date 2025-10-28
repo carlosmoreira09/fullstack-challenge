@@ -22,13 +22,6 @@ COPY apps/web/package.json ./apps/web/
 # Instala com devDependencies (necessário pro build do Nest)
 RUN pnpm install --no-frozen-lockfile --prefer-offline --no-optional --prod=false
 
-# ---------- development ----------
-FROM deps AS development
-COPY apps/auth-service ./apps/auth-service
-WORKDIR /app/apps/auth-service
-EXPOSE 3002
-CMD ["pnpm","run","dev"]
-
 # ---------- build ----------
 FROM deps AS build
 # Copia código completo
@@ -42,10 +35,6 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
 # 2) Build do Auth Service
 WORKDIR /app/apps/auth-service
 RUN pnpm run build
-
-# Retorna para a raiz e remove devDependencies, mantendo apenas o necessário para produção
-WORKDIR /app
-RUN pnpm prune --prod
 
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
