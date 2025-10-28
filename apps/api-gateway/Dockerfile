@@ -28,12 +28,11 @@ FROM deps AS build
 COPY packages ./packages
 COPY apps ./apps
 
-# build ONLY the types package, no dependents
-RUN pnpm -w --filter @taskmanagerjungle/types build
-
+# build ONLY the types package (no root, no turbo)
+RUN pnpm --filter @taskmanagerjungle/types run build
 
 # 2) build do próprio gateway
-RUN pnpm --filter ./apps/api-gateway build
+RUN pnpm --filter ./apps/api-gateway run build
 
 # 3) preparar artefatos de runtime enxutos (node_modules só do gateway + dist)
 #    pnpm deploy cria uma pasta pronta para produção
