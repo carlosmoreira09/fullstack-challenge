@@ -1,6 +1,4 @@
 # syntax=docker/dockerfile:1.7
-
-# ---------- base ----------
 FROM node:22.12-alpine AS base
 WORKDIR /app
 # Flags para CI
@@ -18,6 +16,7 @@ COPY apps/auth-service/package.json ./apps/auth-service/
 COPY apps/tasks-service/package.json ./apps/tasks-service/
 COPY apps/notifications-service/package.json ./apps/notifications-service/
 COPY apps/web/package.json ./apps/web/
+RUN npm install -g pnpm@10.18.3
 
 # Instala com devDependencies (necessário pro build do Nest)
 RUN pnpm install --no-frozen-lockfile --prefer-offline --no-optional --prod=false
@@ -34,35 +33,39 @@ FROM deps AS build
 # Copia código completo
 COPY packages ./packages
 COPY apps ./apps
+RUN npm install -g pnpm@10.18.3
 
 # 1) Build dos tipos (sem turbo)
 RUN pnpm --filter @taskmanagerjungle/types run build \
   || pnpm exec tsc -p packages/types/tsconfig.json
 
 # 2) Build do Tasks Service
-WORKDIR /app/apps/tasks-service
-RUN pnpm run build
-
-# Retorna para a raiz e remove devDependencies
-WORKDIR /app
-RUN pnpm prune --prod
+RUN pnpm --filter ./apps/tasks-service run build
 
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
+RUN npm install -g pnpm@10.18.3
 
-# Copia dependências podadas e artefatos necessários
-COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
-COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages/types ./packages/types
-COPY --from=build /app/apps/tasks-service/package.json ./apps/tasks-service/package.json
+# Remove dependência dos types e instala apenas produção
+RUN sed -i '/"@taskmanagerjungle\\/types"/d' apps/tasks-service/package.json \
+  && pnpm install --prod --prefer-offline --no-optional --no-frozen-lockfile --filter ./apps/tasks-service...
+
+# Reintroduz pacote de types gerado no build
+RUN mkdir -p node_modules/@taskmanagerjungle/types
+COPY --from=build /app/packages/types/package.json ./node_modules/@taskmanagerjungle/types/package.json
+COPY --from=build /app/packages/types/dist ./node_modules/@taskmanagerjungle/types/dist
+
+# Copia manifests do workspace para instalar dependências
+COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=build /app/packages ./packages
+COPY --from=build /app/apps/tasks-service/package.json ./apps/tasks-service/
+
+# Instala apenas dependências de produção
+RUN pnpm install --prod --frozen-lockfile
 
 # Copia o dist compilado para o diretório atual
-WORKDIR /app/apps/tasks-service
 COPY --from=build /app/apps/tasks-service/dist ./dist
-
 EXPOSE 3003
 CMD ["node", "dist/main.js"]
