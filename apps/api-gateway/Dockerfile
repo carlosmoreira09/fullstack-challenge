@@ -48,7 +48,7 @@ COPY --from=build /app/apps/api-gateway/package.json ./package.json
 COPY --from=build /app/packages/types ./node_modules/@taskmanagerjungle/types
 
 # Instala apenas dependências de produção (sem workspace deps)
-RUN npm install --omit=dev --ignore-scripts
+RUN npm install
 
 EXPOSE 4000
 CMD ["node", "dist/main.js"]

@@ -26,13 +26,11 @@ FROM development AS build
 WORKDIR /app/apps/web
 RUN pnpm run build
 
-########## PROD (Nginx) ##########
-FROM nginx:alpine AS production
-# Remove default nginx page
-RUN rm -rf /usr/share/nginx/html/*
+########## PROD (Caddy) ##########
+FROM caddy:2-alpine AS production
 # Copia build do Vite
-COPY --from=build /app/apps/web/dist /usr/share/nginx/html
-# Config básico de nginx (opcional)
-# COPY app/web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/apps/web/dist /srv
+
 EXPOSE 80
-CMD ["nginx","-g","daemon off;"]
+EXPOSE 443
+CMD ["caddy", "file-server", "--root", "/srv", "--listen", ":80"]

@@ -55,7 +55,7 @@ COPY --from=build /app/apps/auth-service/package.json ./package.json
 COPY --from=build /app/packages/types ./node_modules/@taskmanagerjungle/types
 
 # Instala apenas dependências de produção (sem workspace deps)
-RUN npm install --omit=dev --ignore-scripts
+RUN npm install
 
 EXPOSE 3002
 CMD ["node", "dist/main.js"]
