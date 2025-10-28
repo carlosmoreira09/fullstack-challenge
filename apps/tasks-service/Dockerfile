@@ -46,16 +46,18 @@ RUN pnpm --filter ./apps/tasks-service run build
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
+RUN npm install -g pnpm@10.18.3
 
 # Copia dist e package.json
 COPY --from=build /app/apps/tasks-service/dist ./dist
 COPY --from=build /app/apps/tasks-service/package.json ./package.json
 
 # Copia tipos buildados
-COPY --from=build /app/packages/types ./node_modules/@taskmanagerjungle/types
+COPY --from=build /app/packages/types ./packages/types
 
-# Instala apenas dependências de produção (sem workspace deps)
-RUN npm install
+# Substitui workspace: por file: e instala
+RUN sed -i 's|"@taskmanagerjungle/types": "workspace:\*"|"@taskmanagerjungle/types": "file:./packages/types"|g' package.json && \
+    pnpm install --prod
 
 EXPOSE 3003
 CMD ["node", "dist/main.js"]
