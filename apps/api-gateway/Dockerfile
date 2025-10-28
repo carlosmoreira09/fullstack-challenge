@@ -42,6 +42,7 @@ RUN npm install -g pnpm@10.18.3
 # Copia manifests do workspace para instalar dependências
 COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 COPY --from=build /app/apps/api-gateway/package.json ./apps/api-gateway/
+COPY --from=build /app/packages ./packages
 
 # Remove dependência dos types e instala apenas produção
 RUN sed -i '/"@taskmanagerjungle\/types"/d' apps/api-gateway/package.json
