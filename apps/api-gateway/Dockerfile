@@ -36,24 +36,25 @@ RUN pnpm --filter @taskmanagerjungle/types run build \
 WORKDIR /app/apps/api-gateway
 RUN pnpm run build
 
+# Retorna à raiz e remove devDependencies
+WORKDIR /app
+RUN pnpm prune --prod
+
 # ---------- runtime ----------
 FROM node:22.12-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
-RUN npm install -g pnpm@10.18.3
 
-# Copia manifests do workspace para instalar dependências
-COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build /app/packages ./packages
-COPY --from=build /app/apps/api-gateway/package.json ./apps/api-gateway/
-
-# Instala apenas dependências de produção
-RUN pnpm install --prod --frozen-lockfile
-
-# Muda para o diretório do serviço
-WORKDIR /app/apps/api-gateway
+# Copia dependências já podadas e artefatos necessários
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages/types ./packages/types
+COPY --from=build /app/apps/api-gateway/package.json ./apps/api-gateway/package.json
 
 # Copia o dist compilado para o diretório atual
+WORKDIR /app/apps/api-gateway
 COPY --from=build /app/apps/api-gateway/dist ./dist
 
 EXPOSE 4000
